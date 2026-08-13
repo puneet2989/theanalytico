@@ -1,5 +1,6 @@
-# Force the canonical host. Replace the domain before launch.
-https://www.theanalytico.com/*  https://theanalytico.com/:splat  301
+# The canonical-host redirect is NOT here. Workers static assets only support
+# relative destinations, so an absolute cross-host rule is parsed and skipped
+# with a warning. www -> apex is handled at the top of worker.js instead.
 
 # Strip .html extensions
 /index.html      /            301

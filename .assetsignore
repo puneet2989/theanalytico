@@ -1,0 +1,34 @@
+# Files in the repository that must NOT be served as public static assets.
+# Uses .gitignore syntax. The worker script and anything it imports are still
+# bundled as code — excluding them here only stops them being fetchable URLs.
+
+worker.js
+wrangler.toml
+.assetsignore
+.gitignore
+.dev.vars.example
+
+# Server-side code
+functions/
+
+# Internal build documentation and tooling
+docs/
+.claude/
+CLAUDE.md
+AGENTS.md
+PLACEHOLDER-CONTENT.md
+README.md
+
+# Source material for the recorded service-card clips, not part of the site
+mocks/
+
+# Client-supplied reference recordings, if they are ever un-ignored in git
+examples/
+
+# Node
+node_modules/
+package.json
+package-lock.json
+
+# Version control internals — never serve these
+.git/

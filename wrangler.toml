@@ -1,7 +1,49 @@
-name = "theanalytico"
-compatibility_date = "2026-08-13"
-pages_build_output_dir = "."
+# Cloudflare Worker with static assets.
+#
+# Deployed by Workers Builds from the repository. The dev branch deploys the
+# dev environment; production deploys the top-level config.
+#   dev  : npx wrangler deploy --env dev   -> theanalytico-dev
+#   prod : npx wrangler deploy             -> theanalytico
+#
+# `assets` is not an inheritable key, so it is declared for the top level and
+# for each named environment. Omitting it from [env.dev] would deploy a worker
+# with no assets binding at all, and every page request would throw.
 
-[[kv_namespaces]]
-binding = "RATE_LIMIT"
-id = "REPLACE_WITH_KV_NAMESPACE_ID"
+name = "theanalytico"
+main = "worker.js"
+compatibility_date = "2026-08-13"
+
+[assets]
+directory = "."
+binding = "ASSETS"
+# Serves /services from services.html and adds trailing-slash handling, so the
+# clean URLs in _redirects and the nav links resolve without .html suffixes.
+html_handling = "auto-trailing-slash"
+not_found_handling = "404-page"
+
+[observability]
+enabled = true
+
+# --- dev -------------------------------------------------------------------
+[env.dev]
+name = "theanalytico-dev"
+
+[env.dev.assets]
+directory = "."
+binding = "ASSETS"
+html_handling = "auto-trailing-slash"
+not_found_handling = "404-page"
+
+[env.dev.observability]
+enabled = true
+
+# --- notes -----------------------------------------------------------------
+# Secrets are set per environment in the dashboard or with
+# `npx wrangler secret put NAME --env dev`. Never commit them.
+#   TURNSTILE_SECRET_KEY, RESEND_API_KEY, CONTACT_FROM_EMAIL, CONTACT_TO_EMAIL
+#
+# Rate limiting on /api/contact is optional: functions/api/contact.js only uses
+# env.RATE_LIMIT when it is bound. No KV namespace is declared here because none
+# exists yet — the previous config referenced a placeholder id, which failed
+# validation and was one of the reasons deploys never completed. To enable it,
+# create a namespace and add a [[env.dev.kv_namespaces]] block with the real id.
