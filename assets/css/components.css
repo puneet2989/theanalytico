@@ -252,17 +252,31 @@ html[data-drawer-open="true"] {
   transition: background-color var(--dur-fast) var(--ease-out),
     color var(--dur-fast) var(--ease-out),
     border-color var(--dur-fast) var(--ease-out),
-    box-shadow var(--dur-fast) var(--ease-out);
+    box-shadow var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
 }
 
+/* Hover states carry a real colour change, not a near-identical shade. The
+   previous primary hover moved --ink (#1a1a1a) to --ink-black (#0a0a0a), a
+   difference nobody can see. Primary now warms to the brand accent and ghost
+   inverts to solid, so both read as unmistakably interactive.
+   Transitions are neutralised by the prefers-reduced-motion block in base.css. */
 .btn--primary {
   background: var(--ink);
   color: var(--surface);
 }
 
-.btn--primary:hover {
-  background: var(--ink-black);
+.btn--primary:hover,
+.btn--primary:focus-visible {
+  background: var(--accent-strong);
+  color: var(--surface);
   box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.btn--primary:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
 }
 
 .btn--ghost {
@@ -271,8 +285,18 @@ html[data-drawer-open="true"] {
   border-color: var(--line);
 }
 
-.btn--ghost:hover {
+.btn--ghost:hover,
+.btn--ghost:focus-visible {
+  background: var(--ink);
+  color: var(--surface);
   border-color: var(--ink);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.btn--ghost:active {
+  transform: translateY(0);
+  box-shadow: none;
 }
 
 .btn--pill.header__cta {
@@ -853,21 +877,41 @@ html[data-drawer-open="true"] {
   border-radius: var(--radius-lg);
   padding: var(--s-6);
   box-shadow: var(--shadow-sm);
+  /* Grid, not flex: the card has three children (media, quote, citation) and a
+     row-flex would lay them out as three columns. Grid lets the media occupy a
+     single left column spanning both text rows, with no markup change.
+     Mobile-first: one column, portrait above the quote. */
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--s-4) var(--s-6);
+  align-content: start;
+}
+
+@media (min-width: 640px) {
+  .slide {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+  }
+
+  .slide [data-dissolve] {
+    grid-row: 1 / span 2;
+  }
 }
 
 /* Dissolve figure: two stacked frames plus a canvas the JS module lays
    over them for the crossfade. All three occupy the exact same square box
    so swapping between them cannot shift layout. Both images stay visible
    by default — the no-JS path. */
-/* 140px, not 320px: the square figure was the dominant term in a 638px-tall
-   card. The dissolve canvas is sized from this box at runtime, so shrinking it
-   also cuts the per-frame fillRect count roughly fivefold. */
+/* Portrait sits beside the quote, not above it, so the card reads as a row and
+   stays short. flex-shrink is 0 so the image keeps its square regardless of
+   quote length. The dissolve canvas is sized from this box at runtime. */
 [data-dissolve] {
   position: relative;
-  width: 140px;
+  flex: 0 0 auto;
+  inline-size: 168px;
   max-width: 100%;
   aspect-ratio: 1 / 1;
-  margin-block-end: var(--s-4);
+  margin-block-end: 0;
   border-radius: var(--radius-lg);
   overflow: hidden;
 }
