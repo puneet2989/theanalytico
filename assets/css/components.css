@@ -851,7 +851,7 @@ html[data-drawer-open="true"] {
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
-  padding: var(--s-7);
+  padding: var(--s-6);
   box-shadow: var(--shadow-sm);
 }
 
@@ -859,12 +859,15 @@ html[data-drawer-open="true"] {
    over them for the crossfade. All three occupy the exact same square box
    so swapping between them cannot shift layout. Both images stay visible
    by default — the no-JS path. */
+/* 140px, not 320px: the square figure was the dominant term in a 638px-tall
+   card. The dissolve canvas is sized from this box at runtime, so shrinking it
+   also cuts the per-frame fillRect count roughly fivefold. */
 [data-dissolve] {
   position: relative;
-  width: 320px;
+  width: 140px;
   max-width: 100%;
   aspect-ratio: 1 / 1;
-  margin-block-end: var(--s-5);
+  margin-block-end: var(--s-4);
   border-radius: var(--radius-lg);
   overflow: hidden;
 }
@@ -885,7 +888,7 @@ html[data-drawer-open="true"] {
 }
 
 .slide__quote {
-  font-size: var(--fs-h4);
+  font-size: var(--fs-lead);
   line-height: var(--lh-sub);
   color: var(--ink);
 }
