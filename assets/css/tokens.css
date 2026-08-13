@@ -70,14 +70,17 @@
   --surface-60: rgba(255, 255, 255, 0.60);
 
   /* ---- Colour: service card gradients (defect 1) -----------------------
-     Each gradient runs light-to-dark so title/body/link, which sit at the
-     card's bottom edge, land on the dark stop. White text ratios against
-     that dark stop, computed via WCAG relative luminance:
+     Each is a dark base (uniform top-to-bottom, not a light-to-dark ramp)
+     with one bright radial "splash" blob confined to the middle ~45-55%
+     of the card, roughly where the service card's floating video panel
+     sits. The title (top) and body/link (bottom) always land on the dark
+     base, clear of the blob's falloff, so the same white-on-dark contrast
+     ratios apply regardless of where text sits in the card:
      web 14.9:1, seo 12.2:1, paid 16.7:1, ai 16.0:1 — all pass 4.5:1. */
-  --gradient-web:  linear-gradient(160deg, #5b8def 0%, #14225c 100%);
-  --gradient-seo:  linear-gradient(160deg, #34d399 0%, #0b3d2e 100%);
-  --gradient-paid: linear-gradient(160deg, #fb7185 0%, #3b0a24 100%);
-  --gradient-ai:   linear-gradient(160deg, #a78bfa 0%, #2a0e5c 100%);
+  --gradient-web:  radial-gradient(60% 42% at 50% 46%, #5b8def 0%, rgba(20, 34, 92, 0) 72%), linear-gradient(180deg, #14225c 0%, #0b1638 100%);
+  --gradient-seo:  radial-gradient(60% 42% at 50% 46%, #34d399 0%, rgba(11, 61, 46, 0) 72%), linear-gradient(180deg, #0b3d2e 0%, #062018 100%);
+  --gradient-paid: radial-gradient(60% 42% at 50% 46%, #fb7185 0%, rgba(59, 10, 36, 0) 72%), linear-gradient(180deg, #3b0a24 0%, #1f0512 100%);
+  --gradient-ai:   radial-gradient(60% 42% at 50% 46%, #a78bfa 0%, rgba(42, 14, 92, 0) 72%), linear-gradient(180deg, #2a0e5c 0%, #170733 100%);
 
   /* ---- Colour: translucent white surfaces for content sitting on the
      service-card gradients (mockup loop chrome, dots, bars) ------------ */

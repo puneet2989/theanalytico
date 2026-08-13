@@ -26,16 +26,18 @@ section[id] {
    aligned, no gap, in both header states. Only the pinned state removes
    "the" (see the pinned override below) — .logo__words itself does not
    change between states any more.
-   font-size set here to var(--fs-h4) — the same size .logo__line2 sets
+   font-size set here to var(--fs-h3) — the same size .logo__line2 sets
    explicitly on itself — purely so .logo__line1 has something to size
    itself against with `em` below; .logo__line2's own explicit font-size
-   is unaffected by this since it never relies on inheritance. */
+   is unaffected by this since it never relies on inheritance. Bumped up
+   from --fs-h4 so the wordmark reads as a bolder, more prominent brand
+   mark in both the header and the footer, which share this same markup. */
 .logo__words {
   display: flex;
   flex-direction: row;
   align-items: baseline;
   overflow: hidden;
-  font-size: var(--fs-h4);
+  font-size: var(--fs-h3);
 }
 
 /* "the" — lighter weight, muted colour carries the same optical
@@ -60,7 +62,7 @@ section[id] {
    tracking tokens. */
 .logo__line2 {
   font-family: var(--font-heading);
-  font-size: var(--fs-h4);
+  font-size: var(--fs-h3);
   font-weight: var(--fw-heading);
   letter-spacing: var(--ls-display);
   color: var(--ink);
@@ -115,7 +117,7 @@ html[data-header-boot="pinned"] .logo__line1 {
 
 [data-header-state="pinned"] .logo__line2,
 html[data-header-boot="pinned"] .logo__line2 {
-  font-size: var(--fs-lead);
+  font-size: var(--fs-h4);
 }
 
 .header__nav {
@@ -642,31 +644,43 @@ html[data-drawer-open="true"] {
   margin-block-end: var(--s-6);
 }
 
+/* auto-fit with a capped column width, not a hard 2-column split: a fixed
+   repeat(2, 1fr) stretches each card to half the (up to 1320px) container,
+   which at this range makes the 4/5 aspect-ratio card enormous — the media
+   panel's flex-grow height balloons with it, forcing the service video into
+   a far taller box than its native aspect ratio and cropping most of its
+   content away. Capping the column width keeps the card (and its video) at
+   a sane, proportionate size no matter how many columns actually fit. */
 @media (min-width: 640px) {
   .services__grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(240px, 340px));
+    justify-content: center;
   }
 }
 
 @media (min-width: 1280px) {
   .services__grid {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(4, minmax(0, 340px));
+    justify-content: center;
     gap: var(--gap-card);
   }
 }
 
-/* Full-bleed gradient panels, one per card, assigned by source order:
-   1 Web Design (blue), 2 SEO (green), 3 Paid Advertising (magenta),
-   4 AI Services (violet). The card itself carries no padding: the media
-   panel runs edge to edge and flex-grows to fill most of the card's
-   height (matching the reference's large, clearly-visible video), and
-   only the text block below gets its own inline/block padding. */
+/* Colour-blob panels, one per card, assigned by source order: 1 Web Design
+   (blue), 2 SEO (green), 3 Paid Advertising (magenta), 4 AI Services
+   (violet). Reference layout: heading pinned to the top, the video/mockup
+   floats as an inset panel roughly centred (clear colour margin left and
+   right, not edge to edge), description pinned to the bottom. The DOM order
+   stays media -> title -> body -> link (sensible reading/tab order); the
+   `order` property below does the visual reordering. Auto top/bottom
+   margins on the media panel are what centre it in the leftover space
+   between the title and the body once both have taken the height they need. */
 .card--service {
   position: relative;
   display: flex;
   flex-direction: column;
-  aspect-ratio: 4 / 5;
-  padding: 0;
+  aspect-ratio: 3 / 4;
+  padding: var(--s-6);
   color: var(--surface);
   border: none;
   overflow: hidden;
@@ -689,27 +703,42 @@ html[data-drawer-open="true"] {
   background: var(--gradient-ai);
 }
 
-.card--service .card__media {
-  flex: 1 1 auto;
-  aspect-ratio: auto;
-  margin: 0;
-  border-radius: 0;
-}
-
 .card--service .card__title {
-  margin-block-start: var(--s-5);
-  margin-inline: var(--s-6);
+  order: 1;
+  margin-block-start: 0;
+  font-size: var(--fs-h4);
   color: var(--surface);
 }
 
+/* Fills the card's own padded content box — no extra inset of its own.
+   Stacking a second inset here on top of .card--service's padding was what
+   made the panel look tiny with excess colour either side. */
+.card--service .card__media {
+  order: 2;
+  flex: 0 0 auto;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  margin-inline: 0;
+  margin-block: auto;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
 .card--service .card__body {
-  margin-inline: var(--s-6);
+  order: 3;
+  margin-block-start: 0;
+  font-size: var(--fs-small);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
   color: var(--surface);
 }
 
 .card--service .card__link {
-  margin-inline: var(--s-6);
-  margin-block-end: var(--s-6);
+  order: 4;
+  margin-block-start: var(--s-3);
   color: var(--surface);
 }
 
@@ -1183,7 +1212,8 @@ html[data-drawer-open="true"] {
   color: var(--surface);
 }
 
-.footer__brand .logo__line1,
+/* "the" keeps its terracotta accent colour on the dark footer too — only
+   "Analytico" switches to white, matching the header's colour split. */
 .footer__brand .logo__line2 {
   color: var(--surface);
 }
