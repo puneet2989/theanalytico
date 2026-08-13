@@ -1,0 +1,14 @@
+{
+  "name": "TheAnalytico",
+  "short_name": "Analytico",
+  "description": "Web design, SEO, paid advertising and AI services for local businesses.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#e8f2fa",
+  "theme_color": "#e8f2fa",
+  "icons": [
+    { "src": "/assets/img/favicon.svg", "type": "image/svg+xml", "sizes": "any", "purpose": "any" },
+    { "src": "/assets/img/favicon-32.png", "type": "image/png", "sizes": "32x32" },
+    { "src": "/assets/img/favicon-180.png", "type": "image/png", "sizes": "180x180" }
+  ]
+}

@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Search performance — mock</title>
+<style>
+  :root{
+    --ink:#1a1a1a;
+    --white:#ffffff;
+    --paleblue:#e8f2fa;
+    --cream:#f9f0ea;
+    --grey:#f3f3f3;
+    --terracotta:#e5804b;
+    --periwinkle:#9999ff;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{
+    width:1280px;height:800px;overflow:hidden;
+    font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--grey);
+    color:var(--ink);
+  }
+  .stage{
+    width:1280px;height:800px;padding:36px 44px;
+    display:grid;
+    grid-template-columns:1.35fr 1fr;
+    grid-template-rows:auto 1fr;
+    gap:24px;
+  }
+  .header{
+    grid-column:1/3;
+    display:flex;align-items:baseline;justify-content:space-between;
+  }
+  .header h1{font-size:26px;font-weight:600;letter-spacing:-0.01em;}
+  .header p{font-size:14px;color:#6b6b6b;margin-top:4px;}
+  .badge{
+    background:var(--paleblue);
+    color:var(--ink);
+    font-size:12px;font-weight:600;
+    padding:6px 14px;border-radius:100px;
+    display:flex;align-items:center;gap:8px;
+  }
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--terracotta);animation:pulse 1.6s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.25;}}
+
+  .card{
+    background:var(--white);
+    border-radius:16px;
+    padding:24px 26px;
+    box-shadow:0 1px 2px rgba(0,0,0,0.04);
+  }
+  .card h2{font-size:15px;font-weight:600;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;}
+  .card h2 span.sub{font-size:12px;font-weight:400;color:#8a8a8a;}
+
+  .left-col{display:flex;flex-direction:column;gap:24px;}
+  .right-col{display:flex;flex-direction:column;gap:24px;}
+
+  /* Ranking table */
+  table{width:100%;border-collapse:collapse;}
+  th{
+    text-align:left;font-size:11px;font-weight:600;color:#9a9a9a;
+    text-transform:uppercase;letter-spacing:.04em;
+    padding-bottom:10px;border-bottom:1px solid var(--grey);
+  }
+  td{
+    padding:14px 0;border-bottom:1px solid var(--grey);
+    font-size:14px;
+  }
+  tr:last-child td{border-bottom:none;}
+  .kw{font-weight:600;}
+  .pos-cell{display:flex;align-items:center;gap:8px;}
+  .pos-num{font-variant-numeric:tabular-nums;font-weight:700;min-width:22px;display:inline-block;}
+  .arrow{
+    width:0;height:0;
+    border-left:5px solid transparent;
+    border-right:5px solid transparent;
+    border-bottom:8px solid #4caf82;
+  }
+
+  /* line chart */
+  .chart-wrap{position:relative;height:170px;}
+  svg{overflow:visible;}
+  .grid-line{stroke:var(--grey);stroke-width:1;}
+  .chart-path{
+    fill:none;stroke:var(--terracotta);stroke-width:3;
+    stroke-linecap:round;stroke-linejoin:round;
+  }
+  .chart-area{fill:url(#areaFill);opacity:0.9;}
+  .chart-dot{fill:var(--terracotta);}
+
+  /* local pack */
+  .pin-row{
+    display:flex;align-items:center;gap:12px;
+    padding:12px 0;border-bottom:1px solid var(--grey);
+  }
+  .pin-row:last-child{border-bottom:none;}
+  .pin{
+    width:30px;height:30px;border-radius:10px;
+    background:var(--paleblue);
+    display:flex;align-items:center;justify-content:center;
+    font-size:13px;font-weight:700;color:var(--ink);
+    flex-shrink:0;
+  }
+  .pin-row.me .pin{background:var(--terracotta);color:#fff;}
+  .pin-info{flex:1;}
+  .pin-name{font-size:13.5px;font-weight:600;}
+  .pin-sub{font-size:11.5px;color:#9a9a9a;margin-top:2px;}
+  .stars{font-size:12px;color:var(--terracotta);letter-spacing:1px;}
+
+  /* dial */
+  .dial-wrap{display:flex;align-items:center;gap:26px;}
+  .dial-num{font-size:44px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-0.02em;}
+  .dial-label{font-size:12px;color:#9a9a9a;margin-top:6px;}
+  .dial-track{stroke:var(--grey);stroke-width:10;fill:none;}
+  .dial-fill{stroke:var(--periwinkle);stroke-width:10;fill:none;stroke-linecap:round;}
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="header">
+    <div>
+      <h1>Search performance</h1>
+      <p>Local visibility overview · rolling 28 days</p>
+    </div>
+    <div class="badge"><span class="dot"></span>Live tracking</div>
+  </div>
+
+  <div class="left-col">
+    <div class="card">
+      <h2>Keyword rankings <span class="sub">Position on search</span></h2>
+      <table>
+        <thead>
+          <tr><th>Keyword</th><th>Position</th><th>Volume</th><th>Trend</th></tr>
+        </thead>
+        <tbody id="rankBody">
+          <tr>
+            <td class="kw">local plumber</td>
+            <td class="pos-cell"><span class="arrow"></span><span class="pos-num" data-from="14" data-to="4">14</span></td>
+            <td>880</td>
+            <td>steady rise</td>
+          </tr>
+          <tr>
+            <td class="kw">emergency callout</td>
+            <td class="pos-cell"><span class="arrow"></span><span class="pos-num" data-from="9" data-to="2">9</span></td>
+            <td>410</td>
+            <td>steady rise</td>
+          </tr>
+          <tr>
+            <td class="kw">boiler repair cost</td>
+            <td class="pos-cell"><span class="arrow"></span><span class="pos-num" data-from="18" data-to="7">18</span></td>
+            <td>590</td>
+            <td>steady rise</td>
+          </tr>
+          <tr>
+            <td class="kw">same day service</td>
+            <td class="pos-cell"><span class="arrow"></span><span class="pos-num" data-from="11" data-to="3">11</span></td>
+            <td>320</td>
+            <td>steady rise</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card" style="flex:1;">
+      <h2>Visibility trend <span class="sub">Last 12 weeks</span></h2>
+      <div class="chart-wrap">
+        <svg width="100%" height="170" viewBox="0 0 560 170" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="areaFill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#e5804b" stop-opacity="0.22"/>
+              <stop offset="100%" stop-color="#e5804b" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <line class="grid-line" x1="0" y1="30" x2="560" y2="30"/>
+          <line class="grid-line" x1="0" y1="80" x2="560" y2="80"/>
+          <line class="grid-line" x1="0" y1="130" x2="560" y2="130"/>
+          <path id="areaPath" class="chart-area" d=""></path>
+          <path id="linePath" class="chart-path" d=""></path>
+          <circle id="tipDot" class="chart-dot" r="5" cx="0" cy="0"></circle>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="right-col">
+    <div class="card">
+      <h2>Local pack <span class="sub">Map results</span></h2>
+      <div class="pin-row me">
+        <div class="pin">1</div>
+        <div class="pin-info">
+          <div class="pin-name">Your business</div>
+          <div class="pin-sub">0.4 miles · Open now</div>
+        </div>
+        <div class="stars">★★★★★</div>
+      </div>
+      <div class="pin-row">
+        <div class="pin">2</div>
+        <div class="pin-info">
+          <div class="pin-name">Competitor A</div>
+          <div class="pin-sub">0.6 miles · Open now</div>
+        </div>
+        <div class="stars">★★★★☆</div>
+      </div>
+      <div class="pin-row">
+        <div class="pin">3</div>
+        <div class="pin-info">
+          <div class="pin-name">Competitor B</div>
+          <div class="pin-sub">1.1 miles · Closes 6pm</div>
+        </div>
+        <div class="stars">★★★★☆</div>
+      </div>
+    </div>
+
+    <div class="card" style="flex:1;display:flex;flex-direction:column;justify-content:center;">
+      <h2>Visibility score</h2>
+      <div class="dial-wrap">
+        <svg width="140" height="140" viewBox="0 0 140 140">
+          <circle class="dial-track" cx="70" cy="70" r="58"></circle>
+          <circle id="dialFill" class="dial-fill" cx="70" cy="70" r="58"
+            stroke-dasharray="364" stroke-dashoffset="364"
+            transform="rotate(-90 70 70)"></circle>
+        </svg>
+        <div>
+          <div class="dial-num" id="dialNum">60</div>
+          <div class="dial-label">out of 100</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var LOOP = 4000; // ms
+  var start = null;
+
+  function ease(t){ return t<0.5 ? 2*t*t : -1+(4-2*t)*t; } // easeInOutQuad
+
+  var rankNums = document.querySelectorAll('.pos-num');
+
+  // chart data points (12 weeks), target y-values (lower = better visibility drawn as higher line)
+  var points = [40,55,50,70,65,85,80,100,95,120,115,140];
+  var W = 560, H = 170;
+  var stepX = W/(points.length-1);
+
+  var linePath = document.getElementById('linePath');
+  var areaPath = document.getElementById('areaPath');
+  var tipDot = document.getElementById('tipDot');
+  var dialFill = document.getElementById('dialFill');
+  var dialNum = document.getElementById('dialNum');
+
+  function frame(ts){
+    if(start===null) start = ts;
+    var elapsed = (ts - start) % LOOP;
+    var t = elapsed / LOOP; // 0..1
+    var e = ease(t);
+
+    // ranking numbers: count down from "from" to "to" then hold, reset each loop
+    rankNums.forEach(function(el){
+      var from = parseFloat(el.dataset.from);
+      var to = parseFloat(el.dataset.to);
+      var val = Math.round(from + (to-from)*e);
+      el.textContent = val;
+    });
+
+    // chart draw progress: reveal points up to t, values drift slightly using e
+    var revealCount = Math.max(1, Math.floor(e * (points.length-1)) + 1);
+    var d = "";
+    var ad = "";
+    var lastX=0,lastY=0;
+    for(var i=0;i<revealCount;i++){
+      var x = i*stepX;
+      var y = H - points[i]*(0.55+0.45*e) - 10;
+      if(i===0){ d += "M"+x+","+y; ad += "M"+x+","+H+" L"+x+","+y; }
+      else { d += " L"+x+","+y; ad += " L"+x+","+y; }
+      lastX=x; lastY=y;
+    }
+    ad += " L"+lastX+","+H+" Z";
+    linePath.setAttribute('d', d);
+    areaPath.setAttribute('d', ad);
+    tipDot.setAttribute('cx', lastX);
+    tipDot.setAttribute('cy', lastY);
+
+    // dial: 60 -> 94
+    var score = Math.round(60 + (94-60)*e);
+    dialNum.textContent = score;
+    var circumference = 364;
+    var frac = score/100;
+    dialFill.setAttribute('stroke-dashoffset', circumference*(1-frac));
+
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

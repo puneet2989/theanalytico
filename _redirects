@@ -1,0 +1,15 @@
+# Force the canonical host. Replace the domain before launch.
+https://www.theanalytico.com/*  https://theanalytico.com/:splat  301
+
+# Strip .html extensions
+/index.html      /            301
+/services.html   /services    301
+/work.html       /work        301
+/insights.html   /insights    301
+/about.html      /about       301
+/contact.html    /contact     301
+
+# Legacy or mistyped paths
+/portfolio       /work        301
+/blog            /insights    301
+/contact-us      /contact     301

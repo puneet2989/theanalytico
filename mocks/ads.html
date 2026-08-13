@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Campaign manager — mock</title>
+<style>
+  :root{
+    --ink:#1a1a1a;
+    --white:#ffffff;
+    --paleblue:#e8f2fa;
+    --cream:#f9f0ea;
+    --grey:#f3f3f3;
+    --terracotta:#e5804b;
+    --periwinkle:#9999ff;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{
+    width:1280px;height:800px;overflow:hidden;
+    font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--grey);
+    color:var(--ink);
+  }
+  .stage{
+    width:1280px;height:800px;
+    display:grid;
+    grid-template-columns:300px 1fr;
+    gap:24px;
+    padding:36px 44px;
+  }
+  .rail{
+    background:var(--white);
+    border-radius:16px;
+    padding:22px 18px;
+  }
+  .rail h2{font-size:13px;color:#9a9a9a;font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:16px;padding:0 6px;}
+  .camp-row{
+    display:flex;align-items:center;gap:12px;
+    padding:14px 12px;border-radius:12px;margin-bottom:8px;
+    border-left:3px solid transparent;
+  }
+  .camp-row.active{
+    background:var(--paleblue);
+    border-left:3px solid var(--periwinkle);
+  }
+  .camp-icon{
+    width:34px;height:34px;border-radius:10px;
+    background:var(--cream);
+    display:flex;align-items:center;justify-content:center;
+    font-size:14px;font-weight:700;flex-shrink:0;
+  }
+  .camp-row.active .camp-icon{background:var(--periwinkle);color:#fff;}
+  .camp-name{font-size:13.5px;font-weight:600;}
+  .camp-sub{font-size:11.5px;color:#9a9a9a;margin-top:2px;}
+  .camp-status{margin-left:auto;font-size:10.5px;font-weight:700;padding:3px 8px;border-radius:100px;background:var(--grey);color:#8a8a8a;}
+  .camp-row.active .camp-status{background:#e4f7ec;color:#3d9a6a;}
+
+  .main{display:flex;flex-direction:column;gap:24px;}
+  .row-top{display:grid;grid-template-columns:1.2fr 0.8fr;gap:24px;}
+  .card{
+    background:var(--white);
+    border-radius:16px;
+    padding:24px 26px;
+    box-shadow:0 1px 2px rgba(0,0,0,0.04);
+  }
+  .card h3{font-size:13px;font-weight:600;color:#9a9a9a;text-transform:uppercase;letter-spacing:.04em;margin-bottom:10px;}
+
+  .cpe-num{font-size:52px;font-weight:700;letter-spacing:-0.02em;font-variant-numeric:tabular-nums;color:var(--ink);}
+  .cpe-num span{font-size:24px;color:#9a9a9a;font-weight:600;}
+  .cpe-sub{display:flex;align-items:center;gap:10px;margin-top:10px;}
+  .pill{font-size:11.5px;font-weight:700;background:#e4f7ec;color:#3d9a6a;padding:4px 10px;border-radius:100px;}
+
+  .toggle-row{display:flex;align-items:center;justify-content:space-between;margin-top:22px;}
+  .toggle-label{font-size:13px;font-weight:600;}
+  .toggle-sub{font-size:11.5px;color:#9a9a9a;margin-top:2px;}
+  .switch{
+    width:46px;height:26px;border-radius:100px;
+    background:var(--grey);position:relative;
+    transition:background .3s ease;
+  }
+  .switch.on{background:var(--periwinkle);}
+  .knob{
+    width:20px;height:20px;border-radius:50%;background:#fff;
+    position:absolute;top:3px;left:3px;
+    box-shadow:0 1px 3px rgba(0,0,0,0.2);
+    transition:left .3s ease;
+  }
+  .switch.on .knob{left:23px;}
+
+  .stat-tiles{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .tile{background:var(--cream);border-radius:14px;padding:18px 20px;}
+  .tile-label{font-size:11.5px;color:#8a7a6f;font-weight:600;text-transform:uppercase;letter-spacing:.03em;}
+  .tile-num{font-size:28px;font-weight:700;margin-top:6px;font-variant-numeric:tabular-nums;}
+
+  .chart-card{flex:1;display:flex;flex-direction:column;}
+  .bar-chart{
+    flex:1;display:flex;align-items:flex-end;gap:18px;
+    padding-top:20px;
+  }
+  .bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:10px;height:100%;justify-content:flex-end;}
+  .bar{
+    width:100%;max-width:44px;border-radius:8px 8px 4px 4px;
+    background:linear-gradient(180deg, var(--periwinkle), #b3b3ff);
+  }
+  .bar-day{font-size:11px;color:#9a9a9a;font-weight:600;}
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="rail">
+    <h2>Campaigns</h2>
+    <div class="camp-row active">
+      <div class="camp-icon">S</div>
+      <div>
+        <div class="camp-name">Spring enquiries</div>
+        <div class="camp-sub">Search · £40/day</div>
+      </div>
+      <div class="camp-status">Active</div>
+    </div>
+    <div class="camp-row">
+      <div class="camp-icon">B</div>
+      <div>
+        <div class="camp-name">Brand awareness</div>
+        <div class="camp-sub">Display · £18/day</div>
+      </div>
+      <div class="camp-status">Paused</div>
+    </div>
+    <div class="camp-row">
+      <div class="camp-icon">L</div>
+      <div>
+        <div class="camp-name">Local promotions</div>
+        <div class="camp-sub">Search · £22/day</div>
+      </div>
+      <div class="camp-status">Active</div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="row-top">
+      <div class="card">
+        <h3>Cost per enquiry</h3>
+        <div class="cpe-num"><span>£</span><span id="cpeNum">14.20</span></div>
+        <div class="cpe-sub"><span class="pill" id="cpePill">▼ improving</span></div>
+
+        <div class="toggle-row">
+          <div>
+            <div class="toggle-label">Auto-bidding</div>
+            <div class="toggle-sub">Adjust bids to hit target cost</div>
+          </div>
+          <div class="switch" id="switchEl"><div class="knob"></div></div>
+        </div>
+      </div>
+
+      <div class="card stat-tiles">
+        <div class="tile">
+          <div class="tile-label">Impressions</div>
+          <div class="tile-num" id="impNum">8,400</div>
+        </div>
+        <div class="tile">
+          <div class="tile-label">Clicks</div>
+          <div class="tile-num" id="clickNum">210</div>
+        </div>
+        <div class="tile">
+          <div class="tile-label">Enquiries</div>
+          <div class="tile-num" id="enqNum">12</div>
+        </div>
+        <div class="tile">
+          <div class="tile-label">Spend today</div>
+          <div class="tile-num" id="spendNum">£38</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card chart-card">
+      <h3>Enquiries by day</h3>
+      <div class="bar-chart" id="barChart">
+        <div class="bar-col"><div class="bar" id="b0"></div><div class="bar-day">Mon</div></div>
+        <div class="bar-col"><div class="bar" id="b1"></div><div class="bar-day">Tue</div></div>
+        <div class="bar-col"><div class="bar" id="b2"></div><div class="bar-day">Wed</div></div>
+        <div class="bar-col"><div class="bar" id="b3"></div><div class="bar-day">Thu</div></div>
+        <div class="bar-col"><div class="bar" id="b4"></div><div class="bar-day">Fri</div></div>
+        <div class="bar-col"><div class="bar" id="b5"></div><div class="bar-day">Sat</div></div>
+        <div class="bar-col"><div class="bar" id="b6"></div><div class="bar-day">Sun</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var LOOP = 4000;
+  var start = null;
+  function ease(t){ return t<0.5 ? 2*t*t : -1+(4-2*t)*t; }
+
+  var cpeNum = document.getElementById('cpeNum');
+  var impNum = document.getElementById('impNum');
+  var clickNum = document.getElementById('clickNum');
+  var enqNum = document.getElementById('enqNum');
+  var spendNum = document.getElementById('spendNum');
+  var switchEl = document.getElementById('switchEl');
+  var bars = [0,1,2,3,4,5,6].map(function(i){ return document.getElementById('b'+i); });
+  var barTargets = [40,55,50,72,64,90,80]; // percent heights
+
+  var switched = false;
+
+  function frame(ts){
+    if(start===null) start = ts;
+    var elapsed = (ts - start) % LOOP;
+    var t = elapsed / LOOP;
+    var e = ease(t);
+
+    // cost per enquiry counts down
+    var cpe = 14.20 + (6.40-14.20)*e;
+    cpeNum.textContent = cpe.toFixed(2);
+
+    // stat tiles increment
+    impNum.textContent = Math.round(8400 + 6200*e).toLocaleString();
+    clickNum.textContent = Math.round(210 + 340*e).toLocaleString();
+    enqNum.textContent = Math.round(12 + 26*e);
+    spendNum.textContent = "£" + Math.round(38 + 74*e);
+
+    // bars grow
+    bars.forEach(function(bar, i){
+      var h = barTargets[i] * (0.3 + 0.7*e);
+      bar.style.height = h + "%";
+    });
+
+    // toggle flips once per loop, around 55% through
+    var shouldBeOn = t > 0.55;
+    if(shouldBeOn !== switched){
+      switched = shouldBeOn;
+      switchEl.classList.toggle('on', switched);
+    }
+
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
