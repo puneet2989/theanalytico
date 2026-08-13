@@ -134,8 +134,8 @@ export function initProcessDial({ gsap, ScrollTrigger, reduced, isMobile }) {
 
     const st = ScrollTrigger.create({
       trigger: dial,
-      start: 'top 80%',
-      end: 'bottom 20%',
+      start: 'top 90%',
+      end: 'center center',
       scrub: 0.6,
       invalidateOnRefresh: true,
       onEnter: () => {

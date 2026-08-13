@@ -65,18 +65,19 @@ const FRAGMENT = `
   uniform sampler2D tMap;
   varying vec2 vUv;
 
-  // Peak alpha over standard source-over compositing. Raised to 0.5 after
-  // 0.28 read as a barely-visible pale haze in a real captured frame.
+  // Peak alpha over standard source-over compositing. Raised again to 0.68
+  // after 0.5 still read as faint against the hero background once the
+  // plume itself was thinned out (see REACH below): a thinner trail needs
+  // more contrast per pixel to stay equally visible.
   // Checked against the hero background (--bg-blue #e8f2fa, luminance
   // ~0.86) and the darkest hero text (--ink-black #0a0a0a, luminance
-  // ~0.02): blending 0.5 of a mid grey (~0.4 luminance) into the
-  // background pulls its luminance to roughly 0.63 — still far lighter
-  // than the text, so contrast against ink-black stays effectively
-  // unchanged. The smoke also sits behind the headline in stacking order,
-  // so opaque glyphs are never themselves tinted — only the page around
-  // and behind them is, which is where the headroom for a bolder value
-  // comes from.
-  const float PEAK_ALPHA = 0.5;
+  // ~0.02): blending 0.68 of a mid grey (~0.4 luminance) into the
+  // background still leaves the result far lighter than the text, so
+  // contrast against ink-black stays effectively unchanged. The smoke also
+  // sits behind the headline in stacking order, so opaque glyphs are never
+  // themselves tinted — only the page around and behind them is, which is
+  // where the headroom for a bolder value comes from.
+  const float PEAK_ALPHA = 0.68;
 
   void main() {
     vec2 uv = vUv;
@@ -92,8 +93,11 @@ const FRAGMENT = `
     // what turns the flowmap's naturally circular stamp into a trailing
     // plume — dense near the pointer (t = 0, full weight), progressively
     // fainter and more spread out along the tail (t -> 1, weight -> 0).
+    // REACH trimmed ~30% (0.075 -> 0.052) so the plume reads as a slimmer
+    // trail rather than a thick fog; PEAK_ALPHA above was raised to
+    // compensate so the thinner trail is still clearly visible.
     const int TAPS = 10;
-    const float REACH = 0.075;
+    const float REACH = 0.052;
     float accum = 0.0;
     float weightSum = 0.0;
     for (int i = 0; i < TAPS; i++) {

@@ -29,41 +29,49 @@ const NOOP = () => {};
 export function initHeroArrow({ gsap, ScrollTrigger, lenis, reduced, isMobile }) {
   const arrowElement = document.querySelector('[data-hero-arrow]');
   const pathElement = document.querySelector('[data-hero-arrow-path]');
+  const headElement = document.querySelector('[data-hero-arrow-head]');
 
   if (!arrowElement || !pathElement) return NOOP;
 
-  const pathLength = pathElement.getTotalLength();
+  // Head path is optional: older single-path markup still works.
+  const paths = headElement ? [pathElement, headElement] : [pathElement];
+  const lengths = paths.map((path) => path.getTotalLength());
 
   // Set initial dash state: arrow hidden, ready to draw
-  gsap.set(pathElement, {
-    strokeDasharray: pathLength,
-    strokeDashoffset: pathLength,
+  paths.forEach((path, i) => {
+    gsap.set(path, { strokeDasharray: lengths[i], strokeDashoffset: lengths[i] });
   });
 
   if (reduced) {
     // Reduced-motion users must see the finished arrow immediately
-    gsap.set(pathElement, { strokeDashoffset: 0 });
+    paths.forEach((path) => gsap.set(path, { strokeDashoffset: 0 }));
     return function cleanup() {
-      gsap.set(pathElement, { clearProps: 'all' });
+      paths.forEach((path) => gsap.set(path, { clearProps: 'all' }));
     };
   }
 
-  // Animate the arrow drawing itself
-  const tween = gsap.to(pathElement, {
-    strokeDashoffset: 0,
-    duration: 0.9,
-    ease: 'power2.inOut',
+  // Draw the curve first, then the arrowhead follows on its heels.
+  const timeline = gsap.timeline({
     delay: 0.55,
     onStart() {
-      pathElement.style.willChange = 'stroke-dashoffset';
+      paths.forEach((path) => {
+        path.style.willChange = 'stroke-dashoffset';
+      });
     },
     onComplete() {
-      pathElement.style.willChange = '';
+      paths.forEach((path) => {
+        path.style.willChange = '';
+      });
     },
   });
 
+  timeline.to(pathElement, { strokeDashoffset: 0, duration: 0.9, ease: 'power2.inOut' });
+  if (headElement) {
+    timeline.to(headElement, { strokeDashoffset: 0, duration: 0.3, ease: 'power2.out' }, '-=0.15');
+  }
+
   return function cleanup() {
-    tween.kill();
-    gsap.set(pathElement, { clearProps: 'all' });
+    timeline.kill();
+    paths.forEach((path) => gsap.set(path, { clearProps: 'all' }));
   };
 }
