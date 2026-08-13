@@ -14,7 +14,8 @@ examples/
 # Node
 node_modules/
 npm-debug.log*
-package-lock.json
+# package-lock.json is tracked: Workers Builds should install a pinned
+# dependency tree rather than resolving a fresh wrangler on every build.
 
 # Editor and OS noise
 .DS_Store

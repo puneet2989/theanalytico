@@ -1,0 +1,16 @@
+{
+  "name": "theanalytico",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Marketing site for TheAnalytico. Static assets served by a Cloudflare Worker.",
+  "scripts": {
+    "dev": "wrangler dev --env dev",
+    "deploy:dev": "wrangler deploy --env dev",
+    "deploy:prod": "wrangler deploy",
+    "check:dev": "wrangler deploy --env dev --dry-run",
+    "check:prod": "wrangler deploy --dry-run"
+  },
+  "devDependencies": {
+    "wrangler": "^4.123.0"
+  }
+}
