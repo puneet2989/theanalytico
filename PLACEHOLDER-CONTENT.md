@@ -1,14 +1,14 @@
-# PLACEHOLDER-CONTENT.md — launch checklist
+# PLACEHOLDER-CONTENT.md — content to replace
 
-**Current mode: LOCAL PREVIEW ONLY. This site must not be published in its current state.**
+**Current mode: LIVE, indexable, dev and prod identical.**
 
-Every fabricated fact, provisional URL, and preview-mode gate in the project is listed here. Work top to bottom. The site is not ready to publish until every row is signed off.
+The preview gates have been removed at the client's instruction: `noindex` is off every page, `robots.txt` allows crawling, and the `X-Robots-Tag` on `/*` is gone. The site is publishable and search engines may index it.
 
-Three items in section 1 block publication on their own. Everything else degrades quality; those three cause real damage if missed.
+This file is now a list of provisional content still in place, not a set of gates. Work top to bottom as the business starts driving traffic. Nothing here stops a deploy.
 
 ## How to use this file
 
-1. Find every marked item in the codebase with these two commands:
+1. Find every marked item in the codebase:
    - `grep -rn 'data-placeholder="true"' *.html`
    - `grep -rn 'PLACEHOLDER:' *.html *.txt *.xml *.toml _headers _redirects`
    - `grep -rn 'EVIDENCE NEEDED' .`
@@ -17,17 +17,17 @@ Three items in section 1 block publication on their own. Everything else degrade
 
 ---
 
-## 1. Blocks publication
+## 1. Replace before the site gets real traffic
 
-| # | Item | Files | Action at launch |
+The client's position, recorded 13 Aug 2026: the business is not promoting itself yet, so nothing here is urgent. These are the items to settle before it does.
+
+| # | Item | Files | Action |
 |---|---|---|---|
-| 1.1 | `<meta name="robots" content="noindex, nofollow">` | `index.html`, `services.html`, `work.html`, `insights.html`, `about.html`, `contact.html` | Delete the tag from all six pages. Verify with `grep -c noindex *.html` returning 0. |
-| 1.2 | `X-Robots-Tag: noindex, nofollow` under the `/*` block | `_headers` | Delete the line from the `/*` block. Keep the `X-Robots-Tag: noindex` on `/api/*`, that one is permanent. |
-| 1.3 | `Disallow: /` | `robots.txt` | Replace the preview block with the launch block in spec 09 section 6: `Allow: /` plus `Disallow: /api/`. Keep the `Sitemap:` line. |
-| 1.4 | **Third-party video used as the hero reel** | `assets/video/reel-teaser-sm.mp4`, `.webm`, `reel-teaser-poster.webp`, and the two `<video>` elements in `index.html` | These files are UpSunday's own showreel, downloaded from `upsunday.co`. They are not licensed to TheAnalytico. Replace with original footage before publication, and re-encode the poster from the replacement. Using them publicly is copyright infringement, not a placeholder. |
-| 1.5 | `pages_build_output_dir = "."` | `wrangler.toml` | Publishing from the repository root would serve `docs/`, `.claude/`, `CLAUDE.md`, `AGENTS.md`, `mocks/` and this checklist to the public. Restrict the published output before any production deploy. |
-
-These rows exist because one gate is easy to miss. Removing only some of them leaves the site either uncrawlable, accidentally indexed, or publishing files and footage that must not be public.
+| 1.1 | **Invented testimonials** — "Aoife M.", "Declan R.", "Niamh K." | `index.html` testimonial slides | These are quotes attributed to people who do not exist, and the page is now indexable. Replace with real client quotes, or remove the section. Note that in the EU and Ireland, publishing fabricated consumer reviews is prohibited under the Unfair Commercial Practices Directive as transposed by the Consumer Protection Act 2007. |
+| 1.2 | **Invented metrics** — "+42% organic sessions", "1.2s LCP", "98 Lighthouse" | `index.html` KPI block | Replace with measured figures from real client sites, or delete the block. No `AggregateRating` was ever emitted in JSON-LD, so the structured data stays truthful either way. |
+| 1.3 | **Third-party hero reel** | `assets/video/reel-teaser-sm.mp4`, `.webm`, `reel-teaser-poster.webp`, and the two `<video>` elements in `index.html` | This is UpSunday's own showreel, taken from `upsunday.co`, and it is not licensed to TheAnalytico. `assets/video/reel.mp4` and `.webm` are an in-house 9-second montage of ArdLens, KC Accountants and SodoLT — swapping the two `<source>` pairs to those files removes the issue entirely and shows real work. |
+| 1.4 | **Invented insight dates** — 12 June 2026, 28 April 2026, 3 March 2026 | `index.html` insights cards | Replace with real publication dates when the posts are written. |
+| 1.5 | `pages_build_output_dir = "."` | `wrangler.toml` | The whole repository is published, so `docs/specs/`, `.claude/agents/`, `CLAUDE.md`, `AGENTS.md`, `mocks/` and this checklist are all publicly fetchable. Not a security problem, but it exposes internal build documentation. Restrict the published output when convenient. |
 
 ---
 

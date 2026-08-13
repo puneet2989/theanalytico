@@ -1,8 +1,5 @@
-# PREVIEW MODE — all crawling disallowed.
-# Remove the Disallow line and restore the sitemap directive at launch.
-# See PLACEHOLDER-CONTENT.md.
-
 User-agent: *
-Disallow: /
+Allow: /
+Disallow: /api/
 
 Sitemap: https://theanalytico.com/sitemap.xml
