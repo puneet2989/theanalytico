@@ -107,11 +107,11 @@ Every row here is invented and must be replaced or deleted before publication.
 
 | # | Item | Files | Action at launch |
 |---|---|---|---|
-| 6.1 | Turnstile site key, using the Cloudflare test key `1x00000000000000000000AA` | `contact.html`, `[data-turnstile-slot]` widget div | Create a Turnstile widget in the Cloudflare dashboard. Replace `data-sitekey`. The site key is public and may stay in the HTML. `[EVIDENCE NEEDED: Turnstile site key]` |
-| 6.2 | `TURNSTILE_SECRET_KEY` not set | Cloudflare Pages dashboard | Set as an encrypted environment variable. Never commit it. |
-| 6.3 | `RESEND_API_KEY` not set | Cloudflare Pages dashboard | Set as an encrypted environment variable. Never commit it. |
-| 6.4 | `CONTACT_FROM_EMAIL` not set | Cloudflare Pages dashboard | Verify a sending domain in Resend first, then set this. `[EVIDENCE NEEDED: verified sending domain for Resend]` |
-| 6.5 | `CONTACT_TO_EMAIL` not set | Cloudflare Pages dashboard | Depends on row 3.1. Set once the business email exists. |
+| 6.1 | ~~Turnstile site key~~ — resolved 16 Aug 2026, real widget key `0x4AAAAAAERIfQZjxAqpZRu5` now in `contact.html` | `contact.html`, `[data-turnstile-slot]` widget div | Done. |
+| 6.2 | `TURNSTILE_SECRET_KEY` — client setting via `npx wrangler secret put TURNSTILE_SECRET_KEY [--env dev]` | Cloudflare Worker (dev + prod environments) | In progress, client-side. Never commit it. |
+| 6.3 | `RESEND_API_KEY` — client setting via `npx wrangler secret put RESEND_API_KEY [--env dev]` | Cloudflare Worker (dev + prod environments) | In progress, client-side. Never commit it. |
+| 6.4 | `CONTACT_FROM_EMAIL` — client setting via `npx wrangler secret put CONTACT_FROM_EMAIL [--env dev]` | Cloudflare Worker (dev + prod environments) | In progress, client-side. Domain already verified in Resend per client. |
+| 6.5 | `CONTACT_TO_EMAIL` — client setting via `npx wrangler secret put CONTACT_TO_EMAIL [--env dev]`, value `info@theanalytico.com` | Cloudflare Worker (dev + prod environments) | In progress, client-side. Mailbox confirmed working on PurelyMail. |
 | 6.6 | KV namespace id is the literal `REPLACE_WITH_KV_NAMESPACE_ID` | `wrangler.toml` | Create a KV namespace named for rate limiting. Paste its id. Without it the Function skips rate limiting silently, which is not a hard failure but leaves the form open to abuse. `[EVIDENCE NEEDED: KV namespace id for RATE_LIMIT]` |
 | 6.7 | No privacy policy page exists | `contact.html`, `#faq` answer 3 | Write a privacy policy. Create `/privacy`. Link it from the contact FAQ and the footer. Add it to `sitemap.xml`. `[EVIDENCE NEEDED: privacy policy page]` |
 
