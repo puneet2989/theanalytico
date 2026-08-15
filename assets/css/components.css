@@ -93,9 +93,17 @@ section[id] {
   contain: layout paint;
 }
 
+/* max-width is a min() of the pill's cap and (100% - a gutter), not just
+   var(--header-pill-max): margin-inline: auto (inherited from the base
+   .header__shell rule) only produces visible side gutters once the
+   viewport is wider than that cap. Below it — every mobile width — the
+   shell simply fills 100% with nothing left for auto to distribute, so
+   the floating pill's background/blur/shadow ran edge to edge with no
+   inset at all. The calc() term guarantees a minimum gutter at every
+   width, including mobile. */
 [data-header-state="pinned"] .header__shell,
 html[data-header-boot="pinned"] .header__shell {
-  max-width: var(--header-pill-max);
+  max-width: min(var(--header-pill-max), calc(100% - var(--s-4) * 2));
   margin-block-start: var(--s-5);
   padding-block: var(--s-3);
   border-radius: var(--radius-pill);
@@ -147,7 +155,13 @@ html[data-header-boot="pinned"] .logo__line2 {
   color: var(--ink-black);
 }
 
-.header__cta {
+/* Compound selector, not a bare .header__cta: .btn's own `display:
+   inline-flex` (Buttons section, below) has equal specificity and comes
+   later in the stylesheet, so a bare .header__cta rule loses the cascade
+   tie and the button stays visible on mobile regardless of this display:
+   none. Scoping to its actual parent outranks .btn without needing
+   !important. */
+.header__shell .header__cta {
   display: none;
 }
 
@@ -170,6 +184,22 @@ html[data-header-boot="pinned"] .logo__line2 {
   height: 2px;
   background: var(--ink);
   border-radius: var(--radius-pill);
+  transition: transform var(--dur-fast) var(--ease-out),
+    opacity var(--dur-fast) var(--ease-out);
+}
+
+/* Hamburger -> X. Three bars: the middle one fades out, the outer two
+   rotate to cross at the centre. Transform and opacity only. */
+.header__burger[aria-expanded="true"] .header__burger-bar:nth-child(1) {
+  transform: translateY(6px) rotate(45deg);
+}
+
+.header__burger[aria-expanded="true"] .header__burger-bar:nth-child(2) {
+  opacity: 0;
+}
+
+.header__burger[aria-expanded="true"] .header__burger-bar:nth-child(3) {
+  transform: translateY(-6px) rotate(-45deg);
 }
 
 /* No-JS fallback: the drawer cannot be reached, so keep the full nav list
@@ -183,7 +213,7 @@ html:not([data-js]) .header__nav {
     display: flex;
   }
 
-  .header__cta {
+  .header__shell .header__cta {
     display: inline-flex;
   }
 
@@ -198,10 +228,17 @@ html[data-drawer-open="true"] {
   overflow: hidden;
 }
 
+/* z-index: var(--z-sticky), not var(--z-drawer) — this panel must stay
+   BELOW the fixed header (var(--z-header), 200), not above it. The header
+   holds the burger button, which turns into the close (X) icon while the
+   drawer is open; if this panel out-ranked the header it would visually
+   bury that close control under its own opaque background the moment it
+   opened. var(--z-drawer) itself is reserved for the skip-link, which does
+   need to sit above literally everything, header included. */
 .drawer {
   position: fixed;
   inset: 0;
-  z-index: var(--z-drawer);
+  z-index: var(--z-sticky);
   background: var(--surface);
   padding: var(--s-9) var(--section-pad-x) var(--s-7);
   overflow-y: auto;
@@ -228,6 +265,14 @@ html[data-drawer-open="true"] {
   color: var(--ink-black);
   text-decoration: none;
   border-block-end: 1px solid var(--line);
+}
+
+/* Pushed to the bottom of the drawer's flex column (.drawer:not([hidden])
+   is display: flex; flex-direction: column;), set apart from the plain nav
+   links as a real button, matching the header's own Contact Us pill. */
+.drawer__cta {
+  margin-block-start: auto;
+  width: 100%;
 }
 
 @media (min-width: 768px) {
@@ -488,21 +533,32 @@ html[data-drawer-open="true"] {
    hidden once WebGL takes over, so an empty stage must read as part of
    the section background, not a visible placeholder panel. Radius stays,
    so the flattened plane still reads as landing into rounded corners. */
-/* Width trimmed to 75% (centred) rather than touching the aspect-ratio:
-   the WebGL plane maps the video texture straight across the stage's
-   rect with no object-fit logic of its own, so changing the aspect ratio
-   would stretch/distort the footage. Narrowing the box while keeping
-   16/9 intact shrinks the settled height by the same 25%, with the
-   video's proportions untouched. */
+/* Full width on mobile: at narrow widths there's no spare room to spare,
+   and the request to trim this panel down was specifically about desktop
+   looking oversized, not mobile — a 75% cut here left the phone version
+   looking cramped and narrow rather than wide and clear. */
 [data-hero-unfold-stage] {
   position: relative;
-  width: 75%;
+  width: 100%;
   margin-inline: auto;
   margin-block-start: var(--s-8);
   aspect-ratio: 16 / 9;
   border-radius: var(--radius-section);
   overflow: hidden;
   background: var(--bg-blue);
+}
+
+/* Width trimmed to 75% (centred) rather than touching the aspect-ratio:
+   the WebGL plane maps the video texture straight across the stage's
+   rect with no object-fit logic of its own, so changing the aspect ratio
+   would stretch/distort the footage. Narrowing the box while keeping
+   16/9 intact shrinks the settled height by the same 25%, with the
+   video's proportions untouched. Desktop only (see above) — mobile keeps
+   the full-width base rule. */
+@media (min-width: 768px) {
+  [data-hero-unfold-stage] {
+    width: 75%;
+  }
 }
 
 /* Full-viewport fixed layer, not confined to the stage box: the WebGL

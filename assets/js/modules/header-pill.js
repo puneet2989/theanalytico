@@ -59,6 +59,17 @@ export function initHeaderPill({ gsap, ScrollTrigger, lenis, reduced, isMobile }
   if (!reduced) {
     const line1Width = line1.scrollWidth;
 
+    // Pinned max-width must never exceed the viewport minus a gutter, or the
+    // pill runs edge to edge with no side inset on any viewport narrower than
+    // --header-pill-max (i.e. every mobile width) — this GSAP tween sets
+    // max-width via inline style every frame, which always outranks the CSS
+    // rule of the same name, so the clamp has to live here too, not just in
+    // components.css.
+    const rootStyles = getComputedStyle(document.documentElement);
+    const pillMaxPx = parseFloat(rootStyles.getPropertyValue('--header-pill-max')) || 1120;
+    const gutterPx = parseFloat(rootStyles.getPropertyValue('--s-4')) || 16;
+    const pinnedMaxWidth = `${Math.min(pillMaxPx, window.innerWidth - gutterPx * 2)}px`;
+
     tl = gsap.timeline({
       paused: true,
       defaults: { duration: 0.45, ease: 'power3.out' },
@@ -89,7 +100,7 @@ export function initHeaderPill({ gsap, ScrollTrigger, lenis, reduced, isMobile }
         boxShadow: '0 0 0 rgba(26,26,26,0)'
       },
       {
-        maxWidth: '1120px',
+        maxWidth: pinnedMaxWidth,
         borderRadius: '999px',
         paddingTop: '10px',
         paddingBottom: '10px',

@@ -24,9 +24,12 @@
  *
  * OWNERSHIP: peek-carousel.js has one early-return guard so it never touches
  * an element that also carries [data-marquee]. This module has exclusive
- * ownership of that element's transform, drag/paging semantics are retired,
- * and the two [data-carousel-prev]/[data-carousel-next] buttons are
- * repurposed below as the WCAG 2.2.2 pause/resume control.
+ * ownership of that element's transform. Drag/paging semantics are retired,
+ * but the two [data-carousel-prev]/[data-carousel-next] buttons stay live as
+ * directional nudges: each steps the drift by one slide-width in that
+ * direction, then it resumes automatic drift. WCAG 2.2.2 (pausable motion)
+ * is satisfied independently of these buttons, by the existing hover/focus/
+ * visibility/scroll pause reasons below.
  *
  * SEAMLESS LOOP TECHNIQUE: the original slide set is moved into an owned
  * wrapper, then whole sets are cloned until the wrapper is at least one full
@@ -116,6 +119,20 @@ export function initTestimonialMarquee({ gsap, ScrollTrigger, lenis, reduced, is
 
   let period = measurePeriod();
 
+  // Distance for a single-slide nudge: from the first slide's start to the
+  // second's. Falls back to the full period for a one-slide set (nothing to
+  // step between).
+  function measureStep() {
+    if (originalSlides.length > 1) {
+      const a = originalSlides[0].getBoundingClientRect();
+      const b = originalSlides[1].getBoundingClientRect();
+      return Math.round(b.left - a.left);
+    }
+    return period;
+  }
+
+  const step = measureStep();
+
   // Add further whole sets only until the wrapper covers the container width
   // plus one more period, so no point in the loop ever runs out of physical
   // content before the wrap resets. Minimal on mobile by construction, since
@@ -146,10 +163,15 @@ export function initTestimonialMarquee({ gsap, ScrollTrigger, lenis, reduced, is
     return `${wrapped}px`;
   }
 
-  function buildTween() {
+  // fromX lets a nudge (below) hand off into a fresh infinite tween starting
+  // from wherever the nudge left the wrapper, rather than resetting to 0 —
+  // a relative x tween's target is fixed at creation time, so simply
+  // resuming the old (paused) tween after a manual nudge would ignore the
+  // nudge and jump back to that tween's original path.
+  function buildTween(fromX = 0) {
     if (tween) tween.kill();
     if (period <= 0) return null;
-    gsap.set(wrapper, { x: 0 });
+    gsap.set(wrapper, { x: fromX });
     return gsap.to(wrapper, {
       x: `-=${period}`,
       duration: period / speed,
@@ -164,12 +186,12 @@ export function initTestimonialMarquee({ gsap, ScrollTrigger, lenis, reduced, is
     });
   }
 
-  tween = buildTween();
+  tween = buildTween(0);
 
   // --- Pause/resume, multi-reason -------------------------------------------
   // Several independent conditions can each demand a pause. The tween plays
-  // only when none of them are active. "manual" is the user's own explicit
-  // choice via the repurposed button and is never cleared by anything else.
+  // only when none of them are active. "nudge" (below) is the one reason
+  // this module clears on its own, once its own step animation finishes.
   const pauseReasons = new Set();
 
   function applyPlayState() {
@@ -254,54 +276,48 @@ export function initTestimonialMarquee({ gsap, ScrollTrigger, lenis, reduced, is
   });
   if (!isInViewport()) addReason('scroll');
 
-  // --- Repurpose the two controls as the WCAG 2.2.2 pause/resume toggle ----
-  // Paging is retired: the first button becomes a genuine pause/resume
-  // toggle with its accessible name and aria-pressed driven from JS. The
-  // second button is redundant and is hidden from view and from assistive
-  // tech, also from JS, since the markup is not this module's to edit.
-  let prevBtnOriginalLabel = null;
-  let nextBtnOriginalDisplay = '';
-  let nextBtnHadAriaHidden = false;
-  let nextBtnOriginalAriaHidden = null;
-  let nextBtnHadTabindex = false;
-  let nextBtnOriginalTabindex = null;
+  // --- Directional nudge controls -------------------------------------------
+  // Paging is retired (there is no fixed "index" on a continuous drift), but
+  // both buttons stay live: each steps the wrapper by one slide-width in its
+  // direction, pausing the drift for the step and resuming it afterwards
+  // (unless another pause reason — hover, focus, hidden tab, out of view —
+  // is still active, in which case it stays paused until that clears too).
+  let nudgeTween = null;
 
-  function updateToggleButton() {
-    if (!prevBtn) return;
-    const paused = pauseReasons.has('manual');
-    prevBtn.setAttribute('aria-pressed', paused ? 'true' : 'false');
-    prevBtn.setAttribute(
-      'aria-label',
-      paused ? 'Resume testimonial animation' : 'Pause testimonial animation'
-    );
+  function nudge(direction) {
+    if (period <= 0) return;
+    if (nudgeTween) nudgeTween.kill();
+    addReason('nudge');
+
+    const current = gsap.getProperty(wrapper, 'x');
+    const wrapped = gsap.utils.wrap(-period, 0, current - direction * step);
+
+    nudgeTween = gsap.to(wrapper, {
+      x: wrapped,
+      duration: 0.45,
+      ease: 'power2.out',
+      onComplete: () => {
+        nudgeTween = null;
+        tween = buildTween(wrapped);
+        removeReason('nudge');
+      },
+    });
   }
 
-  function onToggleClick() {
-    if (pauseReasons.has('manual')) {
-      removeReason('manual');
-    } else {
-      addReason('manual');
-    }
-    updateToggleButton();
+  function onPrevClick() {
+    nudge(-1);
+  }
+  function onNextClick() {
+    nudge(1);
   }
 
   if (prevBtn) {
-    prevBtnOriginalLabel = prevBtn.getAttribute('aria-label');
     prevBtn.removeAttribute('aria-disabled');
-    prevBtn.addEventListener('click', onToggleClick);
-    updateToggleButton();
+    prevBtn.addEventListener('click', onPrevClick);
   }
-
   if (nextBtn) {
-    nextBtnOriginalDisplay = nextBtn.style.display;
-    nextBtnHadAriaHidden = nextBtn.hasAttribute('aria-hidden');
-    nextBtnOriginalAriaHidden = nextBtn.getAttribute('aria-hidden');
-    nextBtnHadTabindex = nextBtn.hasAttribute('tabindex');
-    nextBtnOriginalTabindex = nextBtn.getAttribute('tabindex');
-
-    nextBtn.style.display = 'none';
-    nextBtn.setAttribute('aria-hidden', 'true');
-    nextBtn.setAttribute('tabindex', '-1');
+    nextBtn.removeAttribute('aria-disabled');
+    nextBtn.addEventListener('click', onNextClick);
   }
 
   return function cleanup() {
@@ -312,30 +328,10 @@ export function initTestimonialMarquee({ gsap, ScrollTrigger, lenis, reduced, is
     document.removeEventListener('visibilitychange', onVisibilityChange);
     st.kill();
 
-    if (prevBtn) {
-      prevBtn.removeEventListener('click', onToggleClick);
-      prevBtn.removeAttribute('aria-pressed');
-      if (prevBtnOriginalLabel === null) {
-        prevBtn.removeAttribute('aria-label');
-      } else {
-        prevBtn.setAttribute('aria-label', prevBtnOriginalLabel);
-      }
-    }
+    if (prevBtn) prevBtn.removeEventListener('click', onPrevClick);
+    if (nextBtn) nextBtn.removeEventListener('click', onNextClick);
 
-    if (nextBtn) {
-      nextBtn.style.display = nextBtnOriginalDisplay;
-      if (nextBtnHadAriaHidden) {
-        nextBtn.setAttribute('aria-hidden', nextBtnOriginalAriaHidden);
-      } else {
-        nextBtn.removeAttribute('aria-hidden');
-      }
-      if (nextBtnHadTabindex) {
-        nextBtn.setAttribute('tabindex', nextBtnOriginalTabindex);
-      } else {
-        nextBtn.removeAttribute('tabindex');
-      }
-    }
-
+    if (nudgeTween) nudgeTween.kill();
     if (tween) tween.kill();
     wrapper.style.willChange = 'auto';
 

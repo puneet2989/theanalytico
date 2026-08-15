@@ -104,17 +104,59 @@ export function initProcessDial({ gsap, ScrollTrigger, reduced, isMobile }) {
       return;
     }
 
-    // Mobile: rotation is awkward on a narrow screen. Draw the arc fully and let the
-    // cards stack as a plain list; no scroll-linked rotation, no active-step signalling.
+    // Mobile: rotation is awkward on a narrow screen, so the dial itself never turns.
+    // In its place: the arc draws itself in once as the section enters view, and each
+    // step card lights up (data-dial-active) as it individually scrolls into view —
+    // additive, not exclusive, so by the time the section is scrolled past every step
+    // is lit. Both are one-time, non-scrubbed triggers, not a continuous per-frame scroll
+    // link, keeping this cheap on a mobile device.
     if (isMobile) {
-      if (pathLength) {
-        gsap.set(path, { strokeDasharray: pathLength, strokeDashoffset: 0 });
-      }
       gsap.set(arc, { rotate: 0, clearProps: 'transform' });
       gsap.set(nums, { rotate: 0, clearProps: 'transform' });
 
+      let arcTrigger = null;
+      let arcTween = null;
+      if (pathLength) {
+        gsap.set(path, { strokeDasharray: pathLength, strokeDashoffset: pathLength });
+        arcTween = gsap.to(path, {
+          strokeDashoffset: 0,
+          duration: 0.9,
+          ease: 'power2.out',
+          paused: true,
+          onStart: () => {
+            path.style.willChange = 'stroke-dashoffset';
+          },
+          onComplete: () => {
+            path.style.willChange = '';
+          },
+        });
+        arcTrigger = ScrollTrigger.create({
+          trigger: dial,
+          start: 'top 80%',
+          once: true,
+          toggleActions: 'play none none none',
+          animation: arcTween,
+        });
+      }
+
+      const stepTriggers = cards
+        .map((card) => {
+          if (!card) return null;
+          return ScrollTrigger.create({
+            trigger: card,
+            start: 'top 75%',
+            once: true,
+            onEnter: () => card.setAttribute('data-dial-active', ''),
+          });
+        })
+        .filter(Boolean);
+
       cleanups.push(() => {
-        gsap.set(path, { clearProps: 'strokeDasharray,strokeDashoffset' });
+        if (arcTrigger) arcTrigger.kill();
+        if (arcTween) arcTween.kill();
+        stepTriggers.forEach((st) => st.kill());
+        gsap.set(path, { clearProps: 'strokeDasharray,strokeDashoffset,willChange' });
+        clearActive();
       });
       return;
     }
