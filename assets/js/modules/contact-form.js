@@ -34,13 +34,13 @@ export function initContactForm({ gsap, ScrollTrigger, lenis, reduced, isMobile 
   const statusEl = form.querySelector('[data-form-status]');
 
   // Field names matched exactly against functions/api/contact.js:
-  // name, email, phone, business, service, message, consent,
+  // name, email, phone, business, service, message,
   // and the Turnstile response field 'cf-turnstile-response'.
-  const FIELD_IDS = ['name', 'email', 'phone', 'business', 'service', 'message', 'consent'];
+  const FIELD_IDS = ['name', 'email', 'phone', 'business', 'service', 'message'];
   const TURNSTILE_FIELD = 'cf-turnstile-response';
 
   // Only these fields have a dedicated <p class="field__error"> in the markup.
-  const ERROR_TARGETS = ['name', 'email', 'service', 'message', 'consent'];
+  const ERROR_TARGETS = ['name', 'email', 'service', 'message'];
 
   const CLIENT_MESSAGES = {
     nameEmpty: 'Please enter your name.',
@@ -48,8 +48,7 @@ export function initContactForm({ gsap, ScrollTrigger, lenis, reduced, isMobile 
     emailMalformed: 'That email address does not look right.',
     serviceEmpty: 'Please choose what you need.',
     messageEmpty: 'Please tell us what you need.',
-    messageTooLong: 'Please keep this under 2000 characters.',
-    consentUnchecked: 'Please tick the box so we can reply.'
+    messageTooLong: 'Please keep this under 2000 characters.'
   };
 
   const STATUS_MESSAGES = {
@@ -69,7 +68,6 @@ export function initContactForm({ gsap, ScrollTrigger, lenis, reduced, isMobile 
     business: 'Please shorten the business name.',
     service: CLIENT_MESSAGES.serviceEmpty,
     message: CLIENT_MESSAGES.messageEmpty,
-    consent: CLIENT_MESSAGES.consentUnchecked,
     [TURNSTILE_FIELD]: 'Please complete the security check.'
   };
 
@@ -190,22 +188,13 @@ export function initContactForm({ gsap, ScrollTrigger, lenis, reduced, isMobile 
       return null;
     }
 
-    if (id === 'consent') {
-      if (!input.checked) {
-        writeFieldError('consent', CLIENT_MESSAGES.consentUnchecked);
-        return 'consent';
-      }
-      clearFieldError('consent');
-      return null;
-    }
-
     return null;
   }
 
   // Validates every required field. Returns the first invalid field id, or null.
   function validateAll() {
     let firstInvalid = null;
-    ['name', 'email', 'service', 'message', 'consent'].forEach((id) => {
+    ['name', 'email', 'service', 'message'].forEach((id) => {
       const invalidId = validateField(id);
       if (invalidId && !firstInvalid) {
         firstInvalid = invalidId;
@@ -343,7 +332,7 @@ export function initContactForm({ gsap, ScrollTrigger, lenis, reduced, isMobile 
 
   form.addEventListener('submit', handleSubmit);
 
-  ['name', 'email', 'service', 'message', 'consent'].forEach((id) => {
+  ['name', 'email', 'service', 'message'].forEach((id) => {
     const input = inputs[id];
     if (!input) return;
     const handler = handleBlur(id);

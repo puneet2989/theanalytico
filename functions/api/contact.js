@@ -1,3 +1,5 @@
+import { connect } from 'cloudflare:sockets';
+
 export async function onRequestPost(context) {
   const { request, env } = context;
 
@@ -83,7 +85,6 @@ export async function onRequestPost(context) {
     const business = String(data.business || '').trim();
     const service = String(data.service || '').trim();
     const message = String(data.message || '').trim();
-    const consent = String(data.consent || '').trim();
 
     // Check rate limit
     const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
@@ -118,28 +119,20 @@ export async function onRequestPost(context) {
         'TURNSTILE_SECRET_KEY'
       );
     }
-    if (!env.RESEND_API_KEY) {
+    if (!env.SMTP_USER) {
       return jsonResponse(
         { ok: false, error: 'misconfigured' },
         500,
         acceptsJson,
-        'RESEND_API_KEY'
+        'SMTP_USER'
       );
     }
-    if (!env.CONTACT_FROM_EMAIL) {
+    if (!env.SMTP_PASS) {
       return jsonResponse(
         { ok: false, error: 'misconfigured' },
         500,
         acceptsJson,
-        'CONTACT_FROM_EMAIL'
-      );
-    }
-    if (!env.CONTACT_TO_EMAIL) {
-      return jsonResponse(
-        { ok: false, error: 'misconfigured' },
-        500,
-        acceptsJson,
-        'CONTACT_TO_EMAIL'
+        'SMTP_PASS'
       );
     }
 
@@ -149,28 +142,42 @@ Email: ${email}
 Phone: ${phone || '(not provided)'}
 Business: ${business || '(not provided)'}
 Service needed: ${service}
-Message: ${message}
-Consent: ${consent === 'yes' ? 'Given' : 'Not given'}`;
+Message: ${message}`;
 
-    // Send email via Resend
-    const resendResponse = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${env.RESEND_API_KEY}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        from: env.CONTACT_FROM_EMAIL,
-        to: env.CONTACT_TO_EMAIL,
-        reply_to: email,
-        subject: `New enquiry from ${name} — ${service}`,
-        text: emailBody
-      })
-    });
+    // Send email via raw SMTP to Purelymail, same approach as ardlens'
+    // worker.js: Workers cannot send email natively, and this project's info@
+    // mailbox is already on Purelymail, so this sends directly to the mailbox
+    // over cloudflare:sockets rather than going through a third-party email
+    // API (Resend, previously) that needed its own account and domain
+    // verification.
+    const smtpHost = env.SMTP_HOST || 'smtp.purelymail.com';
+    const smtpPort = parseInt(env.SMTP_PORT || '465', 10);
+    const mailTo = env.MAIL_TO || env.SMTP_USER;
+    const subject = `New enquiry from ${name} — ${service}`;
 
-    if (!resendResponse.ok) {
-      const errorData = await resendResponse.json().catch(() => ({}));
-      console.error(`Resend API error: ${resendResponse.status}`, errorData.id || '');
+    const headers =
+      `From: "${sanitizeHeader(name)} (website)" <${env.SMTP_USER}>\r\n` +
+      `To: ${mailTo}\r\n` +
+      `Reply-To: ${sanitizeHeader(email)}\r\n` +
+      `Subject: ${sanitizeHeader(subject)}\r\n` +
+      `MIME-Version: 1.0\r\n` +
+      `Content-Type: text/plain; charset=utf-8\r\n` +
+      `Date: ${new Date().toUTCString()}\r\n\r\n`;
+
+    const fullMessage = headers + dotStuff(emailBody.replace(/\n/g, '\r\n'));
+
+    try {
+      await sendSmtp({
+        host: smtpHost,
+        port: smtpPort,
+        user: env.SMTP_USER,
+        pass: env.SMTP_PASS,
+        from: env.SMTP_USER,
+        to: mailTo,
+        fullMessage
+      });
+    } catch (e) {
+      console.error('SMTP send error:', e.message || String(e));
       return jsonResponse(
         { ok: false, error: 'send_failed' },
         502,
@@ -245,12 +252,6 @@ function validateFields(data) {
     errors.push('message');
   }
 
-  // consent: present, equals 'yes'
-  const consent = String(data.consent || '').trim();
-  if (consent !== 'yes') {
-    errors.push('consent');
-  }
-
   // cf-turnstile-response: present, non-empty
   const turnstile = String(data['cf-turnstile-response'] || '').trim();
   if (!turnstile) {
@@ -284,6 +285,75 @@ async function verifyTurnstile(token, secret, remoteIp) {
   } catch (e) {
     console.error('Turnstile verification error:', e.message);
     return false;
+  }
+}
+
+function sanitizeHeader(value) {
+  return value.replace(/[\r\n]+/g, ' ').trim();
+}
+
+function dotStuff(text) {
+  return text
+    .split('\r\n')
+    .map((line) => (line.startsWith('.') ? '.' + line : line))
+    .join('\r\n');
+}
+
+async function sendSmtp({ host, port, user, pass, from, to, fullMessage }) {
+  const socket = connect({ hostname: host, port }, { secureTransport: 'on' });
+  const writer = socket.writable.getWriter();
+  const reader = socket.readable.getReader();
+  const encoder = new TextEncoder();
+  const decoder = new TextDecoder();
+
+  const expect = async (wanted) => {
+    const { code, text } = await readReply(reader, decoder);
+    if (code !== wanted) {
+      throw new Error(`expected ${wanted}, got ${code} (${text.trim()})`);
+    }
+  };
+  const cmd = async (line, wanted) => {
+    await writer.write(encoder.encode(line + '\r\n'));
+    await expect(wanted);
+  };
+
+  try {
+    await expect(220);
+    await cmd(`EHLO theanalytico.com`, 250);
+    await cmd(`AUTH LOGIN`, 334);
+    await cmd(btoa(user), 334);
+    await cmd(btoa(pass), 235);
+    await cmd(`MAIL FROM:<${from}>`, 250);
+    await cmd(`RCPT TO:<${to}>`, 250);
+    await cmd(`DATA`, 354);
+    await writer.write(encoder.encode(fullMessage + '\r\n.\r\n'));
+    await expect(250);
+    await writer.write(encoder.encode('QUIT\r\n'));
+  } finally {
+    try {
+      await writer.close();
+    } catch (e) {
+      /* socket already closing */
+    }
+    try {
+      reader.releaseLock();
+    } catch (e) {
+      /* already released */
+    }
+  }
+}
+
+async function readReply(reader, decoder) {
+  let buffer = '';
+  while (true) {
+    const { value, done } = await reader.read();
+    if (value) buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split('\r\n').filter(Boolean);
+    const last = lines[lines.length - 1];
+    if (last && /^\d{3} /.test(last)) {
+      return { code: parseInt(last.slice(0, 3), 10), text: buffer };
+    }
+    if (done) return { code: 0, text: buffer };
   }
 }
 

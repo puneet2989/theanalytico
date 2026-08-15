@@ -24,6 +24,14 @@ not_found_handling = "404-page"
 [observability]
 enabled = true
 
+# Contact form sends over raw SMTP to Purelymail (functions/api/contact.js),
+# same approach as the ardlens project. Only the mailbox password is
+# sensitive; the login/recipient addresses are plain vars, same split
+# ardlens uses.
+[vars]
+SMTP_USER = "info@theanalytico.com"
+MAIL_TO = "info@theanalytico.com"
+
 # --- dev -------------------------------------------------------------------
 [env.dev]
 name = "theanalytico-dev"
@@ -37,10 +45,22 @@ not_found_handling = "404-page"
 [env.dev.observability]
 enabled = true
 
+[env.dev.vars]
+SMTP_USER = "info@theanalytico.com"
+MAIL_TO = "info@theanalytico.com"
+
 # --- notes -----------------------------------------------------------------
 # Secrets are set per environment in the dashboard or with
 # `npx wrangler secret put NAME --env dev`. Never commit them.
-#   TURNSTILE_SECRET_KEY, RESEND_API_KEY, CONTACT_FROM_EMAIL, CONTACT_TO_EMAIL
+#   TURNSTILE_SECRET_KEY, SMTP_PASS
+# SMTP_HOST/SMTP_PORT are optional and default to smtp.purelymail.com/465 in
+# functions/api/contact.js if unset.
+#
+# RESEND_API_KEY, CONTACT_FROM_EMAIL, CONTACT_TO_EMAIL were set as secrets
+# during an earlier attempt using Resend instead of direct SMTP. They are no
+# longer read by any code and can be removed with `wrangler secret delete
+# <NAME> --env dev` (and again without --env dev for prod), but leaving them
+# in place is harmless.
 #
 # Rate limiting on /api/contact is optional: functions/api/contact.js only uses
 # env.RATE_LIMIT when it is bound. No KV namespace is declared here because none

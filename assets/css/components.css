@@ -1586,32 +1586,6 @@ main > .section:first-child:not(.hero) {
   resize: vertical;
 }
 
-/* Checkbox row: input and label sit side by side, not stacked like a
-   text field; the error message (when present) spans the full row width
-   underneath both. */
-.field--check {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  align-items: start;
-  gap: var(--s-3);
-}
-
-.field--check .field__label {
-  font-weight: var(--fw-body);
-  color: var(--ink);
-}
-
-.field--check .field__error {
-  grid-column: 1 / -1;
-}
-
-.field__check {
-  width: var(--s-5);
-  height: var(--s-5);
-  margin-block-start: var(--s-1);
-  accent-color: var(--ink);
-}
-
 .field__hint {
   font-size: var(--fs-micro);
   color: var(--ink-soft);
