@@ -235,6 +235,8 @@ Exit condition: Phase 4 re-run passes with zero rejections.
 
 ## 10. Phase 6 — Remaining pages
 
+> **SUPERSEDED 15 Aug 2026.** This section was written in Phase 0, before `index.html` was built and revised. It is stale on `pages.css`, on the work-page screenshots, on the insights post count, and on the contact Function. **Read `docs/specs/10a-phase6-breakdown.md` instead.** The text below is kept only for history.
+
 Five `html-builder` agents in parallel, then one `css-stylist` pass.
 
 ### 10.1 Phases 6a to 6e — Page markup

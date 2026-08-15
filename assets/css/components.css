@@ -1329,3 +1329,320 @@ html[data-drawer-open="true"] {
   color: var(--surface-60);
 }
 
+/* ==========================================================================
+   Inner pages (services, work, insights, about, contact)
+   ========================================================================== */
+
+/* .hero clears the fixed header (72px) with its own margin/padding override;
+   every other page's first section has no such override, so .section's
+   negative margin-block-start pulls it up under the fixed header, and the
+   eyebrow/h1 land underneath the (transparent, at rest) nav. :not(.hero)
+   keeps this off the home page, which already has its own correct rule. */
+main > .section:first-child:not(.hero) {
+  margin-block-start: 0;
+  padding-block-start: calc(72px + var(--s-8));
+  border-start-start-radius: 0;
+  border-start-end-radius: 0;
+}
+
+/* ---- Page intro heading + lead --------------------------------------------------- */
+
+.page__title {
+  margin-block-start: var(--s-4);
+  font-size: var(--fs-h1);
+  font-weight: var(--fw-medium);
+  line-height: var(--lh-heading);
+  letter-spacing: var(--ls-heading);
+  color: var(--ink-black);
+}
+
+.page__lead {
+  margin-block-start: var(--s-5);
+  font-size: var(--fs-lead);
+  color: var(--ink-soft);
+  max-width: var(--container-text);
+}
+
+/* ---- Pillar / principle card grid (services, work, about) ------------------------ */
+/* Cards inside reuse .card as-is; only the grid wrapper is new. */
+
+.pillar__list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--gap-grid);
+  margin-block-start: var(--s-6);
+}
+
+@media (min-width: 640px) {
+  .pillar__list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .pillar__list {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ---- FAQ list (services, contact) -------------------------------------------------- */
+/* <dl> with dt/dd as direct, un-wrapped siblings. Each dt after the first
+   gets the larger top gap that separates one Q&A pair from the next; dd
+   gets a small gap under its own question. */
+
+.faq__list {
+  margin-block-start: var(--s-6);
+}
+
+.faq__list dt {
+  margin-block-start: var(--s-7);
+  font-size: var(--fs-h4);
+  font-weight: var(--fw-medium);
+  color: var(--ink-black);
+}
+
+.faq__list dt:first-child {
+  margin-block-start: 0;
+}
+
+.faq__list dd {
+  margin-block-start: var(--s-2);
+  font-size: var(--fs-body);
+  color: var(--ink-soft);
+}
+
+/* ---- Facts list (work) -------------------------------------------------------------- */
+/* <dl> of label/value rows. Grid auto-placement lays each dt in column 1
+   and its following dd in column 2, one row per pair, since they appear
+   as direct siblings in that exact order in the markup. */
+
+.facts__list {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  column-gap: var(--s-5);
+  row-gap: var(--s-3);
+  align-items: baseline;
+  margin-block-start: var(--s-6);
+  padding-block-start: var(--s-5);
+  border-block-start: 1px solid var(--line);
+}
+
+.facts__list dt {
+  font-size: var(--fs-micro);
+  font-weight: var(--fw-medium);
+  letter-spacing: var(--ls-caps);
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.facts__list dd {
+  font-size: var(--fs-body);
+  color: var(--ink);
+}
+
+/* ---- Topics chip list (insights) ----------------------------------------------------- */
+
+.topics__list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--s-3);
+  margin-block-start: var(--s-6);
+}
+
+.topics__list li {
+  padding: var(--s-2) var(--s-5);
+  border-radius: var(--radius-pill);
+  background: var(--ink-05);
+  font-size: var(--fs-small);
+  font-weight: var(--fw-medium);
+  color: var(--ink);
+}
+
+/* ---- Contact address / phone (about, contact) ---------------------------------------- */
+
+.contact__address {
+  margin-block-start: var(--s-5);
+  font-style: normal;
+}
+
+.contact__address p {
+  margin-block-start: var(--s-2);
+}
+
+.contact__address p:first-child {
+  margin-block-start: 0;
+}
+
+.contact__phone {
+  font-family: var(--font-heading);
+  font-size: var(--fs-h3);
+  font-weight: var(--fw-medium);
+  letter-spacing: var(--ls-heading);
+  color: var(--ink-black);
+}
+
+.contact__phone a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.contact__phone a:hover,
+.contact__phone a:focus-visible {
+  color: var(--accent-strong);
+}
+
+/* ---- Enquiry split (contact) ----------------------------------------------------------- */
+/* .enquiry__split wraps only the form and the details panel — not the
+   section's <h2>, which is a third sibling in .container. A :has() grid on
+   .container itself (an earlier version of this rule) auto-placed the h2
+   into the grid alongside the other two, which is why this wrapper exists
+   instead. Single column below 1024; 7/5 split (roughly 58%/42%) at 1024
+   and up. */
+
+.enquiry__form,
+.enquiry__details {
+  margin-block-start: var(--s-6);
+}
+
+@media (min-width: 1024px) {
+  .enquiry__split {
+    display: grid;
+    grid-template-columns: 7fr 5fr;
+    gap: var(--gap-grid);
+    align-items: start;
+  }
+
+  .enquiry__form,
+  .enquiry__details {
+    margin-block-start: 0;
+  }
+}
+
+.enquiry__details h3 {
+  margin-block-start: var(--s-7);
+  font-size: var(--fs-h4);
+}
+
+.enquiry__details h3:first-child {
+  margin-block-start: 0;
+}
+
+.enquiry__details p {
+  margin-block-start: var(--s-2);
+  font-size: var(--fs-body);
+  color: var(--ink-soft);
+}
+
+/* ---- Contact form (contact) -------------------------------------------------------------- */
+
+.form__set {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-5);
+  border: 0;
+  padding: 0;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+}
+
+.field__label {
+  font-size: var(--fs-small);
+  font-weight: var(--fw-medium);
+  color: var(--ink-black);
+}
+
+.field__optional {
+  font-weight: var(--fw-body);
+  color: var(--ink-soft);
+}
+
+.field__input {
+  padding: var(--s-3) var(--s-4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  font-size: var(--fs-body);
+  color: var(--ink);
+  transition: border-color var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-fast) var(--ease-out);
+}
+
+.field__input:focus-visible {
+  border-color: var(--ink);
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.field__input[aria-invalid="true"] {
+  border-color: var(--accent-strong);
+}
+
+.field__input--area {
+  resize: vertical;
+}
+
+/* Checkbox row: input and label sit side by side, not stacked like a
+   text field; the error message (when present) spans the full row width
+   underneath both. */
+.field--check {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  gap: var(--s-3);
+}
+
+.field--check .field__label {
+  font-weight: var(--fw-body);
+  color: var(--ink);
+}
+
+.field--check .field__error {
+  grid-column: 1 / -1;
+}
+
+.field__check {
+  width: var(--s-5);
+  height: var(--s-5);
+  margin-block-start: var(--s-1);
+  accent-color: var(--ink);
+}
+
+.field__hint {
+  font-size: var(--fs-micro);
+  color: var(--ink-soft);
+}
+
+/* Error text: --accent-strong only, never --accent (fails 4.5:1 on
+   --surface). */
+.field__error {
+  display: flex;
+  align-items: center;
+  gap: var(--s-1);
+  font-size: var(--fs-small);
+  color: var(--accent-strong);
+}
+
+/* An author-origin `display` beats the UA stylesheet's [hidden] rule on
+   cascade origin alone, so the `flex` above was silently defeating every
+   field's `hidden` attribute (and contact-form.js's `errorEl.hidden = true`
+   in clearFieldError) — errors rendered as empty boxes at all times. */
+.field__error[hidden] {
+  display: none;
+}
+
+.form__submit {
+  margin-block-start: var(--s-2);
+  align-self: flex-start;
+}
+
+.form__status {
+  margin-block-start: var(--s-4);
+  font-size: var(--fs-small);
+  color: var(--ink-soft);
+}
+

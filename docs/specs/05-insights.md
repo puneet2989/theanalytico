@@ -1,336 +1,209 @@
 # Spec 05 — Insights page (`insights.html`)
 
-Owner agents: `html-builder` (Haiku 4.5) for markup, `css-stylist` (Sonnet 5) for `pages.css`.
-Phase: 6. Starts only after `index.html` passes Phase 4.
+Rewritten 15 Aug 2026 against the shipped `index.html`, `components.css`, and `assets/js/modules/`. Supersedes the Phase 0 version entirely.
+
+Agent: `html-builder` (Haiku 4.5). Read `docs/specs/08-motion-modules.md` sections 2, 4 and 6 before starting.
 
 ## 1. Files
 
-`html-builder` may create or edit only:
+Create exactly one file:
 
-- `insights.html`
+- `/insights.html`
 
-`css-stylist` may edit only:
+Edit nothing else. Add no image file.
 
-- `assets/css/pages.css`
+## 2. Scope change from the Phase 0 spec — read this first
 
-Do not create individual post pages in this phase.
-Do not create any other file.
-Do not edit `tokens.css`, `base.css`, or `components.css`.
-Do not write any `.js` file.
+The Phase 0 spec listed **six** posts with `.post`-prefixed classes. Both parts are now wrong:
 
-## 2. Mode reminder and content policy
+1. **Three posts, not six.** Only three insight images exist (`/assets/img/insights/insight-1.webp`, `-2.webp`, `-3.webp`), and the home page already commits to exactly those three titles. Listing six stub links, five of which have no artwork and none of which resolve to an article, multiplies fabricated content for no gain. Posts 4–6 from the Phase 0 spec are held back until they are written and illustrated.
+2. **`.post` classes do not exist.** `components.css` lines 1128–1235 style insight cards as `.insights__grid .card` with `card__media`, `card__date`, `card__title` and a stretched `card__link`. Use those. `card__category`, `card__standfirst` and `card__meta` are deliberately hidden by that stylesheet — do not author them.
 
-Current mode is LOCAL PREVIEW ONLY. Not for publication.
+Both changes are flagged to the client as open questions. Build to this spec.
 
-Insight content is genuine advice. Expertise claims about a subject are not claims about past clients, so the article text below is not a fabrication and does not need placeholder marking.
+## 3. Content policy for this page
 
-What does need placeholder marking on this page:
+Insight posts are advice about a subject, not claims about past clients, so the titles and topics may ship as written. What may **not** ship unmarked:
 
-1. Publication dates. No post is published. `data-placeholder="true"` plus a PLACEHOLDER comment on every date.
-2. Author names. No team names are confirmed. Omit authors entirely rather than invent one.
-3. Read times. Acceptable only if the drafted article supports the figure. Since no article is drafted, mark every read time as a placeholder.
-4. Individual post URLs. No post pages exist. Every card links to `#` and is marked as a placeholder.
+- Publication dates — none of the three posts is written or dated. Marked placeholder.
+- Post URLs — no post pages exist. Every link points at `/insights` (the current page), never at `#`, never at a 404 URL. Marked placeholder.
+- Read times — not calculable before the posts exist. **Omitted entirely**, not marked. The card layout hides `card__read-time` anyway.
 
-`<meta name="robots" content="noindex, nofollow">` is required.
+No author byline. No headshot. No comment count. No share count.
 
-No claim about a client's results appears on this page.
-No invented statistic appears in any article summary. If a figure would help, write `[EVIDENCE NEEDED: source for this figure]` instead of a number.
+## 4. Shared chrome — copy, do not rewrite
 
-## 3. Document structure
+Identical to spec 03 section 2. Copy from `/index.html`:
 
-| # | Section | `id` | Background | Radius + overlap |
-|---|---|---|---|---|
-| 1 | Header | — | transparent | no |
-| 2 | Page intro | `intro` | `--bg-blue` | no |
-| 3 | Featured post | `featured` | `--bg-cream` | yes |
-| 4 | Post grid | `all-posts` | `--bg-grey` | yes |
-| 5 | Topics band | `topics` | `--bg-blue` | yes |
-| 6 | Final CTA | `cta` | `--bg-cream` | yes |
-| 7 | Footer | — | `--ink` | no |
+| What | `index.html` lines |
+|---|---|
+| Anti-flash script | 28 |
+| Font preloads | 30–31 |
+| Stylesheet links | 33–35 |
+| Skip link | 60 |
+| Flowmap mount div | 62 |
+| `<header>` | 64–88 — move `aria-current="page"` to the Insights link |
+| Drawer | 90–101 |
+| `<footer>` | 397–425 |
+| Script tags | 427–430 |
 
-Heading order:
-- One `<h1>`, in the page intro.
-- Each of sections 3 to 6 has one `<h2>`.
-- Each post card title is an `<h3>`.
-
-Semantics:
-- `<main id="main">` wraps sections 2 to 6.
-- The post grid is a `<ul>`, one `<li>` per post, each containing an `<article>`.
-- The featured post is a single `<article>`.
-- Category labels are plain text, not links, because no category pages exist.
-
-## 4. Section 2 — Page intro
-
-Structure:
-
-```
-section#intro
-  div.container
-    p.eyebrow        "Insights"
-    h1.page__title   page heading
-    p.page__lead     lead paragraph
-```
-
-`h1` copy, exact: `Practical notes on getting found.`
-
-Lead copy, exact: `Short, specific pieces on web design, search and AI for small businesses. No growth-hacking, no jargon, just the things that move the needle when you have one person doing everything.`
-
-Section padding-top is `calc(72px + var(--s-9))`.
-
-Tokens: `h1` uses `--fs-h1`, `--fw-heading`, `--lh-heading`, `--ls-heading`, colour `--ink-black`. Lead uses `--fs-lead`, colour `--ink-soft`, `max-width: var(--container-text)`.
-
-Motion: `heading-mask.js` on the `h1`.
-
-## 5. Section 3 — Featured post
-
-One post, laid out wider than the grid cards.
-
-`h2` copy, exact: `Start here.`
-
-Featured post is post 1 from the list in section 6.
-
-Structure:
-
-```
-section#featured.section.section--cream
-  div.container
-    h2#featured-title            "Start here."
-    article.post.post--featured
-      p.post__cat                category label
-      h3.post__title             post title as a link
-      p.post__standfirst         standfirst
-      p.post__meta               read time and date
-      a.post__link               "Read the full piece"
-```
-
-Post title is wrapped in an `<a>`. The `<a>` href is `#`.
-Add before the `<article>`: `<!-- PLACEHOLDER: replace before launch — individual post URL once the post is published -->`
-Add `data-placeholder="true"` to the `<article>`.
-
-Layout: two columns at 1024px, text left occupying 7 of 12 columns, an empty decorative block right occupying 5 of 12. The decorative block has `aria-hidden="true"` and no text. Below 1024px it is a single column and the decorative block is hidden with `display: none`.
-
-Tokens: article background `--surface`, radius `--radius-lg`, padding `var(--s-7)`, border `1px solid var(--line)`.
-Category uses `--fs-micro`, `--ls-caps`, colour `--accent`.
-Title uses `--fs-h3`, `--fw-medium`, `--ls-heading`, colour `--ink-black`.
-Standfirst uses `--fs-lead`, colour `--ink-soft`.
-Meta uses `--fs-micro`, colour `--ink-soft`.
-
-## 6. Section 4 — Post grid
-
-`h2` copy, exact: `All pieces.`
-
-Six posts total. Post 1 also appears as the featured post above; in the grid, render posts 2 to 6 only, so no post appears twice.
-Therefore the grid contains exactly five `<li>` items.
-
-Post metadata rules for every card:
-- Category: plain text, from the fixed set `Web design`, `SEO`, `Paid ads`, `AI`.
-- Read time: marked as a placeholder.
-- Date: marked as a placeholder.
-- Author: omitted.
-- Link: `#`, marked as a placeholder.
-
-Post 1 — featured, also the source for the home page insights card
-- Category: `Web design`
-- Title: `What a local business actually needs on a homepage`
-- Standfirst: `Six blocks, in order, and why the phone number belongs above the fold.`
-- Read time: `5 min read`
-- Date: `August 2026`
-- Body direction for a future draft: the six blocks are what you do, who for, proof, price signal, contact, and location. Order matters because most visitors leave from the first screen.
-
-Post 2 — also on the home page
-- Category: `SEO`
-- Title: `Google Business Profile: the fields most people skip`
-- Standfirst: `Services, attributes, and the description field that quietly does the work.`
-- Read time: `6 min read`
-- Date: `August 2026`
-- Body direction: fill every service, set attributes honestly, keep the description factual, post occasionally, answer questions yourself.
-
-Post 3 — also on the home page
-- Category: `AI`
-- Title: `Where AI helps a small team, and where it wastes money`
-- Standfirst: `Chatbots, reporting, and the automations worth building first.`
-- Read time: `7 min read`
-- Date: `July 2026`
-- Body direction: automate the repeat, the boring and the after-hours. Do not automate judgement, pricing, or apologies.
-
-Post 4
-- Category: `Web design`
-- Title: `Why your site feels slow even though it looks finished`
-- Standfirst: `Unsized images, four font files, and a chat widget nobody uses.`
-- Read time: `5 min read`
-- Date: `July 2026`
-- Body direction: sized images, two font faces, no third-party widgets, lazy load below the fold.
-
-Post 5
-- Category: `Paid ads`
-- Title: `Before you spend a euro on Meta ads`
-- Standfirst: `Conversion tracking, one clear offer, and a landing page that matches the ad.`
-- Read time: `6 min read`
-- Date: `June 2026`
-- Body direction: tracking first, one offer per campaign, message match, then budget.
-
-Post 6
-- Category: `SEO`
-- Title: `Local search when you serve a whole county`
-- Standfirst: `Service-area businesses, one location page, and the pages not to build.`
-- Read time: `6 min read`
-- Date: `June 2026`
-- Body direction: do not build a page per town. Build one strong page and prove the service area properly.
-
-Card markup shape:
+## 5. Head requirements
 
 ```html
-<!-- PLACEHOLDER: replace before launch — individual post URL, publication date, and verified read time -->
-<li>
-  <article class="post" data-placeholder="true">
-    <p class="post__cat">SEO</p>
-    <h3 class="post__title"><a href="#">Google Business Profile: the fields most people skip</a></h3>
-    <p class="post__standfirst">Services, attributes, and the description field that quietly does the work.</p>
-    <p class="post__meta"><span data-placeholder="true">6 min read</span> · <time datetime="2026-08" data-placeholder="true">August 2026</time></p>
-  </article>
-</li>
-```
-
-Tokens: card background `--surface`, radius `--radius-lg`, padding `var(--s-6)`, border `1px solid var(--line)`, shadow `--shadow-sm`.
-Grid: one column below 640px, two at 768px, three at 1024px. Gap `var(--gap-grid)`.
-
-Do not add a thumbnail image to any post card. No post images exist and none are authorised.
-Do not add a `<img>` placeholder grey box.
-
-Motion: module `reveal-stagger.js`. See spec 08 section 12.
-This is the primary use of `reveal-stagger.js`. Trigger start `top 85%`, duration `0.6`, stagger `0.08`, ease `power2.out`.
-
-## 7. Section 5 — Topics band
-
-Structure:
-
-```
-section#topics.section.section--blue
-  div.container.container--narrow
-    h2#topics-title    heading
-    p.section__lead    one lead line
-    ul.topics__list    four topic chips
-```
-
-`h2` copy, exact: `What we write about.`
-Lead copy, exact: `Four topics, matching the four things we do.`
-
-Chips, exactly four, plain text, not links:
-1. `Web design`
-2. `SEO`
-3. `Paid ads`
-4. `AI`
-
-Chips are `<li>` elements, not `<a>`. No category archive pages exist, so a link would be a dead end.
-Add: `<!-- PLACEHOLDER: replace before launch — link each topic to a category archive page once archives exist -->`
-The `<ul>` carries `data-placeholder="true"`.
-
-Tokens: chip background `--surface`, radius `--radius-pill`, padding `var(--s-2) var(--s-5)`, font `--fs-small`, colour `--ink`, border `1px solid var(--line)`.
-
-Motion: none.
-
-## 8. Section 6 — Final CTA
-
-Identical structure to `index.html` section 10, with copy adjusted for this page's context.
-
-`h2` copy, exact: `Want this applied to your site?`
-Lead copy, exact: `A short call, no charge, no pitch deck. Based in Dublin, working with clients anywhere.`
-Phone button: `<a class="btn btn--primary" href="tel:+353872520034">Call 087-2520034</a>`
-Form button: `<a class="btn btn--ghost" href="/contact">Send a message</a>`
-
-No email address. `[EVIDENCE NEEDED: business email]`
-No newsletter signup. No email delivery service is configured for a list.
-
-## 9. Footer
-
-Identical to `index.html` section 13.
-The `Insights` footer and header nav links carry `aria-current="page"` on this page.
-
-## 10. Head requirements
-
-```html
-<title>Insights on Web Design, SEO and AI | TheAnalytico</title>
-<meta name="description" content="Practical notes from TheAnalytico on homepages that convert, Google Business Profile, local search, Meta ads and where AI actually helps a small team.">
-<meta name="robots" content="noindex, nofollow">
+<title>Insights — Practical Notes on Getting Found | TheAnalytico</title>
+<meta name="description" content="Short, specific pieces on web design, search, paid ads and AI for small businesses. Written by the people who build the sites.">
 <link rel="canonical" href="https://theanalytico.com/insights">
 ```
 
-JSON-LD on this page: `BreadcrumbList` plus a `CollectionPage`. Shapes are in spec 09 section 8.
-Do not emit `Article` or `BlogPosting` JSON-LD on this page. `Article` schema belongs on an individual post page, and none exist yet. Emitting `Article` for an unpublished post with a `#` URL is invalid.
-No `AggregateRating`. No `review`. No `author` node, because no author is confirmed.
+OG and Twitter tags follow `index.html` lines 10–19 with title, description and URL swapped. `og:type` stays `website`.
+
+**JSON-LD: one block only — `BreadcrumbList`.** Home → Insights, same shape as spec 03 section 3, `position: 2` name `Insights`, item `https://theanalytico.com/insights`.
+
+Do **not** emit `Article`, `BlogPosting`, `Blog`, or `ItemList` on this page. CLAUDE.md requires `Article` schema *on an insight post page*. No post page exists, and `Article` nodes whose `url` points back at the listing page are structured-data spam. When the posts are written, each post page gets its own `Article` node then.
+
+## 6. Section order and backgrounds
+
+Four sections. The first carries no `data-curtain`; the other three do. This page is deliberately short.
+
+| # | `id` | classes | curtain |
+|---|---|---|---|
+| 1 | `intro` | `section section--blue` | no |
+| 2 | `posts` | `section section--cream` | yes |
+| 3 | `topics` | `section section--grey` | yes |
+| 4 | `cta` | `section section--blue` | yes |
+
+## 7. Section 1 — `#intro`
+
+```
+section#intro.section.section--blue
+  div.container
+    p.eyebrow        "Insights"
+    h1.page__title   heading
+    p.page__lead     lead
+```
+
+`h1`, exact: `Practical notes on getting found`
+Lead, exact: `Short, specific pieces on web design, search and AI for small businesses. No growth hacking, no jargon, just the things that move the needle when one person is doing everything.`
+
+No buttons in this section. The `h1` carries no motion hook.
+
+## 8. Section 2 — `#posts`
+
+`h2 id="posts-title" data-mask-heading`, exact: `Everything we have written`
+
+Then the grid. Start from `index.html` lines 351–379 and change three things:
+
+1. The `<ul>` keeps `class="insights__grid" data-reveal-group data-placeholder="true"` and keeps the placeholder comment above it, reworded to: `<!-- PLACEHOLDER: replace before launch — individual post URLs once the posts are published; all three currently link to /insights -->`
+2. Each `card__link` href stays `/insights`.
+3. Nothing else changes: same three images, same alt text, same titles, same dates, same `loading="lazy" decoding="async" width="400" height="250"`, same `data-placeholder="true"` on each `card__date`, same per-card date placeholder comment.
+
+Card shape, one per post, exactly:
+
+```html
+<li class="card" data-reveal-item>
+  <figure class="card__media">
+    <img src="/assets/img/insights/insight-1.webp" width="400" height="250" alt="Market traders serving customers at an outdoor stall" loading="lazy" decoding="async">
+  </figure>
+  <!-- PLACEHOLDER: replace before launch — real publication date needed -->
+  <p class="card__date" data-placeholder="true">12 June 2026</p>
+  <h3 class="card__title">What a local business actually needs on a homepage</h3>
+  <a class="card__link" href="/insights">Read article</a>
+</li>
+```
+
+The three posts, in this order, matching the home page exactly:
+
+| # | Image | Alt text | Date | Title |
+|---|---|---|---|---|
+| 1 | `insight-1.webp` | `Market traders serving customers at an outdoor stall` | `12 June 2026` | `What a local business actually needs on a homepage` |
+| 2 | `insight-2.webp` | `Google Analytics open on a mobile phone` | `28 April 2026` | `Google Business Profile: the fields most people skip` |
+| 3 | `insight-3.webp` | `A team planning with sticky notes on a whiteboard` | `3 March 2026` | `Where AI helps a small team, and where it wastes money` |
+
+Rules:
+
+1. Exactly three `<li>` items. No fourth.
+2. No `card__category`, no `card__standfirst`, no `card__meta`, no `card__read-time` element. The stylesheet hides all four; authoring them adds hidden text to the accessibility tree for nothing.
+3. Every card's `<h3>` is plain text with no link inside it. The stretched `card__link` is the click target, per `components.css` line 1230.
+4. No `<time>` element. The dates are not real, so a machine-readable `datetime` attribute would be a fabricated fact in a machine-readable field.
+5. Do not add a "Load more" or pagination control.
+
+After the grid, one line, exact: `<p class="section__lead">The full pieces are being written. The three above go live first.</p>`
+
+That sentence is a statement of intent, not a fact about the past, and needs no placeholder marking. If the client disagrees, delete the line.
+
+## 9. Section 3 — `#topics`
+
+```
+section#topics.section.section--grey[data-curtain] aria-labelledby="topics-title"
+  div.container.container--narrow
+    h2#topics-title[data-mask-heading]   "What we write about"
+    p.section__lead                       lead
+    ul.topics__list[data-placeholder="true"]   four chips
+```
+
+Lead, exact: `Four topics, matching the four things we do.`
+
+Chips, exactly four `<li>` elements, plain text, **not** links, in this order: `Web design`, `SEO`, `Paid ads`, `AI`.
+
+Above the `<ul>`: `<!-- PLACEHOLDER: replace before launch — link each topic to a category archive page once archives exist -->`
+
+`.topics__list` is a new class. Tokens: chip background `--surface`, radius `--radius-pill`, padding `var(--s-2) var(--s-5)`, font `--fs-small`, colour `--ink`, border `1px solid var(--line)`, list is a wrapping flex row with `gap: var(--s-3)`.
+
+No motion hooks on this section beyond the heading and the curtain.
+
+## 10. Section 4 — `#cta`
+
+Container `.container--narrow`. Shape copies `index.html` lines 384–393.
+
+`h2 id="cta-title" data-mask-heading`, exact: `Want this applied to your site?`
+`p.cta__lead`, exact: `A short call, no charge, no pitch deck. Based in Dublin, working with clients anywhere.`
+Actions: `Call 087-2520034` → `tel:+353872520034` (`btn btn--primary`), `Send a message` → `/contact` (`btn btn--ghost`).
 
 ## 11. Motion summary
 
-| Section | Module | Gating |
+| Module | Hooks on this page | Where |
 |---|---|---|
-| `h1` and every `h2` | `heading-mask.js` | desktop only |
-| Section overlaps | `section-curtain.js` | desktop only |
-| Post grid | `reveal-stagger.js` | desktop only |
-| Featured post | `reveal-stagger.js` | desktop only |
-| Cursor blob | `cursor-blob.js` | desktop only, pointer fine only |
-| Smooth scroll | `lenis-scroll.js` | desktop only |
+| `header-pill.js` | header chrome | shared |
+| `flowmap-trail.js` | `[data-flowmap]` | one div after the skip link |
+| `heading-mask.js` | `data-mask-heading` | the three `<h2>` elements |
+| `section-curtain.js` | `data-curtain` | sections 2, 3, 4 |
+| `reveal-stagger.js` | `data-reveal-group` on the grid, `data-reveal-item` on each card | `#posts` |
 
-No carousel on this page.
-No counters on this page.
-No tilt cards on this page.
-No service loops on this page.
+`reveal-stagger.js` fires at the grid's `top 85%`, `y 20 → 0`, `opacity 0 → 1`, `0.6s`, `power2.out`, `0.08s` stagger. This is its canonical use.
+
+New hooks required: **none**. No `data-anchor-link` on this page — there is nothing to jump to.
 
 ## 12. Acceptance criteria
 
-1. `insights.html` contains exactly one `<h1>`.
-2. Heading levels descend without skipping.
-3. Sections appear in the order given in section 3.
-4. Backgrounds run blue, cream, grey, blue, cream.
-5. No two adjacent rhythm sections share a background class.
-6. The featured section contains exactly one `<article>`.
-7. The post grid contains exactly five `<li>` elements.
-8. Post 1 appears in the featured section and does not appear again in the grid.
-9. Six distinct post titles exist across the page, matching the six titles in section 6 character for character.
-10. Post titles 1, 2, and 3 match the three insights card titles on `index.html` character for character.
-11. Post standfirsts 1, 2, and 3 match the three insights card standfirsts on `index.html` character for character.
-12. Every post `<article>` has `data-placeholder="true"`.
-13. Every post `<article>` is preceded by a PLACEHOLDER comment.
-14. Every read time `<span>` has `data-placeholder="true"`.
-15. Every `<time>` element has `data-placeholder="true"` and a valid `datetime` attribute.
-16. No author name appears anywhere on the page.
-17. Every post link href is exactly `#`.
-18. No post card contains an `<img>`.
-19. Category labels come only from the set `Web design`, `SEO`, `Paid ads`, `AI`.
-20. The topics list contains exactly four `<li>` and zero `<a>` elements.
-21. The topics `<ul>` has `data-placeholder="true"` and a preceding PLACEHOLDER comment.
-22. No invented statistic appears in any standfirst.
-23. No numeric percentage appears anywhere on the page.
-24. No newsletter form appears on the page.
-25. `<meta name="robots" content="noindex, nofollow">` is present.
-26. The canonical points at `https://theanalytico.com/insights`.
-27. JSON-LD contains zero `Article` nodes and zero `BlogPosting` nodes.
-28. JSON-LD contains no `author`, `aggregateRating`, or `review` key.
-29. Every `data-placeholder="true"` element has a matching row in `PLACEHOLDER-CONTENT.md`.
-30. The header, footer, and button markup match `index.html` apart from `aria-current`.
-31. No inline `<style>` block, except the critical-CSS block in `<head>`.
-32. Exactly one inline `<script>`, the header anti-flash script.
-33. No `on*` attribute anywhere in the file.
-34. No hex colour anywhere in the file.
-35. With JS disabled, all six posts are visible with full titles, standfirsts, and metadata, and no element has `opacity: 0`.
-36. Lighthouse mobile scores 95 or above on all four categories.
-37. CLS below 0.05.
-38. British English throughout.
-39. No email address appears anywhere on the page.
+1. `/insights.html` exists and is the only file created. No image file is added.
+2. `<title>` is `Insights — Practical Notes on Getting Found | TheAnalytico` and the canonical is `https://theanalytico.com/insights`.
+3. Exactly one `<h1>` exists, in `#intro`, with no motion hook.
+4. Four `<section>` elements exist with the exact ids, classes and order in section 6's table.
+5. Section 1 has no `data-curtain`; sections 2–4 each have one.
+6. Every `<h2>` carries `data-mask-heading`, has an `id` referenced by its section's `aria-labelledby`, and contains no child elements.
+7. `#posts` contains exactly three `<li class="card" data-reveal-item>` items inside one `<ul class="insights__grid" data-reveal-group data-placeholder="true">`.
+8. Each card contains, in this order: `figure.card__media` with one `<img>`, a placeholder comment, `p.card__date[data-placeholder="true"]`, `h3.card__title`, `a.card__link[href="/insights"]`.
+9. No `card__category`, `card__standfirst`, `card__meta`, `card__read-time` or `<time>` element appears anywhere in the file.
+10. Every `<img>` has `width`, `height`, `alt`, `loading="lazy"` and `decoding="async"`.
+11. No link on the page has `href="#"`.
+12. Exactly one JSON-LD block exists, and it is a `BreadcrumbList`.
+13. The strings `Article`, `BlogPosting`, `aggregateRating` and `review` do not appear in any JSON-LD on this page.
+14. `#topics` contains exactly four `<li>` chips, none of which is an `<a>`.
+15. The `<header>` matches `index.html` lines 64–88 except that `aria-current="page"` sits on the Insights link; the `<footer>` matches lines 397–425 byte for byte.
+16. Exactly one `<div data-flowmap aria-hidden="true"></div>` exists.
+17. The four script tags match `index.html` lines 427–430 and no other script is loaded.
+18. No `on*` attribute, no inline `<style>`, no inline `style` attribute, no raw hex, no `px` font size.
+19. Every fabricated date carries the three-part placeholder marking from CLAUDE.md.
+20. With JavaScript disabled, all four sections render fully readable and all three cards are visible.
 
 ## 13. Non-goals
 
-Do not write the full body text of any article. Only titles, standfirsts, and body direction notes are in scope.
-Do not create individual post HTML pages.
-Do not create category archive pages.
-Do not add pagination. Six posts do not need it.
-Do not add a search field.
-Do not add a tag cloud.
-Do not add a newsletter signup form.
-Do not add social share buttons. No social profiles are confirmed.
-Do not add an RSS feed link. No feed is generated.
-Do not add post thumbnail images.
-Do not add author bios or headshots.
-Do not add `Article` JSON-LD.
-Do not add reading-progress motion.
-Do not edit `tokens.css`, `base.css`, or `components.css`.
-Do not write any `.js` file.
+- Do not create individual post pages in this pass.
+- Do not write the article bodies.
+- Do not add posts 4–6 from the Phase 0 spec.
+- Do not add pagination, search, filtering, RSS, or a newsletter signup. No mailing list exists.
+- Do not add author bylines, headshots, or social share buttons.
+- Do not add `Article` or `Blog` JSON-LD.
+- Do not reuse an insight image on more than one card.
+- Do not write any CSS. `.page__title`, `.page__lead` and `.topics__list` are handed to `css-stylist` in Phase 6f.
+- Do not edit `PLACEHOLDER-CONTENT.md`; rows 5.9–5.11 need trimming from six posts to three, and the architect will do it.

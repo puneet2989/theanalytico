@@ -1,393 +1,330 @@
 # Spec 03 — Services page (`services.html`)
 
-Owner agents: `html-builder` (Haiku 4.5) for markup, `css-stylist` (Sonnet 5) for `pages.css`.
-Phase: 6. Starts only after `index.html` passes Phase 4.
+Rewritten 15 Aug 2026 against the shipped `index.html`, `components.css`, and `assets/js/modules/`. Supersedes the Phase 0 version entirely.
+
+Agent: `html-builder` (Haiku 4.5). Read `docs/specs/08-motion-modules.md` sections 2, 4 and 6 before starting.
 
 ## 1. Files
 
-`html-builder` may create or edit only:
+Create exactly one file:
 
-- `services.html`
+- `/services.html`
 
-`css-stylist` may edit only:
+Edit nothing else. Not `index.html`. Not any `.css`. Not any `.js`. Not `sitemap.xml`, `_headers`, `_redirects`, `robots.txt`, `PLACEHOLDER-CONTENT.md`.
 
-- `assets/css/pages.css`
+If a style is missing, ship the markup with the class names named in this spec and report the gap. `css-stylist` adds the rules in Phase 6f.
 
-Do not create any other file.
-Do not edit `assets/css/tokens.css`.
-Do not edit `assets/css/base.css`.
-Do not edit `assets/css/components.css`.
-Do not edit `index.html`.
-Do not write any `.js` file.
+## 2. Shared chrome — copy, do not rewrite
 
-Reuse every component class established in `index.html`. Do not invent a second card class for the same visual pattern.
+Open `/index.html` and copy these ranges verbatim:
 
-## 2. Mode reminder
+| What | `index.html` lines | Change allowed |
+|---|---|---|
+| Anti-flash script in `<head>` | 28 | none |
+| Font preloads | 30–31 | none |
+| Three stylesheet links | 33–35 | none |
+| Skip link | 60 | none |
+| Flowmap mount div | 62 | none |
+| `<header>` block | 64–88 | move `aria-current="page"` from the Home link to the Services link |
+| Drawer block | 90–101 | none |
+| `<footer>` block | 397–425 | none |
+| Script tags before `</body>` | 427–430 | none |
 
-Current mode is LOCAL PREVIEW ONLY. Not for publication.
+`<html lang="en" data-header-boot="top">` and `<body>` open exactly as in `index.html`.
+`<main id="main">` wraps every section.
+There is no `<meta name="robots">` on `index.html`; do not add one here. (See open question OQ-1 in the handover note.)
 
-1. `<meta name="robots" content="noindex, nofollow">` is required.
-2. Every fabricated fact is wrapped in `data-placeholder="true"`.
-3. Every fabricated fact is preceded by `<!-- PLACEHOLDER: replace before launch — <what is needed> -->`.
-4. Attributions use forename plus initial, plus role, plus sector.
-5. Every placeholder is listed in `PLACEHOLDER-CONTENT.md`.
-
-No pricing appears on this page. No pricing is confirmed.
-No turnaround time appears on this page. No delivery-time evidence exists.
-No result claim appears on this page. No analytics evidence exists.
-
-## 3. Document structure
-
-| # | Section | `id` | Background | Radius + overlap |
-|---|---|---|---|---|
-| 1 | Header | — | transparent | no |
-| 2 | Page intro | `intro` | `--bg-blue` | no |
-| 3 | Pillar 1 — Web Design | `web-design` | `--bg-cream` | yes |
-| 4 | Pillar 2 — SEO | `seo` | `--bg-grey` | yes |
-| 5 | Pillar 3 — Paid Advertising | `paid-advertising` | `--bg-blue` | yes |
-| 6 | Pillar 4 — AI Services | `ai-services` | `--bg-cream` | yes |
-| 7 | Combination band | `combinations` | `--bg-grey` | yes |
-| 8 | FAQ | `faq` | `--bg-blue` | yes |
-| 9 | Final CTA | `cta` | `--bg-cream` | yes |
-| 10 | Footer | — | `--ink` | no |
-
-Heading order:
-- One `<h1>`, in the page intro.
-- Each of sections 3 to 9 has one `<h2>`.
-- Each capability or sub-item inside a pillar is an `<h3>`.
-- No level is skipped.
-
-Semantics:
-- `<main id="main">` wraps sections 2 to 9.
-- Each pillar is a `<section class="section section--cream" id="web-design" aria-labelledby="web-design-title">`.
-- Capability lists are `<ul>`.
-- The FAQ is a `<dl>` with one `<dt>` per question and one `<dd>` per answer.
-- Do not use `<details>` for the FAQ. `<dl>` keeps the answers in the accessibility tree and visible with JS disabled.
-
-## 4. Section 2 — Page intro
-
-Structure:
-
-```
-section#intro
-  div.container
-    p.eyebrow           "Services"
-    h1.page__title      page heading
-    p.page__lead        lead paragraph
-    ul.anchor-nav       four in-page links
-```
-
-`h1` copy, exact: `Four services. One goal: more of the right customers.`
-
-Lead copy, exact: `Web design, SEO, paid advertising and AI services. Run one on its own or stack them in the order that pays back fastest for your business.`
-
-Anchor nav, exactly four links, in this order:
-
-1. `<a href="#web-design">Web Design</a>`
-2. `<a href="#seo">SEO</a>`
-3. `<a href="#paid-advertising">Paid Advertising</a>`
-4. `<a href="#ai-services">AI Services</a>`
-
-Anchor nav is a `<nav aria-label="Services on this page">` wrapping the `<ul>`.
-Anchor links use `--radius-pill`, background `--surface`, border `1px solid var(--line)`, padding `var(--s-3) var(--s-5)`, font `--fs-small`.
-
-Section padding-top is `calc(72px + var(--s-9))` to clear the fixed header, matching the home hero.
-
-Tokens: `h1` uses `--fs-h1`, `--fw-heading`, `--lh-heading`, `--ls-heading`, colour `--ink-black`. Lead uses `--fs-lead`, colour `--ink-soft`, `max-width: var(--container-text)`.
-
-Motion: `heading-mask.js` on the `h1`.
-
-## 5. Pillar block template
-
-All four pillar sections share this shape. Do not deviate.
-
-```
-section.section.section--{bg}#{id}
-  div.container
-    div.pillar__head
-      p.eyebrow                 pillar number, e.g. "01"
-      h2#{id}-title             pillar name
-      p.pillar__lead            one lead line
-    div.pillar__body
-      ul.pillar__list           what is included, 4 to 5 items
-      div.pillar__visual        decorative loop block, aria-hidden
-    a.btn.btn--primary          CTA to /contact
-```
-
-Rules:
-- The eyebrow is the two-digit pillar number: `01`, `02`, `03`, `04`.
-- The `<h2>` text is the pillar name exactly as written in section 6 to 9 below.
-- Each `<ul>` item is a short noun phrase, no full stop.
-- `.pillar__visual` is decorative, contains no text, and has `aria-hidden="true"`.
-- CTA text differs per pillar. Never use `Learn more`.
-- Layout: `.pillar__body` is one column below 1024px and two columns at 1024px, list left, visual right. Gap `var(--gap-grid)`.
-
-Tokens for every pillar:
-- Eyebrow: `--fs-micro`, `--fw-medium`, `--ls-caps`, colour `--accent`.
-- `h2`: `--fs-h2`, `--fw-heading`, `--lh-heading`, `--ls-heading`, colour `--ink-black`.
-- Lead: `--fs-lead`, colour `--ink-soft`, `max-width: var(--container-text)`.
-- List items: `--fs-body`, colour `--ink`, row gap `var(--s-3)`.
-- Visual block: background `--surface`, radius `--radius-lg`, border `1px solid var(--line)`, `aspect-ratio: 4 / 3`.
-
-## 6. Section 3 — Pillar 1, Web Design
-
-Eyebrow: `01`
-`h2` copy, exact: `Web Design`
-Lead copy, exact: `Design and build from scratch, shaped around the one action you want a visitor to take. Responsive, fast, and easy to update.`
-
-List items, exact:
-1. `Design and build from scratch`
-2. `Responsive across phone, tablet and desktop`
-3. `Built for speed, hosted on Cloudflare`
-4. `Conversion-focused layout and calls to action`
-5. `Contact forms that reach you reliably`
-
-CTA text: `Talk about a new site`
-`.pillar__visual` loop type: `data-service-loop="mockup-slide"`
-
-## 7. Section 4 — Pillar 2, SEO
-
-Eyebrow: `02`
-`h2` copy, exact: `SEO`
-Lead copy, exact: `Technical fixes first, then on-page structure, then local search. The order matters, because ranking a broken page is wasted effort.`
-
-List items, exact:
-1. `Technical audit and fixes`
-2. `On-page structure, titles and internal links`
-3. `Local search and Google Business Profile`
-4. `Content structure and keyword mapping`
-5. `Core Web Vitals and page speed`
-
-CTA text: `Ask about an SEO audit`
-`.pillar__visual` loop type: `data-service-loop="cycle"`
-
-Do not promise a ranking position.
-Do not promise a timeframe to rank.
-
-## 8. Section 5 — Pillar 3, Paid Advertising
-
-Eyebrow: `03`
-`h2` copy, exact: `Paid Advertising`
-Lead copy, exact: `Meta and Google campaigns, set up properly the first time and managed month to month. You see the account, the spend and the results.`
-
-List items, exact:
-1. `Meta campaign setup and management`
-2. `Google Search and Performance Max campaigns`
-3. `Conversion tracking and event setup`
-4. `Ad creative and landing page pairing`
-5. `Monthly reporting in plain language`
-
-CTA text: `Discuss an ad budget`
-`.pillar__visual` loop type: `data-service-loop="cycle"`
-
-Do not state a return on ad spend figure.
-Do not state a cost per lead figure.
-
-## 9. Section 6 — Pillar 4, AI Services
-
-Eyebrow: `04`
-`h2` copy, exact: `AI Services`
-Lead copy, exact: `Five capabilities that remove repeat work and answer customers when you are not at your desk. Start with one, add the rest when it earns its place.`
-
-This pillar uses five `<h3>` sub-blocks instead of a plain `<ul>`, because each capability needs a sentence of its own.
-All five are mandatory. Do not merge them. Do not drop one. Do not add a sixth.
-
-Capability 1
-- `h3`: `AI chatbots and 24/7 customer engagement`
-- Body: `A chatbot on your site that answers common questions, captures details and hands over to you when it matters.`
-
-Capability 2
-- `h3`: `AI-driven local SEO and Google Business Profile optimisation`
-- Body: `Profile fields, service lists and posts kept current, with local queries mapped to the pages that answer them.`
-
-Capability 3
-- `h3`: `AI marketing automation across ads, email and social`
-- Body: `Campaign variants, email sequences and social posts drafted and scheduled from one brief.`
-
-Capability 4
-- `h3`: `Workflow and operations automation`
-- Body: `Quotes, bookings, invoices and follow-ups connected so the same detail is never typed twice.`
-
-Capability 5
-- `h3`: `AI analytics and reporting`
-- Body: `One monthly summary that says what changed, what caused it and what to do next.`
-
-Spelling note. Use `optimisation`, not `optimization`. British English is mandatory.
-
-Layout: capability blocks are one column below 768px, two columns at 768px, and the fifth block spans both columns at 768px. At 1024px use three columns with the fourth and fifth on the second row.
-
-`.pillar__visual` loop type: `data-service-loop="icon-fan"`
-CTA text: `Scope an AI project`
-
-## 10. Section 7 — Combination band
-
-Structure:
-
-```
-section#combinations.section.section--grey
-  div.container
-    h2#combinations-title    heading
-    p.section__lead          one lead line
-    ul.combo__grid           three combination cards
-```
-
-`h2` copy, exact: `Common combinations.`
-Lead copy, exact: `Most projects start in one of three ways.`
-
-Card 1
-- `h3`: `New business, no website`
-- Body: `Web Design first, then Google Business Profile and local SEO once the site is live.`
-
-Card 2
-- `h3`: `Site exists, nobody finds it`
-- Body: `SEO audit and fixes, then paid advertising to cover the gap while organic builds.`
-
-Card 3
-- `h3`: `Busy but drowning in admin`
-- Body: `Workflow automation and a chatbot first, then reporting so you can see what is working.`
-
-Tokens: reuse `.card` from `components.css`. Background `--surface`, radius `--radius-lg`, padding `var(--s-6)`.
-Grid: one column below 768px, three at 1024px.
-
-Motion: `reveal-stagger.js`.
-
-## 11. Section 8 — FAQ
-
-Six questions. Use a `<dl>`.
-
-`h2` copy, exact: `Questions we get asked.`
-
-Q1 `dt`: `Do you work with businesses outside Ireland?`
-A1 `dd`: `Yes. We are based in Dublin and work with clients anywhere.`
-
-Q2 `dt`: `Can you take on just one service?`
-A2 `dd`: `Yes. Each of the four services runs on its own.`
-
-Q3 `dt`: `Who owns the website when it is finished?`
-A3 `dd`: `You do. The domain, the hosting account and the files are yours.`
-
-Q4 `dt`: `What platform do you build on?`
-A4 `dd`: `Usually a fast static build hosted on Cloudflare. WordPress when the site needs a full editor, as with SodoLT.`
-
-Q5 `dt`: `Will I be able to update the site myself?`
-A5 `dd`: `Yes. We agree which parts you need to edit before the build starts and set those up for you.`
-
-Q6 `dt`: `How much does it cost?`
-A6 `dd`: `It depends on scope. Book a short call and you will get a figure in writing.`
-- Add before Q6: `<!-- PLACEHOLDER: replace before launch — pricing bands or starting price once confirmed by the client -->`
-- Add `data-placeholder="true"` to the Q6 `<dd>`.
-- Reason: the answer implies a pricing process that has not been confirmed.
-
-Every other answer above is verifiable from confirmed facts and needs no marking.
-
-Tokens: `dt` uses `--fs-h4`, `--fw-medium`, colour `--ink-black`. `dd` uses `--fs-body`, colour `--ink-soft`, margin-inline-start `0`, margin-block-end `var(--s-6)`.
-FAQ container uses `.container--narrow`.
-
-Motion: `reveal-stagger.js` on the `dl` children.
-
-## 12. Section 9 — Final CTA
-
-Identical structure and copy to `index.html` section 10, so the two pages agree.
-
-`h2` copy, exact: `Tell us what the site has to do.`
-Lead copy, exact: `A short call, no charge, no pitch deck. Based in Dublin, working with clients anywhere.`
-Phone button: `<a class="btn btn--primary" href="tel:+353872520034">Call 087-2520034</a>`
-Form button: `<a class="btn btn--ghost" href="/contact">Send a message</a>`
-
-No email address. `[EVIDENCE NEEDED: business email]`
-
-## 13. Footer
-
-Identical to `index.html` section 13. Copy the markup exactly. Do not vary the wording.
-The `Services` footer link carries `aria-current="page"` on this page.
-
-## 14. Head requirements
+## 3. Head requirements
 
 ```html
 <title>Web Design, SEO, Paid Ads and AI Services | TheAnalytico</title>
-<meta name="description" content="Four services from TheAnalytico: web design, SEO, Meta and Google advertising, and five AI capabilities including chatbots, automation and reporting.">
-<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="Four services for local businesses: web design, SEO, Meta and Google advertising, and AI automation. Dublin based, working worldwide.">
 <link rel="canonical" href="https://theanalytico.com/services">
 ```
 
-JSON-LD on this page: one `Service` node per pillar, four in total, plus a `BreadcrumbList`. Shapes are defined in spec 09 section 8.
-No `AggregateRating`. No `review`. No `offers` with a price, because no price is confirmed.
+Open Graph and Twitter tags follow `index.html` lines 10–19 exactly, with `og:title` and `twitter:title` set to the `<title>` string, `og:description` and `twitter:description` set to the meta description string, and `og:url` set to the canonical URL. `og:image` and `twitter:image` stay `https://theanalytico.com/assets/img/og-default.png`. `og:type` stays `website`. Keep `<meta name="theme-color" content="#e8f2fa">`, the four icon links, and the manifest link.
 
-## 15. Motion summary
+Two JSON-LD blocks, both `<script type="application/ld+json">`, placed at the end of `<head>`:
 
-| Section | Module | Gating |
+**Block 1 — BreadcrumbList**
+
+```json
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://theanalytico.com/" },
+    { "@type": "ListItem", "position": 2, "name": "Services", "item": "https://theanalytico.com/services" }
+  ]
+}
+```
+
+**Block 2 — four `Service` nodes in an `@graph`.** One node per pillar. Each node uses exactly this shape, with `name` and `description` from section 6:
+
+```json
+{
+  "@type": "Service",
+  "serviceType": "Web Design",
+  "name": "Web Design",
+  "description": "…",
+  "provider": { "@type": "ProfessionalService", "name": "TheAnalytico", "url": "https://theanalytico.com", "telephone": "+353872520034", "address": { "@type": "PostalAddress", "addressLocality": "Dublin", "addressCountry": "IE" } },
+  "areaServed": { "@type": "Place", "name": "Worldwide" }
+}
+```
+
+Forbidden in JSON-LD on this page: `offers`, `price`, `priceRange`, `aggregateRating`, `review`, `award`. No pricing is confirmed and no reviews exist.
+
+## 4. Section order and backgrounds
+
+Exactly nine sections, in this order. The first carries no `data-curtain`; the other eight do.
+
+| # | `id` | classes | curtain |
+|---|---|---|---|
+| 1 | `intro` | `section section--blue` | no |
+| 2 | `pillars` | `section section--cream` | yes |
+| 3 | `web-design` | `section section--grey` | yes |
+| 4 | `seo` | `section section--blue` | yes |
+| 5 | `paid-advertising` | `section section--cream` | yes |
+| 6 | `ai-services` | `section section--grey` | yes |
+| 7 | `combine` | `section section--blue` | yes |
+| 8 | `faq` | `section section--cream` | yes |
+| 9 | `cta` | `section section--grey` | yes |
+
+Sections 3–6 keep those exact `id` values. `index.html` already links to `/services#web-design`, `/services#seo`, `/services#paid-advertising`, `/services#ai-services`.
+
+Every section from 2 onwards carries `aria-labelledby` pointing at its own `<h2 id="…">`, matching `index.html` line 123.
+
+## 5. Section 1 — `#intro`
+
+```
+section#intro.section.section--blue
+  div.container
+    p.eyebrow            "What we do"
+    h1.page__title       heading
+    p.page__lead         lead
+    div.section__actions two buttons
+```
+
+`h1`, exact: `Four services, one job: get you found and chosen`
+Lead, exact: `Web design, SEO, paid advertising and AI. Run one on its own or stack them in the order that pays back fastest for your business.`
+
+Buttons: `<a class="btn btn--primary" href="/contact">Contact Us</a>` and `<a class="btn btn--ghost" href="/work">See Our Work</a>`.
+
+The `h1` carries **no** `data-mask-heading` and **no** hero hook. Inner pages have a static `h1`.
+`.page__title` and `.page__lead` are new classes. Tokens: title `--fs-h1`, `--fw-medium`, `--lh-heading`, `--ls-heading`, `--ink-black`; lead `--fs-lead`, `--ink-soft`, `max-width: var(--container-text)`, `margin-block-start: var(--s-4)`.
+
+## 6. Section 2 — `#pillars`
+
+`h2 id="pillars-title" data-mask-heading`, exact: `The four pillars`
+
+Then `<p class="section__lead">`, exact: `Every one of these is delivered by the same person you talk to on the call.`
+
+Then the services grid. **Copy `index.html` lines 132–177 verbatim**, changing only the four `card__link` hrefs to on-page anchors and adding `data-anchor-link`:
+
+- Card 1 link → `href="#web-design" data-anchor-link`
+- Card 2 link → `href="#seo" data-anchor-link`
+- Card 3 link → `href="#paid-advertising" data-anchor-link`
+- Card 4 link → `href="#ai-services" data-anchor-link`
+
+Rules, one per line:
+
+1. The `<ul>` keeps `class="services__grid" data-reveal-group`.
+2. Each `<li>` keeps `class="card card--service" data-reveal-item`.
+3. Card source order is fixed: Web Design, SEO, Paid Advertising, AI Services. The gradients are assigned by `:nth-child` in `components.css` line 755. Reordering breaks the colours.
+4. Every card keeps its `figure.card__media.card__media--video[data-service-media]` and `video[data-service-video]` exactly as authored on the home page, including `muted loop playsinline preload="none"`, the poster, `width="480" height="300"`, `aria-hidden="true"`, and both `<source>` elements.
+5. Card titles and body copy are unchanged from `index.html`.
+6. Do not add a fifth card. Do not add a video that is not one of the four existing clips.
+
+`description` values for the JSON-LD `Service` nodes in section 3 are the four `card__body` strings from these cards, verbatim.
+
+## 7. Sections 3–6 — pillar detail blocks
+
+All four use one template. No images, no video, no new assets.
+
+```
+section#<id>.section.section--<colour>[data-curtain] aria-labelledby="<id>-title"
+  div.container
+    p.eyebrow            pillar label
+    h2#<id>-title[data-mask-heading]   pillar heading
+    p.section__lead      one-paragraph summary
+    ul.pillar__list[data-reveal-group]
+      li.card[data-reveal-item]
+        h3.card__title   deliverable name
+        p.card__body     deliverable detail
+    div.section__actions
+      a.btn.btn--primary href="/contact"  "Talk to us about <pillar>"
+```
+
+`.pillar__list` is a new class: one column below 640px, two columns at 640px, three at 1024px, `gap: var(--gap-grid)`, `margin-block-start: var(--s-6)`.
+
+Rules:
+
+1. Every `h2` carries `data-mask-heading` and contains plain text only.
+2. Every list carries `data-reveal-group`; every `<li>` carries `data-reveal-item`.
+3. No `<li>` carries `data-tilt-card` in sections 3–5.
+4. No claim about results, rankings, traffic, or revenue appears anywhere in these blocks.
+5. No timeframe ("in two weeks", "within a month") appears. None is confirmed.
+6. No price, no package name, no tier appears.
+
+### 7.1 `#web-design` (section--grey)
+
+Eyebrow: `Pillar one`
+`h2`: `Web design`
+Lead: `A site built from scratch around the one action you want a visitor to take, then made fast enough that nobody leaves before it loads.`
+
+Deliverables, exactly four:
+
+1. `Structure first` — `We agree what each page has to do and in what order, before a single pixel is designed.`
+2. `Built responsive` — `One build that holds up from a 360px phone to a wide desktop, tested on real screen sizes.`
+3. `Fast by construction` — `Static HTML, CSS and vanilla JavaScript on Cloudflare. No page builder, no plugin stack, nothing to slow down later.`
+4. `Handover you can use` — `You get the live site, the code, and a walkthrough of how to change the parts you will want to change.`
+
+### 7.2 `#seo` (section--blue)
+
+Eyebrow: `Pillar two`
+`h2`: `SEO`
+Lead: `Technical foundations, page-level structure, and the local signals that decide whether the people nearby ever see you.`
+
+Deliverables, exactly four:
+
+1. `Technical audit` — `Crawlability, indexing, redirects, structured data and Core Web Vitals, checked and fixed rather than reported.`
+2. `On-page structure` — `Titles, descriptions, headings and internal links written so both a reader and a crawler can tell what a page is for.`
+3. `Local search` — `Google Business Profile, service areas, and the location signals that matter when someone searches with intent nearby.`
+4. `Reporting you can read` — `What changed, what moved, and what is next. No 40-page PDF nobody opens.`
+
+### 7.3 `#paid-advertising` (section--cream)
+
+Eyebrow: `Pillar three`
+`h2`: `Paid advertising`
+Lead: `Meta and Google campaigns set up properly the first time, then managed month to month by the person who built them.`
+
+Deliverables, exactly four:
+
+1. `Tracking before spend` — `Conversion tracking is configured and verified before any budget goes live. Otherwise you are buying clicks blind.`
+2. `Meta campaigns` — `Facebook and Instagram, audience and creative built around one clear offer per campaign.`
+3. `Google campaigns` — `Search and Performance Max, with negative keywords maintained so you stop paying for the wrong intent.`
+4. `Landing pages that match` — `The page the ad lands on says the same thing the ad said. Most wasted spend dies here.`
+
+### 7.4 `#ai-services` (section--grey)
+
+Eyebrow: `Pillar four`
+`h2`: `AI services`
+Lead: `Five capabilities. Start with whichever one removes the most repetitive work from your week.`
+
+This section uses **five** items, not four, and uses `tilt-cards.js` instead of `reveal-stagger.js`:
+
+- The `<ul>` carries `class="pillar__list"` and **no** `data-reveal-group`.
+- Each `<li>` carries `class="card" data-tilt-card` and **no** `data-reveal-item`.
+- Each `<li>` starts with `<span class="card__step" aria-hidden="true">01</span>` … `05`. Do **not** add `data-dial-num`; there is no dial on this page.
+
+The five capabilities are fixed by CLAUDE.md and must be listed in this order:
+
+1. `AI chatbots` — `Round-the-clock answers to the questions you already answer twenty times a week, handing over to you when it matters.`
+2. `AI-driven local SEO` — `Google Business Profile and local listings kept current, with content generated from your own service data, not invented.`
+3. `Marketing automation` — `Ads, email and social sequences that run themselves once the rules are agreed.`
+4. `Workflow automation` — `Quotes, bookings, follow-ups and admin handoffs wired together so nothing sits in an inbox.`
+5. `AI analytics and reporting` — `Your numbers summarised in plain English, on a schedule, without you opening a dashboard.`
+
+## 8. Section 7 — `#combine` (section--blue)
+
+`h2 id="combine-title" data-mask-heading`, exact: `Running more than one`
+
+Container is `.container--narrow`.
+
+Lead, exact: `The order matters more than the number. A site that converts first, then the traffic to feed it, then the automation to stop the admin eating your week.`
+
+Then an `<ol class="pillar__list" data-reveal-group>` with three `<li class="card" data-reveal-item>`:
+
+1. `Site first` — `There is no point sending traffic to a page that does not convert. Fix the destination, then buy the visits.`
+2. `Then traffic` — `SEO for the long compounding curve, paid for the immediate one. Most businesses need both, weighted differently.`
+3. `Then automation` — `Once enquiries arrive reliably, automation is what stops them being the thing you do every evening.`
+
+No `data-tilt-card` here.
+
+## 9. Section 8 — `#faq` (section--cream)
+
+`h2 id="faq-title" data-mask-heading`, exact: `Questions we get asked`
+
+Container is `.container--narrow`. Markup is a single `<dl class="faq__list">`. `.faq__list` is a new class.
+
+Six pairs, in this order:
+
+1. `dt`: `Can I start with just one service?` — `dd`: `Yes. Most people start with the site, because everything else points at it.`
+2. `dt`: `Do you work with businesses outside Ireland?` — `dd`: `Yes. We are based in Dublin and work with clients anywhere, remotely.`
+3. `dt`: `Who actually does the work?` — `dd`: `The person you speak to on the call. Nothing is passed to a subcontractor without telling you.`
+4. `dt`: `Do I need to write the copy?` — `dd`: `No. We draft it from the call and you edit it. You know your business better than any brief captures.`
+5. `dt`: `What happens to my site if we stop working together?` — `dd`: `You keep it. The code and the hosting account are yours, and nothing is locked to us.`
+6. `dt`: `How much does it cost?` — `dd`: `It depends on scope. Book a short call and you will get a figure in writing.`
+
+Question 6 is a **marked placeholder**, already logged as row 5.7 in `PLACEHOLDER-CONTENT.md`. Reproduce it exactly like this:
+
+```html
+<!-- PLACEHOLDER: replace before launch — confirm the client's actual pricing process, add real pricing bands, or delete this question -->
+<dt data-placeholder="true">How much does it cost?</dt>
+<dd data-placeholder="true">It depends on scope. Book a short call and you will get a figure in writing.</dd>
+```
+
+Answers 1–5 are statements about how the business operates and are written to be defensible. If any of them is not true, delete the pair rather than softening it, and report the deletion.
+
+Tokens: `dt` uses `--fs-h4`, `--fw-medium`, `--ink-black`; `dd` uses `--fs-body`, `--ink-soft`, `margin-inline-start: 0`, `margin-block-end: var(--s-6)`.
+
+## 10. Section 9 — `#cta` (section--grey)
+
+Copy the shape of `index.html` lines 384–393. Container is `.container--narrow`.
+
+`h2 id="cta-title" data-mask-heading`, exact: `Tell us which one you need first`
+`p.cta__lead`, exact: `A short call, no charge, no pitch deck. Based in Dublin, working with clients anywhere.`
+`div.cta__actions` with `<a class="btn btn--primary" href="tel:+353872520034">Call 087-2520034</a>` and `<a class="btn btn--ghost" href="/contact">Send a message</a>`.
+
+## 11. Motion summary
+
+| Module | Hooks on this page | Where |
 |---|---|---|
-| `h1` and every `h2` | `heading-mask.js` | desktop only |
-| Section overlaps | `section-curtain.js` | desktop only |
-| Pillar visual blocks | `service-loops.js` | desktop only |
-| Combination cards | `reveal-stagger.js` | desktop only |
-| FAQ items | `reveal-stagger.js` | desktop only |
-| Cursor blob | `cursor-blob.js` | desktop only, pointer fine only |
-| Smooth scroll | `lenis-scroll.js` | desktop only |
+| `header-pill.js` | `[data-header]` chrome | shared header |
+| `flowmap-trail.js` | `[data-flowmap]` | one div after the skip link |
+| `heading-mask.js` | `data-mask-heading` | all eight `<h2>` elements |
+| `section-curtain.js` | `data-curtain` | sections 2–9 |
+| `reveal-stagger.js` | `data-reveal-group` / `data-reveal-item` | `#pillars`, `#web-design`, `#seo`, `#paid-advertising`, `#combine` |
+| `tilt-cards.js` | `data-tilt-card` | `#ai-services` only |
+| `service-videos.js` | `data-service-media` / `data-service-video` | `#pillars` only |
+| `lenis-scroll.js` | `data-anchor-link` | the four card links in `#pillars` |
 
-No carousel on this page.
-No counters on this page.
-No tilt cards on this page.
+New hooks required: **none**. No JS file is edited.
 
-Anchor-link conflict warning. Lenis intercepts in-page anchor jumps. The anchor nav must use `lenis.scrollTo(target)` when Lenis is active, and native anchor behaviour when it is not. `lenis-scroll.js` owns this. See spec 08 section 13.
+## 12. Acceptance criteria
 
-Anchor scroll offset must clear the fixed header. Offset is `-88` pixels.
+1. `/services.html` exists and is the only file created.
+2. `<html lang="en" data-header-boot="top">` and the `<head>` anti-flash script are present.
+3. `<title>` is `Web Design, SEO, Paid Ads and AI Services | TheAnalytico`.
+4. `<link rel="canonical" href="https://theanalytico.com/services">` is present, and `og:url` matches it byte for byte.
+5. Exactly one `<h1>` exists, in `#intro`, with no `data-mask-heading`.
+6. Nine `<section>` elements exist, with the exact `id` and class values in section 4's table, in that order.
+7. Section 1 has no `data-curtain`. Sections 2–9 each have one.
+8. Every `<h2>` carries `data-mask-heading`, has an `id`, is referenced by its section's `aria-labelledby`, and contains no child elements.
+9. `#pillars` contains exactly four `.card--service` items, in the order Web Design, SEO, Paid Advertising, AI Services.
+10. Each of those four contains one `[data-service-media]` figure wrapping one `[data-service-video]` with `muted`, `loop`, `playsinline`, `preload="none"`, a `poster`, `width="480"`, `height="300"`, `aria-hidden="true"`, and both `<source>` elements.
+11. The four `card__link` hrefs are `#web-design`, `#seo`, `#paid-advertising`, `#ai-services`, each with `data-anchor-link`.
+12. `#ai-services` contains exactly five `<li class="card" data-tilt-card>` items, in the CLAUDE.md order, and none of them carries `data-reveal-item`.
+13. No element in the file carries both `data-reveal-item` and `data-tilt-card`.
+14. `#faq` contains one `<dl>` with exactly six `dt`/`dd` pairs; pair 6 carries the placeholder comment and `data-placeholder="true"` on both `dt` and `dd`.
+15. Two JSON-LD blocks are present: one `BreadcrumbList`, one `@graph` of four `Service` nodes.
+16. No JSON-LD on this page contains `aggregateRating`, `review`, `offers`, `price`, or `award`.
+17. The `<header>` block matches `index.html` lines 64–88 except that `aria-current="page"` sits on the Services link.
+18. The `<footer>` block matches `index.html` lines 397–425 byte for byte.
+19. Exactly one `<div data-flowmap aria-hidden="true"></div>` exists.
+20. The four script tags before `</body>` match `index.html` lines 427–430 byte for byte, and no other script is loaded.
+21. No `on*` attribute and no inline `<style>` block appears anywhere.
+22. No raw hex colour, no `px` font size, and no inline `style` attribute appears anywhere.
+23. Every fabricated statement carries the three-part placeholder marking from CLAUDE.md.
+24. With JavaScript disabled, all nine sections render fully readable.
 
-## 16. Acceptance criteria
+## 13. Non-goals
 
-1. `services.html` contains exactly one `<h1>`.
-2. Heading levels descend without skipping.
-3. Sections appear in the order given in section 3.
-4. Backgrounds run blue, cream, grey, blue, cream, grey, blue, cream.
-5. No two adjacent rhythm sections share a background class.
-6. All four pillar sections exist with ids `web-design`, `seo`, `paid-advertising`, `ai-services`.
-7. Pillar `h2` texts are exactly `Web Design`, `SEO`, `Paid Advertising`, `AI Services`.
-8. Pillar eyebrows are exactly `01`, `02`, `03`, `04`.
-9. The AI Services section contains exactly five `<h3>` capability headings.
-10. The five capability headings match the five strings in section 9, character for character.
-11. The word `optimisation` appears with an `s`, not a `z`.
-12. The anchor nav contains exactly four links, matching the four pillar ids.
-13. Every anchor `href` resolves to an `id` that exists on the page.
-14. The FAQ is a `<dl>` with six `<dt>` and six `<dd>`.
-15. The FAQ does not use `<details>` or `<summary>`.
-16. The Q6 `<dd>` has `data-placeholder="true"` and a preceding PLACEHOLDER comment.
-17. No price, currency symbol, or numeric cost appears anywhere on the page.
-18. No turnaround time in days or weeks appears anywhere on the page.
-19. No ranking position claim appears anywhere on the page.
-20. No return on ad spend or cost per lead figure appears anywhere on the page.
-21. `<meta name="robots" content="noindex, nofollow">` is present.
-22. The canonical link points at `https://theanalytico.com/services`.
-23. JSON-LD contains four `Service` nodes.
-24. JSON-LD contains no `aggregateRating`, `review`, or `offers` key.
-25. Every `data-placeholder="true"` element has a matching row in `PLACEHOLDER-CONTENT.md`.
-26. Every `.pillar__visual` block has `aria-hidden="true"` and contains no text nodes.
-27. Every CTA button text is unique across the four pillars, and none reads `Learn more`.
-28. The header, footer, and button markup are byte-identical to `index.html` apart from `aria-current`.
-29. The `Services` footer and header nav links carry `aria-current="page"`.
-30. No new component class is introduced for a pattern already styled in `components.css`.
-31. No inline `<style>` block, except the critical-CSS block in `<head>`.
-32. Exactly one inline `<script>`, the header anti-flash script.
-33. No `on*` attribute anywhere in the file.
-34. No hex colour anywhere in the file.
-35. With JS disabled, all nine sections are fully visible and all FAQ answers are readable.
-36. With JS disabled, the four anchor links still jump to their sections.
-37. Lighthouse mobile scores 95 or above on all four categories.
-38. CLS below 0.05.
-39. British English throughout.
-40. No email address appears anywhere on the page.
-
-## 17. Non-goals
-
-Do not add a pricing table.
-Do not add a comparison table against competitors.
-Do not add a service-level agreement.
-Do not add testimonials to this page. Testimonials live on `index.html` only.
-Do not add KPI counters to this page.
-Do not add a peek carousel to this page.
-Do not add a team section.
-Do not add a case study block. Case studies live on `work.html`.
-Do not add a sixth AI capability.
-Do not add a fifth pillar.
-Do not create individual pages per service.
-Do not edit `tokens.css`, `base.css`, or `components.css`.
-Do not write any `.js` file.
+- Do not build individual service sub-pages.
+- Do not add pricing, packages, tiers, or a quote calculator.
+- Do not add testimonials, logos, KPI counters, or a process dial to this page.
+- Do not add a second video beyond the four existing service clips.
+- Do not add case study content; that belongs on `work.html`.
+- Do not create or capture any new image or video asset.
+- Do not edit `PLACEHOLDER-CONTENT.md`; the architect updates it after review.
+- Do not write any CSS. `.page__title`, `.page__lead`, `.pillar__list` and `.faq__list` are handed to `css-stylist` in Phase 6f.

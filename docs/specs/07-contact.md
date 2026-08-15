@@ -1,98 +1,120 @@
 # Spec 07 — Contact page (`contact.html`)
 
-Owner agents: `html-builder` (Haiku 4.5) for markup, `css-stylist` (Sonnet 5) for `pages.css`, `cf-deploy` (Haiku 4.5) for `functions/api/contact.js`.
-Phase: 6 for markup. Phase 2 for the function, so the endpoint exists before the form is wired.
+Rewritten 15 Aug 2026 against the shipped `index.html`, `components.css`, `assets/js/modules/contact-form.js`, and `functions/api/contact.js`. Supersedes the Phase 0 version entirely.
+
+Agent: `html-builder` (Haiku 4.5). Read `docs/specs/08-motion-modules.md` sections 2, 4 and 6 before starting.
 
 ## 1. Files
 
-`html-builder` may create or edit only:
+Create exactly one file:
 
-- `contact.html`
+- `/contact.html`
 
-`css-stylist` may edit only:
+Edit nothing else. In particular:
 
-- `assets/css/pages.css`
+- **`functions/api/contact.js` already exists and is complete.** Do not create, edit, or replace it. Its validation rules are reproduced below only so the markup matches them.
+- **`assets/js/modules/contact-form.js` already exists and is complete.** Do not edit it. The markup below is what it expects; every `id` and `name` is load-bearing.
+- `_headers` already allows `https://challenges.cloudflare.com` in `script-src`, `connect-src` and `frame-src`. Do not edit it.
 
-`cf-deploy` may create or edit only:
+## 2. Contract with the code that already exists
 
-- `functions/api/contact.js`
+`contact-form.js` queries, in order:
 
-`motion-engineer` may create or edit only:
+- `[data-contact-form]` — the `<form>`. Absent, and the module silently no-ops.
+- `[data-form-submit]` — the submit `<button>`.
+- `[data-form-status]` — the live-region `<p>`.
+- `form.elements.namedItem(id)` for each of `name`, `email`, `phone`, `business`, `service`, `message`, `consent` — so each control's `name` attribute must be exactly that string.
+- `document.getElementById(id + '-error')` for each of `name`, `email`, `service`, `message`, `consent` — so those five error paragraphs must have ids `name-error`, `email-error`, `service-error`, `message-error`, `consent-error`. `phone` and `business` have **no** error element; do not add one.
 
-- `assets/js/modules/contact-form.js`
+`functions/api/contact.js` validates server-side: `name` 1–100 chars; `email` 5–254 and format-checked; `phone` optional, ≤30; `business` optional, ≤120; `service` must be one of `web-design`, `seo`, `paid-advertising`, `ai-services`, `not-sure`; `message` 10–2000 chars and at most five URLs; `consent` must equal the string `yes`; `cf-turnstile-response` must be present.
 
-Do not create any other file.
-Do not edit `tokens.css`, `base.css`, or `components.css`.
+Consequences the markup must honour:
 
-## 2. Mode reminder
+1. The `service` `<option>` values are exactly those five strings, in that order, plus a first empty-value option.
+2. The consent checkbox must carry `value="yes"`.
+3. `maxlength` values must match the server: 100, 254, 30, 120, 2000.
+4. The message field needs at least 10 characters server-side; the client module only checks non-empty. Do not add a `minlength` attribute — it would fire the browser's own bubble instead of the module's message.
 
-Current mode is LOCAL PREVIEW ONLY. Not for publication.
+## 3. Shared chrome — copy, do not rewrite
 
-1. `<meta name="robots" content="noindex, nofollow">` is required.
-2. No business email address appears on this page. None has been supplied. `[EVIDENCE NEEDED: business email]`
-3. No street address appears on this page. `[EVIDENCE NEEDED: street address]`
-4. No opening hours appear on this page. `[EVIDENCE NEEDED: opening hours]`
-5. No response-time promise appears on this page. No service-level evidence exists.
-6. Every fabricated fact carries `data-placeholder="true"`, a preceding PLACEHOLDER comment, and a row in `PLACEHOLDER-CONTENT.md`.
+Identical to spec 03 section 2. Copy from `/index.html`:
 
-The confirmed contact facts are the phone number and the location:
-- Phone: 087-2520034, `tel:+353872520034`
-- Location: Dublin, Ireland
-- Service area: Worldwide
+| What | `index.html` lines |
+|---|---|
+| Anti-flash script | 28 |
+| Font preloads | 30–31 |
+| Stylesheet links | 33–35 |
+| Skip link | 60 |
+| Flowmap mount div | 62 |
+| `<header>` | 64–88 — see below |
+| Drawer | 90–101 |
+| `<footer>` | 397–425 — see below |
+| Script tags | 427–430 |
 
-## 3. Document structure
+Header: `Contact Us` is not in `.header__list`, so **no nav link carries `aria-current` on this page**. Instead add `aria-current="page"` to `<a class="btn btn--pill header__cta" href="/contact" data-header-cta>`. Also add `aria-current="page"` to the footer's `Contact Us` link. Change nothing else in either block.
 
-| # | Section | `id` | Background | Radius + overlap |
-|---|---|---|---|---|
-| 1 | Header | — | transparent | no |
-| 2 | Page intro | `intro` | `--bg-blue` | no |
-| 3 | Form and details | `enquiry` | `--bg-cream` | yes |
-| 4 | What happens next | `next` | `--bg-grey` | yes |
-| 5 | FAQ | `faq` | `--bg-blue` | yes |
-| 6 | Footer | — | `--ink` | no |
+## 4. Extra script — Turnstile only
 
-Heading order:
-- One `<h1>`, in the page intro.
-- Each of sections 3 to 5 has one `<h2>`.
-- Sub-blocks use `<h3>`.
+After the four standard script tags, add exactly one more line:
 
-Semantics:
-- `<main id="main">` wraps sections 2 to 5.
-- The form is a `<form>` with a `<fieldset>` and a `<legend>`.
-- Contact details sit in an `<address>`.
-- The FAQ is a `<dl>`.
+```html
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" defer></script>
+```
 
-There is no rhythm section 4 background repeat problem: blue, cream, grey, blue is correct.
+This is the only third-party script permitted anywhere on the site. Do not add `async`. Do not add an `onload` callback parameter (an `on*`-style callback in the URL is fine to omit entirely; the implicit render is used).
 
-## 4. Section 2 — Page intro
+## 5. Head requirements
 
-Structure:
+```html
+<title>Contact TheAnalytico — Dublin Web Design and SEO</title>
+<meta name="description" content="Tell us what your site has to do. Send a message or ring 087-2520034. Based in Dublin, working with clients anywhere.">
+<link rel="canonical" href="https://theanalytico.com/contact">
+```
+
+OG and Twitter tags follow `index.html` lines 10–19 with title, description and URL swapped.
+
+**JSON-LD: one block only — `BreadcrumbList`.** Home → Contact, same shape as spec 03 section 3, `position: 2` name `Contact`, item `https://theanalytico.com/contact`.
+
+Do not emit `ContactPage`, `ContactPoint`, `Organization`, or a second `ProfessionalService` node. Adding a business node with a matching `@id` across all six pages is `seo-auditor`'s Phase 7 job.
+
+## 6. Section order and backgrounds
+
+Four sections. The first carries no `data-curtain`; the other three do. There is no closing CTA section — the form is the call to action.
+
+| # | `id` | classes | curtain |
+|---|---|---|---|
+| 1 | `intro` | `section section--blue` | no |
+| 2 | `enquiry` | `section section--cream` | yes |
+| 3 | `next` | `section section--grey` | yes |
+| 4 | `faq` | `section section--blue` | yes |
+
+## 7. Section 1 — `#intro`
 
 ```
-section#intro
-  div.container.container--narrow
+section#intro.section.section--blue
+  div.container
     p.eyebrow        "Contact"
-    h1.page__title   page heading
-    p.page__lead     lead paragraph
+    h1.page__title   heading
+    p.page__lead     lead
+    div.section__actions
+      a.btn.btn--primary href="tel:+353872520034"  "Call 087-2520034"
+      a.btn.btn--ghost   href="#enquiry" data-anchor-link  "Send a message"
 ```
 
-`h1` copy, exact: `Tell us what the site has to do.`
+`h1`, exact: `Tell us what the site has to do`
+Lead, exact: `A short call, no charge, no pitch deck. Ring the number below, or send the form and we will come back with two or three questions.`
 
-Lead copy, exact: `Fill in the form or ring the number below. A short call, no charge, no pitch deck. Based in Dublin, working with clients anywhere.`
+The phone button is above the form deliberately: with JavaScript disabled, Turnstile never renders and the form submission is rejected server-side, so the phone number is the working fallback and must be visible first.
 
-Section padding-top is `calc(72px + var(--s-9))`.
+No motion hook on the `h1`.
 
-Tokens: `h1` uses `--fs-h1`, `--fw-heading`, `--lh-heading`, `--ls-heading`, colour `--ink-black`. Lead uses `--fs-lead`, colour `--ink-soft`.
+## 8. Section 2 — `#enquiry`
 
-Motion: `heading-mask.js` on the `h1`.
+`h2 id="enquiry-title" data-mask-heading`, exact: `Send a message`
 
-## 5. Section 3 — Form and details
+Two columns at 1024px inside `div.container`: `div.enquiry__form` (7 of 12) then `div.enquiry__details` (5 of 12). One column below 1024px, form first. `.enquiry__form` and `.enquiry__details` are new classes.
 
-Two columns at 1024px. Form left, 7 of 12 columns. Details right, 5 of 12. One column below 1024px, form first.
-
-`h2` copy, exact: `Send a message.`
-
-### 5.1 Form markup
+### 8.1 Form markup — reproduce exactly
 
 ```html
 <form class="form" action="/api/contact" method="POST" novalidate data-contact-form>
@@ -136,7 +158,7 @@ Two columns at 1024px. Form left, 7 of 12 columns. Details right, 5 of 12. One c
 
     <div class="field">
       <label class="field__label" for="message">What does the site have to do?</label>
-      <textarea class="field__input field__input--area" id="message" name="message" rows="6" required maxlength="2000"></textarea>
+      <textarea class="field__input field__input--area" id="message" name="message" rows="6" required maxlength="2000" aria-describedby="message-hint"></textarea>
       <p class="field__hint" id="message-hint">A sentence or two is enough.</p>
       <p class="field__error" id="message-error" role="alert" hidden></p>
     </div>
@@ -147,8 +169,9 @@ Two columns at 1024px. Form left, 7 of 12 columns. Details right, 5 of 12. One c
       <p class="field__error" id="consent-error" role="alert" hidden></p>
     </div>
 
+    <!-- PLACEHOLDER: replace before launch — real Turnstile site key from the Cloudflare dashboard -->
     <div class="field" data-turnstile-slot>
-      <!-- Turnstile widget mounts here, see section 5.3 -->
+      <div class="cf-turnstile" data-sitekey="1x00000000000000000000AA" data-placeholder="true"></div>
     </div>
 
     <button class="btn btn--primary form__submit" type="submit" data-form-submit>Send enquiry</button>
@@ -158,400 +181,160 @@ Two columns at 1024px. Form left, 7 of 12 columns. Details right, 5 of 12. One c
 </form>
 ```
 
-Form rules, one per line:
+Rules, one per line:
 
-1. Exactly seven form controls: name, email, phone, business, service, message, consent.
-2. Required fields: name, email, service, message, consent.
-3. Optional fields: phone, business.
-4. Every control has a `<label>` with a matching `for` and `id`. No placeholder-as-label.
-5. Every input has an `autocomplete` attribute where a standard token exists.
-6. Every input has a `maxlength`.
-7. `novalidate` is on the `<form>` so JS controls the error messaging consistently.
-8. The form still submits natively as a POST to `/api/contact` with JS disabled.
-9. Every error paragraph has `role="alert"` and starts `hidden`.
-10. The status paragraph has `role="status"` and `aria-live="polite"`.
-11. The submit button is a `<button type="submit">`, never a styled `<div>`.
-12. No `on*` attribute on any element.
-13. The service `<select>` options are exactly the five values listed, in that order.
-14. The first option has an empty value so `required` catches an unmade choice.
-15. Do not add a file upload field. No storage is configured.
-16. Do not add a budget field. No pricing bands are confirmed.
-17. Do not add a marketing consent checkbox. No email list exists.
+1. Reproduce the block above exactly. Every `id`, `name`, `class` and `data-*` attribute is depended on by shipped code.
+2. `1x00000000000000000000AA` is Cloudflare's public test key. `[EVIDENCE NEEDED: Turnstile site key]` Logged as row 6.1 in `PLACEHOLDER-CONTENT.md`.
+3. `novalidate` stays on the `<form>` so the module owns all error messaging.
+4. `action="/api/contact"` and `method="POST"` stay, so the form works with JavaScript disabled.
+5. Do **not** add `data-reveal-item`, `data-reveal-group`, or `data-tilt-card` anywhere inside the `<form>`. `reveal-stagger.js` already skips items inside a form; adding the hooks is dead markup at best.
+6. Do not add a file upload field. No storage is configured and the Function would reject it.
+7. Do not add a budget field. No pricing bands are confirmed.
+8. Do not add a marketing-consent checkbox. No mailing list exists.
+9. Do not add a honeypot field. Turnstile is the anti-spam layer and the Function does not read a honeypot.
+10. No `placeholder` attribute is used as a substitute for a label.
+11. No `on*` attribute anywhere.
 
-### 5.2 Client-side validation
+### 8.2 Error and status strings — already implemented, do not restate in markup
 
-Module: `assets/js/modules/contact-form.js`. See spec 08 section 14.
+`contact-form.js` writes these itself. The error paragraphs ship empty and `hidden`. Do not pre-fill them.
 
-Rules:
-1. Validate on submit, not on every keystroke.
-2. Validate a field on `blur` only after the first submit attempt.
-3. On error, set `aria-invalid="true"` on the control.
-4. On error, remove `hidden` from the matching error paragraph and write the message.
-5. On error, move focus to the first invalid control.
-6. On success, clear all errors and write the success message into `[data-form-status]`.
-7. Never rely on client validation alone. The server validates again.
+Field errors: `Please enter your name.` / `Please enter your email address.` / `That email address does not look right.` / `Please choose what you need.` / `Please tell us what you need.` / `Please keep this under 2000 characters.` / `Please tick the box so we can reply.`
 
-Error messages, exact strings:
-- Name empty: `Please enter your name.`
-- Email empty: `Please enter your email address.`
-- Email malformed: `That email address does not look right.`
-- Service unselected: `Please choose what you need.`
-- Message empty: `Please tell us what you need.`
-- Message too long: `Please keep this under 2000 characters.`
-- Consent unchecked: `Please tick the box so we can reply.`
+Status messages: `Sending your enquiry…` / `Thanks. Your enquiry is on its way. We will be in touch.` / `Something went wrong sending that. Please ring 087-2520034 instead.` / `The security check did not pass. Please try again.` / `Too many attempts. Please try again in a few minutes.`
 
-Status messages, exact strings:
-- Submitting: `Sending your enquiry…`
-- Success: `Thanks. Your enquiry is on its way. We will be in touch.`
-- Server error: `Something went wrong sending that. Please ring 087-2520034 instead.`
-- Turnstile failure: `The security check did not pass. Please try again.`
-- Rate limited: `Too many attempts. Please try again in a few minutes.`
+The module also reads `?sent=1` and `?error=1` from the URL for the no-JS redirect path. No markup is needed for that.
 
-The success message contains no response-time promise. Do not add "within 24 hours".
-
-### 5.3 Turnstile
-
-1. Turnstile is a Cloudflare-hosted widget. It is the only permitted third-party script on the site.
-2. Load it with `defer`, from `https://challenges.cloudflare.com/turnstile/v0/api.js`.
-3. Mount it into `[data-turnstile-slot]`.
-4. The site key is injected as a `data-sitekey` attribute on a `<div class="cf-turnstile">`.
-5. The site key is public and may sit in the HTML. The secret key never appears in the repo.
-6. `[EVIDENCE NEEDED: Turnstile site key — use the Cloudflare test key 1x00000000000000000000AA in preview mode]`
-7. Add `<!-- PLACEHOLDER: replace before launch — real Turnstile site key from the Cloudflare dashboard -->` above the widget div.
-8. Add `data-placeholder="true"` to the widget div.
-9. The CSP in `_headers` must allow `https://challenges.cloudflare.com` in `script-src` and `frame-src`. See spec 09 section 2.
-10. With JS disabled, Turnstile does not render, so the server rejects the submission. That is acceptable: the phone number is the JS-free fallback and is prominent on the page.
-
-### 5.4 Contact details column
+### 8.3 Details column
 
 ```html
 <div class="enquiry__details">
   <h3>Or just ring</h3>
-  <address class="enquiry__address">
-    <p class="enquiry__phone"><a href="tel:+353872520034">087-2520034</a></p>
+  <address class="contact__address">
+    <p class="contact__phone"><a href="tel:+353872520034">087-2520034</a></p>
     <p>Dublin, Ireland</p>
   </address>
-  <!-- PLACEHOLDER: replace before launch — business email address, opening hours, street address if a public office exists -->
+  <!-- PLACEHOLDER: replace before launch — business email address, opening hours, and street address if a public office exists -->
   <h3>Service area</h3>
   <p>Based in Dublin. We work with clients anywhere, remotely.</p>
+  <h3>What we do</h3>
+  <p>Web design, SEO, paid advertising on Meta and Google, and AI services.</p>
 </div>
 ```
 
 Rules:
-1. The phone number is the most prominent element in this column. Font size `--fs-h3`.
-2. `Dublin, Ireland` is the full extent of the location detail.
+
+1. The phone number is the most prominent element in the column. `.contact__phone` uses `--fs-h3`.
+2. `Dublin, Ireland` is the entire location detail. No street, no postcode, no Eircode.
 3. No email address. `[EVIDENCE NEEDED: business email]`
 4. No opening hours. `[EVIDENCE NEEDED: opening hours]`
-5. No street address. `[EVIDENCE NEEDED: street address]`
-6. No embedded map.
+5. No response-time promise anywhere on the page.
+6. No embedded map, no `<iframe>`.
 7. No WhatsApp link. No WhatsApp number is confirmed.
-8. `<address>` gets `font-style: normal`.
+8. `<address>` renders `font-style: normal`.
+9. The three `<h3>` elements carry no motion hook.
 
-Tokens: form panel background `--surface`, radius `--radius-lg`, padding `var(--s-7)`, border `1px solid var(--line)`.
-Field input background `--surface`, border `1px solid var(--line)`, radius `--radius-sm`, padding `var(--s-3) var(--s-4)`, font `--fs-body`, colour `--ink`.
-Field input focus border `--ink`, plus the global `:focus-visible` outline.
-Label font `--fs-small`, `--fw-medium`, colour `--ink`.
-Hint font `--fs-micro`, colour `--ink-soft`.
-Error font `--fs-micro`, colour `--accent`.
-Field vertical gap `var(--s-5)`.
+### 8.4 New CSS required — none of it exists yet
 
-Error colour contrast note. `--accent` is `#e5804b` on `--surface` white. That does not reach 4.5:1. Therefore error text must not rely on colour alone: prefix every error message with a `⚠` character inside a `<span aria-hidden="true">`, set the error text colour to `--ink`, and use `--accent` only for the left border of the field. Add `--accent-strong: #a84f1f` to `tokens.css` and use it for error text so contrast passes. Note this token addition in the commit summary.
+`components.css` contains **no form styles at all**. Ship the class names exactly as written above and report the gap. `css-stylist` builds, in Phase 6f: `.form`, `.form__set`, `.form__submit`, `.form__status`, `.field`, `.field--check`, `.field__label`, `.field__optional`, `.field__input`, `.field__input--area`, `.field__check`, `.field__hint`, `.field__error`, `.enquiry__form`, `.enquiry__details`, `.contact__address`, `.contact__phone`.
 
-## 6. Section 4 — What happens next
+Tokens for that work, so the two agents agree: form panel `--surface`, radius `--radius-lg`, padding `var(--s-7)`, border `1px solid var(--line)`. Input background `--surface`, border `1px solid var(--line)`, radius `--radius-sm`, padding `var(--s-3) var(--s-4)`, font `--fs-body`, colour `--ink`. Label `--fs-small` `--fw-medium` `--ink`. Hint `--fs-micro` `--ink-soft`. Error text `--accent-strong` (not `--accent`; `--accent` on white is below 4.5:1). Field vertical gap `var(--s-5)`. Focus uses the global `:focus-visible` ring from `base.css`.
 
-`h2` copy, exact: `What happens next.`
+The module prefixes every error with `⚠` inside a `<span aria-hidden="true">`, so error state is never signalled by colour alone.
 
-Three steps. Use an `<ol>`.
+## 9. Section 3 — `#next`
 
-Step 1
-- `h3`: `We read it`
-- Body: `Your message comes straight to us, not to a shared inbox someone checks weekly.`
+`h2 id="next-title" data-mask-heading`, exact: `What happens next`
 
-Step 2
-- `h3`: `We reply with questions`
-- Body: `Usually two or three, to work out scope before anyone talks about money.`
-
-Step 3
-- `h3`: `We book a short call`
-- Body: `Fifteen or twenty minutes. You come away knowing whether this is worth doing.`
-
-Do not state a response time in hours or days.
-Add before the `<ol>`: `<!-- PLACEHOLDER: replace before launch — add a real response-time commitment once the client confirms one -->`
-Add `data-placeholder="true"` to the `<ol>`.
-
-Reason for marking: the three steps describe a process that has not been confirmed as the client's actual practice.
-
-Tokens: reuse `.card`. Background `--surface`, radius `--radius-lg`, padding `var(--s-6)`. Counter uses `--fs-h3`, colour `--accent`.
-Grid: one column below 768px, three at 1024px.
-
-Motion: `reveal-stagger.js`.
-
-## 7. Section 5 — FAQ
-
-Four questions. Use a `<dl>`. Container is `.container--narrow`.
-
-`h2` copy, exact: `Before you write.`
-
-Q1 `dt`: `Do I need to know what I want first?`
-A1 `dd`: `No. "Not sure yet" is a valid answer in the form, and the call sorts it out.`
-
-Q2 `dt`: `Do you work with businesses outside Ireland?`
-A2 `dd`: `Yes. We are based in Dublin and work with clients anywhere.`
-
-Q3 `dt`: `What happens to my details?`
-A3 `dd`: `They are used to reply to your enquiry and nothing else. You are not added to a mailing list.`
-
-Q4 `dt`: `Can I just ring instead?`
-A4 `dd`: `Yes. 087-2520034.`
-
-A3 is a policy statement. It must be true, and it is true, because no mailing list exists and no analytics or tracking script is loaded.
-Add: `<!-- PLACEHOLDER: replace before launch — link to a privacy policy page once written -->`
-No privacy policy page exists. `[EVIDENCE NEEDED: privacy policy page]`
-Do not link to a non-existent `/privacy` URL.
-
-Tokens: `dt` uses `--fs-h4`, `--fw-medium`, colour `--ink-black`. `dd` uses `--fs-body`, colour `--ink-soft`, margin-inline-start `0`, margin-block-end `var(--s-6)`.
-
-Motion: `reveal-stagger.js`.
-
-## 8. Footer
-
-Identical to `index.html` section 13.
-The `Contact Us` footer link carries `aria-current="page"` on this page.
-The header CTA pill also carries `aria-current="page"` on this page.
-
-## 9. `functions/api/contact.js` contract
-
-Owner: `cf-deploy` (Haiku 4.5). Full contract, one requirement per line.
-
-### 9.1 Handler shape
-
-1. Export a named function `onRequestPost`.
-2. Signature is `export async function onRequestPost(context)`.
-3. Do not export `onRequest`. Only POST is handled.
-4. A GET request therefore returns 405 from the Pages runtime automatically. Do not add a GET handler.
-5. Read `context.request`, `context.env`.
-6. Use no npm dependency. Fetch and the Web Crypto API only.
-
-### 9.2 Request parsing
-
-1. Accept `Content-Type: application/x-www-form-urlencoded`.
-2. Accept `Content-Type: application/json`.
-3. Reject any other content type with 415.
-4. Reject a body larger than 16384 bytes with 413.
-5. Parse with `await request.formData()` for the urlencoded case.
-6. Parse with `await request.json()` for the JSON case.
-7. Wrap parsing in try and catch. On a parse failure return 400.
-
-### 9.3 Server-side validation
-
-Validate every field again. Never trust the client.
-
-| Field | Rule | Failure status |
-|---|---|---|
-| `name` | present, trimmed length 1 to 100 | 400 |
-| `email` | present, trimmed length 5 to 254, matches `/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/` | 400 |
-| `phone` | optional, trimmed length 0 to 30 | 400 |
-| `business` | optional, trimmed length 0 to 120 | 400 |
-| `service` | present, one of `web-design`, `seo`, `paid-advertising`, `ai-services`, `not-sure` | 400 |
-| `message` | present, trimmed length 10 to 2000 | 400 |
-| `consent` | present, equals the string `yes` | 400 |
-| `cf-turnstile-response` | present, non-empty | 400 |
-
-1. Trim every string before length checks.
-2. Reject a `message` containing more than 5 URLs. Count matches of `/https?:\/\//g`. Return 400.
-3. Strip control characters from every value before use.
-4. Do not attempt HTML sanitisation. Send plain text only, so escaping is unnecessary.
-
-### 9.4 Turnstile verification
-
-1. POST to `https://challenges.cloudflare.com/turnstile/v0/siteverify`.
-2. Body is urlencoded with `secret` and `response`.
-3. `secret` comes from `context.env.TURNSTILE_SECRET_KEY`.
-4. `response` is the submitted `cf-turnstile-response` value.
-5. Include `remoteip` from `request.headers.get('CF-Connecting-IP')`.
-6. If the JSON response `success` is not `true`, return 403 with the error code `turnstile_failed`.
-7. Verify before sending the email. Never send first.
-
-### 9.5 Rate limiting
-
-1. Derive a key from `request.headers.get('CF-Connecting-IP')`.
-2. Store a counter in a Cloudflare KV namespace bound as `RATE_LIMIT`.
-3. Limit is 5 submissions per IP per 3600 seconds.
-4. On exceeding the limit, return 429 with the error code `rate_limited`.
-5. If the `RATE_LIMIT` binding is missing, skip rate limiting and continue. Do not throw. Log a warning.
-6. `[EVIDENCE NEEDED: KV namespace id for RATE_LIMIT — create it in the Cloudflare dashboard]`
-
-### 9.6 Email delivery via Resend
-
-1. POST to `https://api.resend.com/emails`.
-2. Header `Authorization: Bearer ${context.env.RESEND_API_KEY}`.
-3. Header `Content-Type: application/json`.
-4. `from` is `context.env.CONTACT_FROM_EMAIL`.
-5. `to` is `context.env.CONTACT_TO_EMAIL`.
-6. `reply_to` is the submitted `email` value.
-7. `subject` is `New enquiry from ${name} — ${service}`.
-8. `text` is a plain-text body listing every submitted field on its own line.
-9. Do not send an `html` body. Plain text removes an injection surface.
-10. If the Resend call returns a non-2xx status, return 502 with the error code `send_failed`.
-11. Do not log the message body. Log the status code and a request id only.
-12. `[EVIDENCE NEEDED: CONTACT_TO_EMAIL — the business email is not yet supplied]`
-13. `[EVIDENCE NEEDED: verified sending domain for Resend]`
-
-### 9.7 Secrets
-
-Environment variables, all set in the Cloudflare Pages dashboard, never in the repo:
-
-- `TURNSTILE_SECRET_KEY`
-- `RESEND_API_KEY`
-- `CONTACT_FROM_EMAIL`
-- `CONTACT_TO_EMAIL`
-
-1. No secret value appears in `wrangler.toml`.
-2. No secret value appears in any committed file.
-3. No `.env` file is committed.
-4. On a missing required env var, return 500 with the error code `misconfigured`, and log which var is missing by name only, never its value.
-
-### 9.8 Responses
-
-All responses are JSON with `Content-Type: application/json`.
-
-Success, status 200:
-```json
-{ "ok": true }
-```
-
-Failure, status as per the table above:
-```json
-{ "ok": false, "error": "validation_failed", "fields": ["email"] }
-```
-
-Error codes, the complete set: `validation_failed`, `turnstile_failed`, `rate_limited`, `send_failed`, `misconfigured`, `bad_content_type`, `too_large`, `bad_request`.
-
-1. Never return a stack trace.
-2. Never echo the submitted message back in the response.
-3. Set `Cache-Control: no-store` on every response.
-
-### 9.9 No-JS submission
-
-1. With JS disabled the browser posts the form natively and lands on the JSON response, which is a poor experience.
-2. Therefore detect a native submission: if the `Accept` header does not include `application/json`, respond with a 303 redirect.
-3. On success redirect to `/contact?sent=1`.
-4. On failure redirect to `/contact?error=1`.
-5. `contact.html` reads the query string with CSS only is not possible, so `contact-form.js` reads it and writes the matching status message into `[data-form-status]`.
-6. With JS fully disabled the user sees the contact page again with no message. Accept that. The phone number is the reliable fallback.
-7. Do not add a separate thank-you HTML page.
-
-## 10. Head requirements
+This whole list is a marked placeholder, logged as row 5.8 in `PLACEHOLDER-CONTENT.md`: the three steps describe a process the client has not confirmed.
 
 ```html
-<title>Contact TheAnalytico: Web, SEO and AI in Dublin | TheAnalytico</title>
-<meta name="description" content="Get in touch with TheAnalytico about web design, SEO, paid advertising or AI services. Ring 087-2520034 or send an enquiry. Based in Dublin, working worldwide.">
-<meta name="robots" content="noindex, nofollow">
-<link rel="canonical" href="https://theanalytico.com/contact">
+<!-- PLACEHOLDER: replace before launch — confirm this is the client's actual enquiry process, then remove this marking -->
+<ol class="process__list" data-placeholder="true">
 ```
 
-JSON-LD on this page: `BreadcrumbList` plus `ContactPage`. Shapes are in spec 09 section 8.
-`contactPoint` may include `telephone: "+353872520034"`, `contactType: "customer service"`, and `areaServed: "Worldwide"`.
-Do not include an `email` key. No email is supplied.
-Do not include `hoursAvailable`. No hours are confirmed.
-No `AggregateRating`. No `review`.
+Three `<li class="card" data-tilt-card>`, each with `<span class="card__step" aria-hidden="true">01</span>` … `03`, an `h3.card__title` and a `p.card__body`:
+
+1. `We read it` — `Your message comes straight to us, not to a shared inbox someone checks weekly.`
+2. `We reply with questions` — `Usually two or three, to work out scope before anyone talks about money.`
+3. `We book a short call` — `Fifteen or twenty minutes. You come away knowing whether this is worth doing.`
+
+Do not state a response time in hours or days anywhere in this section.
+
+## 10. Section 4 — `#faq`
+
+`h2 id="faq-title" data-mask-heading`, exact: `Before you write`
+
+Container is `.container--narrow`. Markup is one `<dl class="faq__list">` with four pairs:
+
+1. `Do I need to know what I want first?` — `No. "Not sure yet" is a valid answer in the form, and the call sorts it out.`
+2. `Do you work with businesses outside Ireland?` — `Yes. We are based in Dublin and work with clients anywhere.`
+3. `What happens to my details?` — `They are used to reply to your enquiry and nothing else. You are not added to a mailing list.`
+4. `Can I just ring instead?` — `Yes. 087-2520034.`
+
+Answer 3 is true today: no mailing list exists and no analytics or tracking script is loaded. If that changes, the answer changes.
+
+Above the `<dl>`: `<!-- PLACEHOLDER: replace before launch — link to a privacy policy page once one is written -->`
+`[EVIDENCE NEEDED: privacy policy page]` — do not link to `/privacy`; it does not exist and would 404.
+
+`.faq__list` is the same new class specified in spec 03 section 9. Only one agent needs to describe it; `css-stylist` writes it once.
 
 ## 11. Motion summary
 
-| Section | Module | Gating |
+| Module | Hooks on this page | Where |
 |---|---|---|
-| `h1` and every `h2` | `heading-mask.js` | desktop only |
-| Section overlaps | `section-curtain.js` | desktop only |
-| Next-steps cards | `reveal-stagger.js` | desktop only |
-| FAQ items | `reveal-stagger.js` | desktop only |
-| Form validation and submit | `contact-form.js` | all viewports, always runs |
-| Cursor blob | `cursor-blob.js` | desktop only, pointer fine only |
-| Smooth scroll | `lenis-scroll.js` | desktop only |
+| `header-pill.js` | header chrome | shared |
+| `flowmap-trail.js` | `[data-flowmap]` | one div after the skip link |
+| `contact-form.js` | `[data-contact-form]`, `[data-form-submit]`, `[data-form-status]`, the seven named controls, the five `*-error` ids | `#enquiry` |
+| `heading-mask.js` | `data-mask-heading` | the three `<h2>` elements |
+| `section-curtain.js` | `data-curtain` | sections 2, 3, 4 |
+| `tilt-cards.js` | `data-tilt-card` | `#next` only |
+| `lenis-scroll.js` | `data-anchor-link` | the `Send a message` button in `#intro` |
 
-`contact-form.js` is not decorative motion. It is never gated on `prefers-reduced-motion`. It is never gated on viewport width. It always runs. See spec 08 section 14.
+`contact-form.js` is ungated: it runs under `prefers-reduced-motion` and on mobile. Everything else on this page is gated normally.
 
-Do not animate the form fields on reveal. A field sliding in under a user's cursor is hostile.
-The form panel itself does not animate.
+New hooks required: **none**.
 
 ## 12. Acceptance criteria
 
-1. `contact.html` contains exactly one `<h1>`.
-2. Heading levels descend without skipping.
-3. Sections appear in the order given in section 3.
-4. Backgrounds run blue, cream, grey, blue.
-5. The form `action` is exactly `/api/contact` and `method` is `POST`.
-6. The form has the `novalidate` attribute.
-7. The form contains exactly seven named controls: name, email, phone, business, service, message, consent.
-8. Every control has a `<label>` whose `for` matches the control `id`.
-9. No control uses a `placeholder` attribute in place of a label.
-10. The service `<select>` has exactly six `<option>` elements, the first with an empty value.
-11. The five service option values are exactly `web-design`, `seo`, `paid-advertising`, `ai-services`, `not-sure`.
-12. Required attributes are present on name, email, service, message, and consent.
-13. Every input has a `maxlength` attribute.
-14. Every error paragraph has `role="alert"` and starts `hidden`.
-15. The status paragraph has `role="status"` and `aria-live="polite"`.
-16. The submit control is a `<button type="submit">`.
-17. The Turnstile div has `data-placeholder="true"` and a preceding PLACEHOLDER comment.
-18. The Turnstile script is loaded with `defer` from `https://challenges.cloudflare.com`.
-19. No other third-party script is loaded on the page.
-20. No file upload field exists.
-21. No budget field exists.
-22. No marketing consent checkbox exists.
-23. The phone link `tel:+353872520034` appears at least twice on the page.
-24. The phone number is rendered at `--fs-h3` in the details column.
-25. No email address appears anywhere on the page.
-26. No street address appears anywhere on the page.
-27. No opening hours appear anywhere on the page.
-28. No response time in hours or days appears anywhere on the page.
-29. No embedded map or iframe appears, other than the Turnstile iframe.
-30. The what-happens-next `<ol>` has `data-placeholder="true"` and a preceding PLACEHOLDER comment.
-31. The FAQ is a `<dl>` with four `<dt>` and four `<dd>`.
-32. No link to `/privacy` exists, because no privacy page exists.
-33. `<meta name="robots" content="noindex, nofollow">` is present.
-34. The canonical points at `https://theanalytico.com/contact`.
-35. JSON-LD contains no `email` key, no `hoursAvailable`, no `aggregateRating`, no `review`.
-36. `functions/api/contact.js` exports `onRequestPost` and does not export `onRequest`.
-37. `functions/api/contact.js` validates all eight fields listed in section 9.3.
-38. `functions/api/contact.js` verifies Turnstile before calling Resend.
-39. `functions/api/contact.js` reads all four secrets from `context.env` and none from a literal.
-40. `grep -rn "re_" functions/` returns zero Resend key literals.
-41. `grep -rn "0x4" functions/ wrangler.toml` returns zero Turnstile secret literals.
-42. Every response from the function has `Cache-Control: no-store`.
-43. No response body contains a stack trace.
-44. No response body echoes the submitted message.
-45. The function returns 415 for an unsupported content type.
-46. The function returns 413 for a body over 16384 bytes.
-47. The function returns 403 with `turnstile_failed` when verification fails.
-48. The function returns 429 with `rate_limited` after 5 submissions from one IP within an hour.
-49. A native form post with an `Accept` header lacking `application/json` receives a 303 redirect, not JSON.
-50. `contact-form.js` runs regardless of `prefers-reduced-motion` and regardless of viewport width.
-51. No form field animates on scroll reveal.
-52. With JS disabled, every field, label, and the submit button are visible and the form posts natively.
-53. Every `data-placeholder="true"` element has a matching row in `PLACEHOLDER-CONTENT.md`.
-54. The header, footer, and button markup match `index.html` apart from `aria-current`.
-55. No inline `<style>` block, except the critical-CSS block in `<head>`.
-56. Exactly one inline `<script>`, the header anti-flash script. The Turnstile script is external, not inline.
-57. No `on*` attribute anywhere in the file.
-58. No hex colour anywhere in the file.
-59. Error text colour passes 4.5:1 against `--surface`.
-60. Every error message is conveyed by text, not by colour alone.
-61. Lighthouse mobile scores 95 or above on all four categories.
-62. CLS below 0.05. The Turnstile widget slot has a reserved `min-height` of 65px.
-63. British English throughout.
+1. `/contact.html` exists and is the only file created. `functions/api/contact.js` and `assets/js/modules/contact-form.js` are untouched.
+2. `<title>` is `Contact TheAnalytico — Dublin Web Design and SEO` and the canonical is `https://theanalytico.com/contact`.
+3. Exactly one `<h1>` exists, in `#intro`, with no motion hook.
+4. Four `<section>` elements exist with the exact ids, classes and order in section 6's table.
+5. Section 1 has no `data-curtain`; sections 2–4 each have one.
+6. Every `<h2>` carries `data-mask-heading`, has an `id` referenced by its section's `aria-labelledby`, and contains no child elements.
+7. Exactly one `<form>` exists, carrying `class="form"`, `action="/api/contact"`, `method="POST"`, `novalidate` and `data-contact-form`.
+8. The form contains exactly seven controls, with `name` attributes `name`, `email`, `phone`, `business`, `service`, `message`, `consent`.
+9. Each of those controls has a `<label>` whose `for` matches the control's `id`, and no control relies on a `placeholder` attribute as its label.
+10. Exactly five error paragraphs exist, with ids `name-error`, `email-error`, `service-error`, `message-error`, `consent-error`; each has `role="alert"`, is `hidden`, and is empty.
+11. No error paragraph exists for `phone` or `business`.
+12. The `service` select contains six options: an empty first option, then `web-design`, `seo`, `paid-advertising`, `ai-services`, `not-sure`, in that order.
+13. The consent checkbox carries `value="yes"` and `required`.
+14. `maxlength` values are 100, 254, 30, 120 and 2000 on name, email, phone, business and message respectively.
+15. Exactly one `[data-form-submit]` button of `type="submit"` and one `[data-form-status]` paragraph with `role="status" aria-live="polite"` exist.
+16. One `[data-turnstile-slot]` div contains one `.cf-turnstile` div with `data-sitekey="1x00000000000000000000AA"` and `data-placeholder="true"`, preceded by the placeholder comment.
+17. Exactly five `<script>` tags exist: the four from `index.html` lines 427–430 plus the Turnstile script, in that order.
+18. No `data-reveal-item`, `data-reveal-group`, or `data-tilt-card` appears inside the `<form>`.
+19. `#next` contains exactly three `[data-tilt-card]` items, and the `<ol>` carries `data-placeholder="true"` and the placeholder comment.
+20. `#faq` contains one `<dl>` with exactly four `dt`/`dd` pairs.
+21. No response-time claim in hours or days appears anywhere in the file.
+22. No email address, opening hours, street address, postcode, map, or WhatsApp link appears anywhere in the file.
+23. `aria-current="page"` appears on the header CTA pill and on the footer `Contact Us` link, and on no nav list item.
+24. Exactly one JSON-LD block exists, and it is a `BreadcrumbList`.
+25. Exactly one `<div data-flowmap aria-hidden="true"></div>` exists.
+26. No `on*` attribute, no inline `<style>`, no inline `style` attribute, no raw hex, no `px` font size.
+27. With JavaScript disabled, the form is fully visible, every label is readable, the phone number is visible above the form, and the form still posts natively to `/api/contact`.
 
 ## 13. Non-goals
 
-Do not add a calendar booking embed.
-Do not add a live chat widget.
-Do not add a WhatsApp link.
-Do not add a separate thank-you page.
-Do not add a newsletter signup.
-Do not add a file upload.
-Do not add a budget or pricing field.
-Do not add a CAPTCHA other than Cloudflare Turnstile.
-Do not add reCAPTCHA. It is a Google third-party script and breaks the performance and privacy posture.
-Do not add an embedded map.
-Do not write a privacy policy page in this phase.
-Do not add analytics or tracking of any kind.
-Do not store submissions in KV or D1. Email delivery only, plus the rate-limit counter.
-Do not edit `tokens.css`, `base.css`, or `components.css`.
+- Do not write, edit, or replace `functions/api/contact.js`. It is complete.
+- Do not edit `assets/js/modules/contact-form.js`.
+- Do not edit `_headers`. The CSP already allows Turnstile.
+- Do not add a booking or calendar embed.
+- Do not add a live chat widget.
+- Do not add a map, an office photo, or an address block beyond `Dublin, Ireland`.
+- Do not add a newsletter signup or marketing-consent checkbox.
+- Do not add a honeypot or any second anti-spam mechanism.
+- Do not create `/privacy`.
+- Do not write any CSS. The seventeen new class names in section 8.4 are handed to `css-stylist` in Phase 6f.
+- Do not edit `PLACEHOLDER-CONTENT.md`.
