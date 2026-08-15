@@ -10,8 +10,8 @@
  * 5. The only RAF loop in the project is gsap.ticker. This module never calls requestAnimationFrame.
  * 6. This module returns a cleanup function.
  * 7. Bails out to a no-op cleanup when prefers-reduced-motion: reduce matches.
- * 8. Bails out to a no-op cleanup when matchMedia('(max-width: 768px)') matches — this module
- *    does not declare mobile support.
+ * 8. Mobile-enabled: a cheap transform/opacity word stagger, once per heading, so it now
+ *    runs on matchMedia('(max-width: 768px)') too instead of bailing.
  * 9. Never animates width, height, top, or left. Only transform, opacity, and (via overflow:
  *    hidden, per spec section 3) the clip-mask substitute.
  * 10. will-change is set on tween start and removed on complete/cleanup.
@@ -38,7 +38,6 @@ const NOOP = () => {};
 export function initHeadingMask({ gsap, ScrollTrigger, reduced, isMobile }) {
   // Gate first, animate second.
   if (reduced) return NOOP;
-  if (isMobile) return NOOP;
 
   const headings = Array.from(
     document.querySelectorAll('[data-mask-heading]')

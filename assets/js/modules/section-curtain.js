@@ -10,7 +10,8 @@
  * 5. gsap.ticker is the only RAF loop. Never call requestAnimationFrame here.
  * 6. Returns a cleanup function.
  * 7. Bails out with a no-op cleanup when prefers-reduced-motion: reduce.
- * 8. Bails out with a no-op cleanup on matchMedia(max-width: 768px) — desktop only, spec 08 section 5.
+ * 8. Mobile-enabled: a cheap scroll-scrubbed yPercent tween, no pinning, so it now
+ *    runs on matchMedia(max-width: 768px) too instead of bailing.
  * 9. Never animate width, height, top, or left.
  * 10. will-change set on start, removed on complete/reverse-complete/cleanup.
  * 11. Reveal/slide start state is set from JS; with JS disabled the CSS overlap alone is fully readable.
@@ -22,7 +23,7 @@
 export function initSectionCurtain({ gsap, ScrollTrigger, lenis, reduced, isMobile }) {
   const noop = () => {};
 
-  if (reduced || isMobile) return noop;
+  if (reduced) return noop;
 
   const sections = document.querySelectorAll('[data-curtain]');
   if (!sections.length) return noop;

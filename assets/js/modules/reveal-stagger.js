@@ -10,7 +10,8 @@
  * 5. Exactly one RAF loop in the project: gsap.ticker. Never call requestAnimationFrame here.
  * 6. This module returns a cleanup function.
  * 7. Bail out with a no-op cleanup when prefers-reduced-motion: reduce matches.
- * 8. Bail out with a no-op cleanup when matchMedia('(max-width: 768px)') matches.
+ * 8. Mobile-enabled: cheap transform/opacity stagger, no scrub or pinning, so it
+ *    runs on matchMedia('(max-width: 768px)') too instead of bailing.
  * 9. Never animate width, height, top, or left. Transform and opacity only.
  * 10. will-change on animation start, removed on complete and in cleanup.
  * 11. Reveal start state is set from JS, never CSS. Content is visible with JS disabled.
@@ -26,7 +27,6 @@ const NOOP = () => {};
 
 export function initRevealStagger({ gsap, ScrollTrigger, lenis, reduced, isMobile }) {
   if (reduced) return NOOP;
-  if (isMobile) return NOOP;
 
   const groups = Array.from(document.querySelectorAll('[data-reveal-group]'));
   const standaloneItems = Array.from(

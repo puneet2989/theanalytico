@@ -16,7 +16,8 @@
  * 5. The only RAF loop in the project is gsap.ticker. Never call requestAnimationFrame here.
  * 6. This module returns a cleanup function.
  * 7. Bails out and returns a no-op cleanup when prefers-reduced-motion: reduce matches.
- * 8. Bails out and returns a no-op cleanup when matchMedia('(max-width: 768px)') matches.
+ * 8. Mobile-enabled per explicit client request: this is the hero's signature effect,
+ *    so it now runs on matchMedia('(max-width: 768px)') too instead of bailing.
  * 9. Never animate width, height, top, or left in CSS terms. The WebGL plane's
  *    position/scale live entirely inside the vertex shader / uniforms, not CSS.
  *    [data-hero-unfold-canvas]'s own fixed/full-viewport positioning is set by
@@ -129,7 +130,6 @@ function crossfade(progress) {
 export function initHeroUnfold({ gsap, ScrollTrigger, reduced, isMobile }) {
   // 1 + 2. Gate first, animate second. Fallback video stays visible, no autoplay.
   if (reduced) return NOOP;
-  if (isMobile) return NOOP;
 
   const mediaSlot = document.querySelector('[data-hero-media]');
   const video = document.querySelector('[data-hero-video]');
@@ -302,15 +302,19 @@ export function initHeroUnfold({ gsap, ScrollTrigger, reduced, isMobile }) {
   // Trigger spans the actual chip-to-stage travel: start when the hero
   // reaches the top of the viewport (the natural start of the scroll,
   // since the hero sits at the top of the page), end when the stage's own
-  // top settles at the top of the viewport (its resting, full-bleed
-  // position) — endTrigger lets the two live independently while still
-  // producing one continuous progress value across the whole ~1300px+ gap
-  // between the chip and the stage.
+  // top settles 96px down from the top of the viewport — matching the
+  // scroll-margin-top every anchored section already uses to clear the
+  // fixed header — rather than 'top top'. Settling exactly at the
+  // viewport's top edge landed the panel directly under the fixed header,
+  // hiding its own top edge right as it finished forming. endTrigger lets
+  // the two live independently while still producing one continuous
+  // progress value across the whole ~1300px+ gap between the chip and
+  // the stage.
   trigger = ScrollTrigger.create({
     trigger: heroSection || stage,
     start: 'top top',
     endTrigger: stage,
-    end: 'top top',
+    end: 'top 96px',
     scrub: true,
     invalidateOnRefresh: true,
     onUpdate: (self) => {

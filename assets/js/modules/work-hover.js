@@ -26,9 +26,11 @@ const NOOP = () => {};
  * @returns {() => void} cleanup
  */
 export function initWorkHover({ gsap, reduced, isMobile }) {
-  // Gate first, animate second.
+  // Gate first, animate second. No isMobile bail: the pointer/hover media
+  // queries below already exclude touch devices on their own, so this only
+  // ever activates on a mobile-width viewport that also has a real pointer
+  // (e.g. a small laptop window), which is exactly when hover should work.
   if (reduced) return NOOP;
-  if (isMobile) return NOOP;
   if (window.matchMedia('(pointer: coarse)').matches) return NOOP;
   if (!window.matchMedia('(hover: hover)').matches) return NOOP;
 

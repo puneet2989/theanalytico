@@ -11,7 +11,8 @@
  * 5. There is exactly one RAF loop in the project: gsap.ticker. Never call requestAnimationFrame here.
  * 6. This module returns a cleanup function.
  * 7. Bails out and returns a no-op cleanup when `reduced` is true.
- * 8. Bails out and returns a no-op cleanup when `isMobile` is true (no mobile support declared for this module).
+ * 8. Mobile-enabled: a cheap, once-only transform/opacity reveal, so it now runs when
+ *    `isMobile` is true too instead of bailing.
  * 9. Never animate width, height, top, or left.
  * 10. will-change is set on animation start and removed on complete and in cleanup.
  * 11. Rest tilt state is set from JS at init, never from CSS. With JS disabled, cards render upright per components.css.
@@ -27,7 +28,6 @@ const NOOP = () => {};
 
 export function initTiltCards({ gsap, ScrollTrigger, reduced, isMobile }) {
   if (reduced) return NOOP;
-  if (isMobile) return NOOP;
 
   const cards = document.querySelectorAll('[data-tilt-card]');
   if (!cards.length) return NOOP;

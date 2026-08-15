@@ -10,8 +10,8 @@
  * 5. The only RAF loop is gsap.ticker. Never call requestAnimationFrame here.
  * 6. Every module returns a cleanup function.
  * 7. Bail out with a no-op cleanup when prefers-reduced-motion: reduce matches.
- * 8. Bail out with a no-op cleanup on matchMedia('(max-width: 768px)'), unless
- *    the module's section explicitly enables mobile. This module does not.
+ * 8. Mobile-enabled: a cheap transform/opacity word stagger with no scrub, so it now
+ *    runs on matchMedia('(max-width: 768px)') too instead of bailing.
  * 9. Never animate width, height, top, or left.
  * 10. will-change is set on animation start and removed on complete.
  * 11. Reveal start state is set from JS, never CSS. No-JS users see finished content.
@@ -33,7 +33,6 @@ const NOOP = () => {};
 
 export function initHeroHeadline({ gsap, ScrollTrigger, lenis, reduced, isMobile }) {
   if (reduced) return NOOP;
-  if (isMobile) return NOOP;
 
   const heading = document.querySelector('[data-hero-headline]');
   if (!heading) return NOOP;

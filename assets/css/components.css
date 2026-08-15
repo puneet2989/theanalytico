@@ -422,18 +422,19 @@ html[data-drawer-open="true"] {
   color: var(--accent);
 }
 
-/* WebGL flowmap canvas mount. Empty div in the markup; JS appends a
-   <canvas>. Covers the hero. Must sit above .hero's own background
-   (painted by .section--blue) or the canvas renders into a layer nothing
-   can ever see — a negative z-index paints behind the positioned
-   ancestor's background, not just behind its content. z-index: 0 clears
-   the background while staying below the hero content wrapper below
-   (z-index: var(--z-raised), 10) and the header (var(--z-header), 200).
-   Never intercepts pointer events so hero links/buttons stay clickable. */
+/* WebGL flowmap canvas mount. Empty div in the markup, once, directly in
+   body (not inside any one section); JS appends a <canvas>. position: fixed
+   + inset: 0 means its box is always the full viewport regardless of
+   scroll, so the trail follows the cursor across every section on the
+   page, not just the hero. z-index: var(--z-sticky) sits above every
+   section's own content (none of which sets a z-index higher than
+   var(--z-raised), 10) but below the fixed header (var(--z-header), 200),
+   so the header stays legible and clickable. Never intercepts pointer
+   events so links/buttons everywhere stay clickable. */
 [data-flowmap] {
-  position: absolute;
+  position: fixed;
   inset: 0;
-  z-index: var(--z-base);
+  z-index: var(--z-sticky);
   overflow: hidden;
   pointer-events: none;
 }
@@ -487,8 +488,16 @@ html[data-drawer-open="true"] {
    hidden once WebGL takes over, so an empty stage must read as part of
    the section background, not a visible placeholder panel. Radius stays,
    so the flattened plane still reads as landing into rounded corners. */
+/* Width trimmed to 75% (centred) rather than touching the aspect-ratio:
+   the WebGL plane maps the video texture straight across the stage's
+   rect with no object-fit logic of its own, so changing the aspect ratio
+   would stretch/distort the footage. Narrowing the box while keeping
+   16/9 intact shrinks the settled height by the same 25%, with the
+   video's proportions untouched. */
 [data-hero-unfold-stage] {
   position: relative;
+  width: 75%;
+  margin-inline: auto;
   margin-block-start: var(--s-8);
   aspect-ratio: 16 / 9;
   border-radius: var(--radius-section);

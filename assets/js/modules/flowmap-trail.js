@@ -65,19 +65,17 @@ const FRAGMENT = `
   uniform sampler2D tMap;
   varying vec2 vUv;
 
-  // Peak alpha over standard source-over compositing. Raised again to 0.68
-  // after 0.5 still read as faint against the hero background once the
-  // plume itself was thinned out (see REACH below): a thinner trail needs
-  // more contrast per pixel to stay equally visible.
+  // Peak alpha over standard source-over compositing. Eased back down to
+  // 0.55 now that the stamp itself (falloff, below) and its tail (REACH,
+  // below) are both smaller — a thinner shape doesn't need as much alpha
+  // per pixel to stay clearly visible, and 0.68 was reading as a thick,
+  // heavy smudge on the smaller shape.
   // Checked against the hero background (--bg-blue #e8f2fa, luminance
   // ~0.86) and the darkest hero text (--ink-black #0a0a0a, luminance
-  // ~0.02): blending 0.68 of a mid grey (~0.4 luminance) into the
+  // ~0.02): blending 0.55 of a mid grey (~0.4 luminance) into the
   // background still leaves the result far lighter than the text, so
-  // contrast against ink-black stays effectively unchanged. The smoke also
-  // sits behind the headline in stacking order, so opaque glyphs are never
-  // themselves tinted — only the page around and behind them is, which is
-  // where the headroom for a bolder value comes from.
-  const float PEAK_ALPHA = 0.68;
+  // contrast against ink-black stays effectively unchanged.
+  const float PEAK_ALPHA = 0.55;
 
   void main() {
     vec2 uv = vUv;
@@ -93,11 +91,10 @@ const FRAGMENT = `
     // what turns the flowmap's naturally circular stamp into a trailing
     // plume — dense near the pointer (t = 0, full weight), progressively
     // fainter and more spread out along the tail (t -> 1, weight -> 0).
-    // REACH trimmed ~30% (0.075 -> 0.052) so the plume reads as a slimmer
-    // trail rather than a thick fog; PEAK_ALPHA above was raised to
-    // compensate so the thinner trail is still clearly visible.
+    // REACH trimmed again (0.052 -> 0.038) so the plume's tail is shorter
+    // and slimmer, reducing how far a lingering trail follows the pointer.
     const int TAPS = 10;
-    const float REACH = 0.052;
+    const float REACH = 0.038;
     float accum = 0.0;
     float weightSum = 0.0;
     for (int i = 0; i < TAPS; i++) {
@@ -161,15 +158,10 @@ export function initFlowmapTrail({ gsap, ScrollTrigger, lenis, reduced, isMobile
 
     container.appendChild(canvas);
 
-    // dissipation 0.95: loosened back up after 0.965 (paired with a lower
-    // peak alpha) evaporated the trail within a couple of frames instead of
-    // reading as a following plume. At 0.95/frame, ~60fps: half-life is
-    // ~13.5 frames (~0.22s), and the mask is down to ~4.6% of its value
-    // after 60 frames (~1s) with no further stamping — combined with the
-    // 0.5 peak alpha that is comfortably below a visible threshold, so a
-    // pointer that stops leaves nothing perceptible behind within about a
-    // second.
-    flowmap = new Flowmap(gl, { size: 128, falloff: 0.22, alpha: 1, dissipation: 0.95 });
+    // dissipation 0.92 (down from 0.95) and falloff 0.15 (down from 0.22):
+    // a smaller stamp that fades faster per frame, so the trail clears
+    // behind the pointer sooner instead of lingering.
+    flowmap = new Flowmap(gl, { size: 128, falloff: 0.15, alpha: 1, dissipation: 0.92 });
 
     // Standard source-over alpha blending (Program's default for
     // transparent:true) is what produces the smoke look against the light
@@ -264,13 +256,10 @@ export function initFlowmapTrail({ gsap, ScrollTrigger, lenis, reduced, isMobile
   // A stationary-but-still-inside pointer stops firing pointermove events
   // entirely, so without an unconditional per-frame decay the last velocity
   // would keep re-stamping the flowmap at full strength forever — a
-  // permanent smudge under a motionless cursor. 0.9 (loosened back up from
-  // 0.82) lets a handful of extra frames keep stamping right after the
-  // pointer stops moving, which is what makes the plume read as a real
-  // trailing tail rather than cutting off abruptly; new stamps are
-  // negligible within ~20-25 frames (well under half a second), after which
-  // the mask's own 0.95 dissipation carries the rest of the fade alone.
-  const VELOCITY_DECAY = 0.9;
+  // permanent smudge under a motionless cursor. Tightened to 0.78 (from
+  // 0.9) so stamping drops off within a handful of frames of the pointer
+  // stopping, cutting how far the trail follows the cursor around.
+  const VELOCITY_DECAY = 0.78;
 
   function tick() {
     flowmap.velocity.multiply(VELOCITY_DECAY);

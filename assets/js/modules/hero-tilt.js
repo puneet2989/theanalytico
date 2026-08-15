@@ -10,7 +10,8 @@
  * 5. The only RAF loop in the project is gsap.ticker. Never call requestAnimationFrame here.
  * 6. This module returns a cleanup function.
  * 7. Bails out and returns a no-op cleanup when prefers-reduced-motion: reduce matches.
- * 8. Bails out and returns a no-op cleanup when matchMedia('(max-width: 768px)') matches.
+ * 8. Mobile-enabled: a cheap scroll-scrubbed transform tween, so it now runs on
+ *    matchMedia('(max-width: 768px)') too instead of bailing.
  * 9. Never animate width, height, top, or left. Transform only.
  * 10. Sets will-change on animation start, removes it on complete/reverse-complete/cleanup.
  * 11. Any reveal start state is set from JS, never CSS; with JS disabled the image is visible and correct.
@@ -29,7 +30,6 @@ const NOOP = () => {};
 export function initHeroTilt({ gsap, ScrollTrigger, reduced, isMobile }) {
   // Gate first, animate second.
   if (reduced) return NOOP;
-  if (isMobile) return NOOP;
 
   const elements = document.querySelectorAll('[data-hero-tilt]');
   if (elements.length === 0) return NOOP;
