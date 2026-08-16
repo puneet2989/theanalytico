@@ -36,6 +36,7 @@ import { initSectionCurtain } from './modules/section-curtain.js';
 import { initFlowmapTrail } from './modules/flowmap-trail.js';
 import { initServiceVideos } from './modules/service-videos.js';
 import { initWorkHover } from './modules/work-hover.js';
+import { initInsightHover } from './modules/insight-hover.js';
 import { initPeekCarousel } from './modules/peek-carousel.js';
 import { initTiltCards } from './modules/tilt-cards.js';
 import { initKpiCounter } from './modules/kpi-counter.js';
@@ -43,8 +44,10 @@ import { initRevealStagger } from './modules/reveal-stagger.js';
 import { initHeroUnfold } from './modules/hero-unfold.js';
 import { initHeroArrow } from './modules/hero-arrow.js';
 import { initProcessDial } from './modules/process-dial.js';
+import { initProcessPath } from './modules/process-path.js';
 import { initTestimonialMarquee } from './modules/testimonial-marquee.js';
 import { initTestimonialDissolve } from './modules/testimonial-dissolve.js';
+import { initWorkShowcase } from './modules/work-showcase.js';
 
 // First action: flip the CSS gate so no-JS fallbacks switch off.
 document.documentElement.dataset.js = 'true';
@@ -127,9 +130,12 @@ const remainingModules = [
   ['flowmap-trail', initFlowmapTrail],
   ['service-videos', initServiceVideos],
   ['work-hover', initWorkHover],
+  ['insight-hover', initInsightHover],
   ['peek-carousel', initPeekCarousel],
   ['tilt-cards', initTiltCards],
   ['process-dial', initProcessDial],
+  ['process-path', initProcessPath],
+  ['work-showcase', initWorkShowcase],
   ['kpi-counter', initKpiCounter],
   ['reveal-stagger', initRevealStagger],
 ];

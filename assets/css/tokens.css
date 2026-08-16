@@ -167,6 +167,12 @@
   --dur-slow: 600ms;
   --dur-reveal: 800ms;
 
+  /* ---- Stroke widths --------------------------------------------------- */
+  --stroke-hairline: 1.5px;
+
+  /* ---- Opacity: quiet decorative elements ------------------------------ */
+  --opacity-hint: 0.45;
+
   /* ---- Z-index layers ------------------------------------------------- */
   --z-below: -1;
   --z-base: 0;
@@ -181,4 +187,8 @@
   --container-narrow: 760px;
   --container-text: 66ch;
   --header-pill-max: 1120px;
+
+  /* ---- 3D perspective (work showcase pinned sequence) ------------------ */
+  --perspective-showcase: 1400px;
+  --size-chrome-dot: 10px;
 }

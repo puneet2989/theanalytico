@@ -32,3 +32,8 @@ package-lock.json
 
 # Version control internals — never serve these
 .git/
+
+# Wrangler's own local dev cache/state — watching this causes an infinite
+# reload loop in `wrangler dev` (cache write triggers watcher triggers
+# reload triggers cache write...)
+.wrangler/
