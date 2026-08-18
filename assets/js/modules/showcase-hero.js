@@ -39,6 +39,17 @@
  * mobile connection. The CSS gradient in .showcase-hero__bg and the
  * <video poster> stay as the mobile background.
  *
+ * Mobile gets its own lightweight parallax instead of the desktop pin:
+ * [data-showcase-hero-bg] (the video/gradient layer, not the section
+ * itself) drifts a modest ±28px on a scrubbed transform as the section
+ * scrolls through the viewport. transform-only and no pin/fixed
+ * positioning, so it stays compositor-cheap and doesn't carry the same
+ * mobile Safari scroll-jank risk pin does. The layer is deliberately
+ * larger than its own container in effect (object-fit: cover on the video,
+ * the gradient has no hard edge), so the drift never reveals an empty
+ * edge — confirmed against the poster art specifically since mobile skips
+ * the video fetch and this plays over the static poster frame.
+ *
  * Video loads via fetch-to-Blob, not a plain network src. Not required for
  * a non-seeking autoplay loop the way it was for the old pinned-scrub
  * video, but kept for consistency with the rest of the site's video
@@ -94,6 +105,9 @@ export function initShowcaseHero({ gsap, ScrollTrigger, reduced, isMobile }) {
   // common source of jank/scroll-jump bugs on mobile Safari, so it is
   // skipped there in favour of the section just scrolling normally.
   let pinTrigger = null;
+  let bgTrigger = null;
+  const bg = section.querySelector('[data-showcase-hero-bg]');
+
   if (!isMobile) {
     pinTrigger = ScrollTrigger.create({
       trigger: section,
@@ -103,6 +117,25 @@ export function initShowcaseHero({ gsap, ScrollTrigger, reduced, isMobile }) {
       pinSpacing: false,
       invalidateOnRefresh: true,
     });
+  } else {
+    if (bg) {
+      gsap.set(bg, { willChange: 'transform' });
+      bgTrigger = gsap.fromTo(
+        bg,
+        { y: -28 },
+        {
+          y: 28,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: section,
+            start: 'top bottom',
+            end: 'bottom top',
+            scrub: true,
+            invalidateOnRefresh: true,
+          },
+        }
+      ).scrollTrigger;
+    }
   }
 
   let objectUrl = null;
@@ -131,6 +164,8 @@ export function initShowcaseHero({ gsap, ScrollTrigger, reduced, isMobile }) {
     tl.scrollTrigger?.kill();
     tl.kill();
     if (pinTrigger) pinTrigger.kill();
+    if (bgTrigger) bgTrigger.kill();
+    if (bg) gsap.set(bg, { clearProps: 'all' });
     gsap.set([...fadeUps, ...words], { clearProps: 'all' });
     if (abortController) abortController.abort();
     if (objectUrl) URL.revokeObjectURL(objectUrl);

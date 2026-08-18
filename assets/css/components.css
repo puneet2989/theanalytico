@@ -252,7 +252,10 @@ html[data-drawer-open="true"] {
 .drawer__nav ul {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: var(--s-2);
+  list-style: none;
+  padding-inline-start: 0;
 }
 
 .drawer__nav a {
@@ -264,7 +267,12 @@ html[data-drawer-open="true"] {
   font-weight: var(--fw-medium);
   color: var(--ink-black);
   text-decoration: none;
+  text-align: center;
   border-block-end: 1px solid var(--line);
+}
+
+.drawer__nav a[aria-current="page"] {
+  color: var(--accent-strong);
 }
 
 /* Pushed to the bottom of the drawer's flex column (.drawer:not([hidden])

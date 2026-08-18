@@ -30,6 +30,24 @@
   border-start-end-radius: 0;
 }
 
+/* #projects' own rounded top corner (inherited, unscoped, from .section)
+   is pulled up over showcase-hero by the standard curtain overlap on every
+   viewport, but only reads well on desktop, where showcase-hero.js's pin +
+   pinSpacing:false makes #projects visibly slide up and over it — a
+   continuous reveal, not a static edge. showcase-hero.js explicitly skips
+   that effect on mobile (pin is a common source of scroll jank on mobile
+   Safari), so on mobile #projects just sits there at rest with its round
+   corner against the video, which reads as a flat grey bar rather than a
+   curve, the same issue the flat top above fixes for showcase-hero's own
+   top edge. Flattening #projects' top on mobile only leaves desktop's
+   pin-driven reveal untouched. */
+@media (max-width: 768px) {
+  #projects {
+    border-start-start-radius: 0;
+    border-start-end-radius: 0;
+  }
+}
+
 .showcase-hero__bg {
   position: absolute;
   inset: 0;

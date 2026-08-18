@@ -133,7 +133,16 @@
   --s-9: 96px;
   --s-10: 128px;
 
-  --section-pad-y: clamp(48px, 3vw + 32px, 96px);
+  /* Floor raised from 48px to 72px: at narrow (phone) widths this clamp
+     was hitting its minimum exactly, and --radius-section (the fixed 48px
+     the NEXT section pulls itself up by, to overlap this one) is also
+     48px — a section's own bottom padding and the following section's
+     overlap cancelled out exactly, leaving zero visual gap between
+     whatever sits at a section's bottom (button pills, card grids) and
+     the next section's rounded top edge. 72px leaves a comfortable ~24px
+     of breathing room at every width instead of only at wider ones where
+     the fluid part of the clamp had already overtaken 48px. */
+  --section-pad-y: clamp(72px, 3vw + 32px, 96px);
   --section-pad-x: clamp(20px, 3vw, 48px);
   --gap-card: var(--s-5);
   --gap-grid: var(--s-6);
