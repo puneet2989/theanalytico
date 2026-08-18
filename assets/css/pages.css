@@ -1,0 +1,194 @@
+/* ==========================================================================
+   pages.css — page-specific overrides. Section/component rules that only
+   apply on one page live here, not in components.css.
+   ========================================================================== */
+
+/* ---- work.html: #showcase, a full-bleed video section ----------------
+   Not the page hero (that stays #intro, above) — this is a mid-page
+   section, so it sits inside the normal .section rounded-corner/padding
+   system rather than clearing a fixed header. overflow: hidden clips the
+   absolutely-positioned video/scrim to the section's own rounded top
+   corners, which .section itself does not do by default (nothing else on
+   the site needs an edge-to-edge background layer inside a section). */
+
+.showcase-hero {
+  position: relative;
+  overflow: hidden;
+  background: var(--ink-black);
+  min-height: min(90vh, 820px);
+  display: flex;
+  align-items: center;
+  /* Flat top, not the standard .section rounded-corner curtain: this
+     section pins flush to the viewport's top edge while scrolling (see
+     showcase-hero.js). A rounded top corner clips the video into a
+     rounded rect, and once pinned there is nothing above it in the fixed
+     viewport to hide the resulting corner cutouts — the page background
+     shows through them as a mismatched colour poking through the curve.
+     A flat top has no cutout, so nothing shows through regardless of
+     pin state. */
+  border-start-start-radius: 0;
+  border-start-end-radius: 0;
+}
+
+.showcase-hero__bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(60% 50% at 30% 20%, rgba(229, 128, 75, 0.35), transparent 70%),
+    radial-gradient(55% 45% at 75% 70%, rgba(153, 153, 255, 0.30), transparent 70%),
+    var(--ink-black);
+}
+
+.showcase-hero__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.showcase-hero__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.15) 0%, rgba(0, 0, 0, 0.05) 40%, rgba(0, 0, 0, 0.35) 100%);
+}
+
+.showcase-hero__content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-7);
+  width: 100%;
+}
+
+/* ---- Stats row ------------------------------------------------------ */
+
+.showcase-hero__stats {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: var(--s-5);
+}
+@media (min-width: 768px) {
+  .showcase-hero__stats { gap: var(--s-7); }
+}
+
+.showcase-hero__stat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
+  color: #fff;
+}
+.showcase-hero__stat-num {
+  font-family: var(--font-heading);
+  font-size: clamp(1rem, 2.4vw, 1.75rem);
+  font-weight: var(--fw-heading);
+  letter-spacing: var(--ls-heading);
+  line-height: 1;
+  color: var(--accent);
+  white-space: nowrap;
+}
+.showcase-hero__stat-label {
+  margin-top: var(--s-1);
+  font-size: clamp(0.625rem, 1.2vw, 0.875rem);
+  font-weight: var(--fw-heading);
+  letter-spacing: var(--ls-caps);
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+
+/* ---- Bottom rows ------------------------------------------------------ */
+
+.showcase-hero__bottom {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-6);
+}
+@media (min-width: 768px) {
+  .showcase-hero__bottom { gap: var(--s-9); }
+}
+
+.showcase-hero__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-4);
+}
+.showcase-hero__row--end {
+  align-items: flex-end;
+}
+
+.showcase-hero__tagline {
+  margin: 0;
+  color: #fff;
+  font-size: clamp(0.625rem, 1.2vw, 0.875rem);
+  font-weight: var(--fw-heading);
+  letter-spacing: var(--ls-caps);
+  text-transform: uppercase;
+  max-width: 160px;
+  line-height: 1.3;
+}
+@media (min-width: 768px) {
+  .showcase-hero__tagline { max-width: 220px; }
+}
+
+.showcase-hero__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  color: var(--accent);
+  font-weight: var(--fw-heading);
+  font-size: clamp(1rem, 2.5vw, 1.5rem);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.showcase-hero__cta-icon {
+  width: 18px;
+  height: 18px;
+}
+@media (min-width: 640px) {
+  .showcase-hero__cta-icon { width: 22px; height: 22px; }
+}
+
+.showcase-hero__desc {
+  margin: 0;
+  width: 120px;
+  flex-shrink: 0;
+  color: #fff;
+  text-align: left;
+  font-size: clamp(0.5625rem, 1vw, 0.875rem);
+  font-weight: var(--fw-heading);
+  letter-spacing: var(--ls-caps);
+  text-transform: uppercase;
+  line-height: 1.3;
+}
+@media (min-width: 640px) {
+  .showcase-hero__desc { width: 180px; }
+}
+@media (min-width: 768px) {
+  .showcase-hero__desc { width: 280px; text-align: right; }
+}
+
+.showcase-hero__heading {
+  margin: 0;
+  text-align: right;
+  color: #fff;
+}
+.showcase-hero__word-mask {
+  display: block;
+  overflow: hidden;
+}
+.showcase-hero__word {
+  display: block;
+  font-family: var(--font-heading);
+  font-size: clamp(2rem, 8vw, 6.5rem);
+  line-height: 0.88;
+  font-weight: var(--fw-heading);
+  letter-spacing: var(--ls-display);
+  text-transform: uppercase;
+}

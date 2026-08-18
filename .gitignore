@@ -2,6 +2,12 @@
 # 73 MB, not ours to redistribute, and not needed to build or run the site.
 examples/
 
+# Remotion authoring project used to prototype the work.html showcase video.
+# That direction was superseded by an AI-generated clip (see PLACEHOLDER-
+# CONTENT.md); this is a local scratch tool, not part of the shipped site,
+# and already excluded from served assets via .assetsignore.
+video-studio/
+
 # Secrets. Only the .example template is tracked.
 .dev.vars
 .env

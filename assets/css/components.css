@@ -152,7 +152,7 @@ html[data-header-boot="pinned"] .logo__line2 {
 
 .header__list a[aria-current="page"] {
   font-weight: var(--fw-medium);
-  color: var(--ink-black);
+  color: var(--accent-strong);
 }
 
 /* Compound selector, not a bare .header__cta: .btn's own `display:
@@ -869,86 +869,6 @@ html[data-drawer-open="true"] {
   font-size: var(--fs-micro);
 }
 
-/* ---- Work showcase: pinned 3D browser-chrome mockup ---------------------------
-   [data-work-showcase-frame] IS the rotating element (motion module writes
-   rotateX/rotateY transforms straight onto it), so perspective has to live on
-   its parent, .showcase__scene, for the 3D to read correctly rather than
-   flattening. min-height: 100vh keeps the pinned section filling the
-   viewport for the whole pin duration — without it, the section is shorter
-   than the viewport and a hard-edged strip of the next section's background
-   shows below the pinned frame the entire time. */
-#showcase {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-}
-
-.showcase__scene {
-  perspective: var(--perspective-showcase);
-}
-
-.showcase__frame {
-  width: clamp(320px, 55vw, 860px);
-  margin-inline: auto;
-  margin-block-start: var(--s-7);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  background: var(--surface);
-  box-shadow: var(--shadow-lg);
-}
-
-.showcase__chrome {
-  display: flex;
-  align-items: center;
-  gap: var(--s-2);
-  padding: var(--s-3) var(--s-4);
-  background: var(--bg-grey);
-}
-
-/* Small fixed decorative circle, no fluid token precedent for this size
-   elsewhere (closest existing UI chrome dots are the header burger bars,
-   also fixed px). Size lives in tokens.css as --size-chrome-dot rather than
-   a bare value here. */
-.showcase__dot {
-  width: var(--size-chrome-dot);
-  height: var(--size-chrome-dot);
-  border-radius: 50%;
-  background: var(--ink-12);
-}
-
-.showcase__stage {
-  position: relative;
-  aspect-ratio: 4 / 3;
-  overflow: hidden;
-}
-
-.showcase__slide {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: top;
-  opacity: 0;
-}
-
-/* No-JS / rest-state fallback: first slide (ArdLens) shown, the other two
-   stay hidden until the motion module takes over opacity/transform itself. */
-.showcase__slide:first-child {
-  opacity: 1;
-}
-
-/* Below 768 the frame renders a desktop screenshot at a small fraction of
-   its native size — illegible rather than illustrative — and the module
-   itself never pins or animates it here (see work-showcase.js's isMobile
-   bail), so the static crop is all a mobile visitor would ever see. Hiding
-   it keeps the section to its heading and lead line on small screens. */
-@media (max-width: 767px) {
-  .showcase__frame {
-    display: none;
-  }
-}
-
 /* ---- Process / capability cards ------------------------------------------------ */
 
 /* Dial wrapper. Mobile-first: no dial, the arc stays hidden and the four
@@ -1566,25 +1486,6 @@ main > .section:first-child:not(.hero) {
 
 .facts__list dd {
   font-size: var(--fs-body);
-  color: var(--ink);
-}
-
-/* ---- Topics chip list (insights) ----------------------------------------------------- */
-
-.topics__list {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: var(--s-3);
-  margin-block-start: var(--s-6);
-}
-
-.topics__list li {
-  padding: var(--s-2) var(--s-5);
-  border-radius: var(--radius-pill);
-  background: var(--ink-05);
-  font-size: var(--fs-small);
-  font-weight: var(--fw-medium);
   color: var(--ink);
 }
 

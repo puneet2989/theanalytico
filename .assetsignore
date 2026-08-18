@@ -22,6 +22,12 @@ README.md
 # Source material for the recorded service-card clips, not part of the site
 mocks/
 
+# Remotion project used to prototype brand video clips. Superseded by an
+# AI-generated clip (assets/video/promo-bg.mp4) — kept locally only, now
+# excluded from git entirely via .gitignore, so this line is belt-and-braces
+# in case it's ever restored.
+video-studio/
+
 # Client-supplied reference recordings, if they are ever un-ignored in git
 examples/
 

@@ -47,7 +47,7 @@ import { initProcessDial } from './modules/process-dial.js';
 import { initProcessPath } from './modules/process-path.js';
 import { initTestimonialMarquee } from './modules/testimonial-marquee.js';
 import { initTestimonialDissolve } from './modules/testimonial-dissolve.js';
-import { initWorkShowcase } from './modules/work-showcase.js';
+import { initShowcaseHero } from './modules/showcase-hero.js';
 
 // First action: flip the CSS gate so no-JS fallbacks switch off.
 document.documentElement.dataset.js = 'true';
@@ -135,7 +135,7 @@ const remainingModules = [
   ['tilt-cards', initTiltCards],
   ['process-dial', initProcessDial],
   ['process-path', initProcessPath],
-  ['work-showcase', initWorkShowcase],
+  ['showcase-hero', initShowcaseHero],
   ['kpi-counter', initKpiCounter],
   ['reveal-stagger', initRevealStagger],
 ];

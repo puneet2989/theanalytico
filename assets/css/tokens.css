@@ -188,7 +188,4 @@
   --container-text: 66ch;
   --header-pill-max: 1120px;
 
-  /* ---- 3D perspective (work showcase pinned sequence) ------------------ */
-  --perspective-showcase: 1400px;
-  --size-chrome-dot: 10px;
 }

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Promo Concept — Full-Screen Video Hero | TheAnalytico</title>
+  <meta name="robots" content="noindex, nofollow">
+
+  <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+
+  <link rel="preload" href="/assets/fonts/inter-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/assets/fonts/inter-500.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/assets/fonts/space-grotesk-600.woff2" as="font" type="font/woff2" crossorigin>
+
+  <link rel="stylesheet" href="/assets/css/tokens.css">
+  <link rel="stylesheet" href="/assets/css/promo-hero.css">
+</head>
+<body class="promo-hero" data-promo-hero>
+
+  <!-- PLACEHOLDER: replace before launch — real background video (see prompt in PLACEHOLDER-CONTENT.md), currently a dark gradient stand-in -->
+  <div class="promo-hero__bg" data-placeholder="true" data-promo-video-slot>
+    <video class="promo-hero__video" data-promo-video muted playsinline loop preload="none" aria-hidden="true">
+      <source src="/assets/video/promo-bg.mp4" type="video/mp4">
+    </video>
+  </div>
+  <div class="promo-hero__scrim"></div>
+
+  <header class="promo-hero__nav">
+    <a href="/" class="promo-hero__logo" data-promo-fade aria-label="TheAnalytico home">
+      <span class="promo-hero__logo-ring"><span class="promo-hero__logo-dot"></span></span>
+    </a>
+
+    <nav class="promo-hero__links" aria-label="Primary">
+      <a href="#" data-promo-fade>Story</a>
+      <a href="#" data-promo-fade>Expertise</a>
+      <a href="#" data-promo-fade>Studios</a>
+      <a href="#" data-promo-fade>Feedback</a>
+    </nav>
+
+    <button type="button" class="promo-hero__menu-btn" data-promo-fade data-promo-menu-open aria-label="Open menu" aria-expanded="false" aria-controls="promo-menu">
+      <span></span><span></span><span></span>
+    </button>
+  </header>
+
+  <div class="promo-hero__menu" id="promo-menu" data-promo-menu hidden>
+    <div class="promo-hero__menu-top">
+      <a href="/" class="promo-hero__logo" aria-label="TheAnalytico home">
+        <span class="promo-hero__logo-ring"><span class="promo-hero__logo-dot"></span></span>
+      </a>
+      <button type="button" class="promo-hero__menu-close" data-promo-menu-close aria-label="Close menu">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M1 1L15 15M15 1L1 15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <nav class="promo-hero__menu-links" aria-label="Mobile primary">
+      <a href="#">Story</a>
+      <a href="#">Expertise</a>
+      <a href="#">Studios</a>
+      <a href="#">Feedback</a>
+    </nav>
+    <a href="/contact" class="promo-hero__menu-cta">
+      Work With Us
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M5 15L15 5M15 5H7M15 5V13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+  </div>
+
+  <div class="promo-hero__stats" data-promo-stats>
+    <div class="promo-hero__stat" data-promo-fade-up>
+      <span class="promo-hero__stat-num">Full-Service</span>
+      <span class="promo-hero__stat-label">Digital<br>Agency</span>
+    </div>
+    <div class="promo-hero__stat" data-promo-fade-up>
+      <span class="promo-hero__stat-num">AI-Powered</span>
+      <span class="promo-hero__stat-label">Marketing<br>Automation</span>
+    </div>
+    <div class="promo-hero__stat" data-promo-fade-up>
+      <span class="promo-hero__stat-num">Worldwide</span>
+      <span class="promo-hero__stat-label">Service<br>Area</span>
+    </div>
+  </div>
+
+  <div class="promo-hero__bottom">
+    <div class="promo-hero__row">
+      <p class="promo-hero__tagline" data-promo-fade-up>Built From Dublin<br>For Local Businesses<br>Everywhere</p>
+      <a href="/contact" class="promo-hero__cta" data-promo-fade-up>
+        Work With Us
+        <svg class="promo-hero__cta-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 18L18 6M18 6H9M18 6V15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+    <div class="promo-hero__row promo-hero__row--end">
+      <p class="promo-hero__desc" data-promo-fade-up>Web Design, SEO, Paid Advertising and AI Services Built Around Growing Your Business</p>
+      <h1 class="promo-hero__heading">
+        <span class="promo-hero__word-mask"><span class="promo-hero__word" data-promo-word>Fearless</span></span>
+        <span class="promo-hero__word-mask"><span class="promo-hero__word" data-promo-word>Growth</span></span>
+        <span class="promo-hero__word-mask"><span class="promo-hero__word" data-promo-word>Delivered</span></span>
+      </h1>
+    </div>
+  </div>
+
+  <script src="/assets/js/vendor/gsap.min.js" defer></script>
+  <script type="module" src="/assets/js/promo-hero.js" defer></script>
+</body>
+</html>

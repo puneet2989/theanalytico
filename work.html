@@ -4,18 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Our Work — Sites We Have Built and Shipped | TheAnalytico</title>
-  <meta name="description" content="Three live client sites built by TheAnalytico: ArdLens, KC Accountants and SodoLT. Aerial film, accountancy and wellness, all shipped and live.">
+  <meta name="description" content="Client sites built by TheAnalytico, including ArdLens, KC Accountants and SodoLT. Aerial film, accountancy and wellness, shipped and live.">
   <link rel="canonical" href="https://theanalytico.com/work">
 
   <meta property="og:type" content="website">
   <meta property="og:title" content="Our Work — Sites We Have Built and Shipped | TheAnalytico">
-  <meta property="og:description" content="Three live client sites built by TheAnalytico: ArdLens, KC Accountants and SodoLT. Aerial film, accountancy and wellness, all shipped and live.">
+  <meta property="og:description" content="Client sites built by TheAnalytico, including ArdLens, KC Accountants and SodoLT. Aerial film, accountancy and wellness, shipped and live.">
   <meta property="og:image" content="https://theanalytico.com/assets/img/og-default.png">
   <meta property="og:url" content="https://theanalytico.com/work">
 
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Our Work — Sites We Have Built and Shipped | TheAnalytico">
-  <meta name="twitter:description" content="Three live client sites built by TheAnalytico: ArdLens, KC Accountants and SodoLT. Aerial film, accountancy and wellness, all shipped and live.">
+  <meta name="twitter:description" content="Client sites built by TheAnalytico, including ArdLens, KC Accountants and SodoLT. Aerial film, accountancy and wellness, shipped and live.">
   <meta name="twitter:image" content="https://theanalytico.com/assets/img/og-default.png">
 
   <meta name="theme-color" content="#e8f2fa">
@@ -33,6 +33,7 @@
   <link rel="stylesheet" href="/assets/css/tokens.css">
   <link rel="stylesheet" href="/assets/css/base.css">
   <link rel="stylesheet" href="/assets/css/components.css">
+  <link rel="stylesheet" href="/assets/css/pages.css">
 
   <script type="application/ld+json">
   {
@@ -144,8 +145,8 @@
 <section id="intro" class="section section--blue">
   <div class="container">
     <p class="eyebrow">Selected work</p>
-    <h1 class="page__title">Three sites, built and live</h1>
-    <p class="page__lead">Film, accountancy and wellness. Different sectors, the same job: a site that loads fast, reads clearly, and turns a visitor into an enquiry.</p>
+    <h1 class="page__title">Websites, built and shipped</h1>
+    <p class="page__lead">Film, accountancy and wellness so far, across static builds and WordPress. Different sectors, the same job: a site that loads fast, reads clearly, and turns a visitor into an enquiry.</p>
     <div class="section__actions">
       <a class="btn btn--primary" href="/contact">Contact Us</a>
       <a class="btn btn--ghost" href="/services">See Services</a>
@@ -153,28 +154,51 @@
   </div>
 </section>
 
-<section id="showcase" class="section section--cream" aria-labelledby="showcase-title" data-work-showcase>
-  <div class="container">
-    <h2 id="showcase-title" data-mask-heading>Real sites, not renders</h2>
-    <p class="section__lead">The same three builds below, one at a time.</p>
-    <div class="showcase__scene">
-      <div class="showcase__frame" data-work-showcase-frame>
-        <div class="showcase__chrome" aria-hidden="true">
-          <span class="showcase__dot"></span>
-          <span class="showcase__dot"></span>
-          <span class="showcase__dot"></span>
-        </div>
-        <div class="showcase__stage">
-          <img class="showcase__slide" data-work-showcase-slide src="/assets/img/work/ardlens-card.webp" width="800" height="600" alt="" loading="eager" fetchpriority="high" decoding="async">
-          <img class="showcase__slide" data-work-showcase-slide src="/assets/img/work/kc-accountants-card.webp" width="800" height="600" alt="" loading="lazy" decoding="async">
-          <img class="showcase__slide" data-work-showcase-slide src="/assets/img/work/sodolt-card.webp" width="800" height="600" alt="" loading="lazy" decoding="async">
-        </div>
+<section id="showcase" class="section showcase-hero" aria-labelledby="showcase-title" data-showcase-hero>
+  <div class="showcase-hero__bg" aria-hidden="true">
+    <video class="showcase-hero__video" data-showcase-hero-video muted playsinline loop preload="none" poster="/assets/video/promo-bg-poster.webp">
+      <source src="/assets/video/promo-bg.mp4" type="video/mp4">
+    </video>
+  </div>
+  <div class="showcase-hero__scrim"></div>
+
+  <div class="container showcase-hero__content">
+    <div class="showcase-hero__stats" data-showcase-hero-stats>
+      <div class="showcase-hero__stat" data-showcase-hero-fade-up>
+        <span class="showcase-hero__stat-num">Static-First</span>
+        <span class="showcase-hero__stat-label">Fast<br>Builds</span>
+      </div>
+      <div class="showcase-hero__stat" data-showcase-hero-fade-up>
+        <span class="showcase-hero__stat-num">Cloudflare</span>
+        <span class="showcase-hero__stat-label">Edge<br>Hosted</span>
+      </div>
+      <div class="showcase-hero__stat" data-showcase-hero-fade-up>
+        <span class="showcase-hero__stat-num">Real Sites</span>
+        <span class="showcase-hero__stat-label">Not<br>Renders</span>
+      </div>
+    </div>
+
+    <div class="showcase-hero__bottom">
+      <div class="showcase-hero__row">
+        <p class="showcase-hero__tagline" data-showcase-hero-fade-up>Craft,<br>In<br>Motion</p>
+        <a class="showcase-hero__cta" href="/contact" data-showcase-hero-fade-up>
+          Start a Project
+          <svg class="showcase-hero__cta-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 18L18 6M18 6H9M18 6V15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </div>
+      <div class="showcase-hero__row showcase-hero__row--end">
+        <p class="showcase-hero__desc" data-showcase-hero-fade-up>The same attention to detail runs through everything we build</p>
+        <h2 id="showcase-title" class="showcase-hero__heading">
+          <span class="showcase-hero__word-mask"><span class="showcase-hero__word" data-showcase-hero-word>Real</span></span>
+          <span class="showcase-hero__word-mask"><span class="showcase-hero__word" data-showcase-hero-word>Work</span></span>
+          <span class="showcase-hero__word-mask"><span class="showcase-hero__word" data-showcase-hero-word>Delivered</span></span>
+        </h2>
       </div>
     </div>
   </div>
 </section>
 
-<section id="projects" class="section section--grey" data-curtain aria-labelledby="projects-title">
+<section id="projects" class="section section--grey" aria-labelledby="projects-title">
   <div class="container">
     <h2 id="projects-title" data-mask-heading>Work we are proud of</h2>
     <ul class="work__grid" data-reveal-group>
@@ -326,7 +350,7 @@
 </section>
 
 <section id="approach" class="section section--blue" data-curtain aria-labelledby="approach-title">
-  <div class="container container--narrow">
+  <div class="container">
     <h2 id="approach-title" data-mask-heading>How every one of these was built</h2>
     <p class="section__lead">Different sectors, one method. It is the same four steps whether the build is static or WordPress.</p>
     <ol class="process__list">
@@ -359,16 +383,17 @@
     <h2 id="numbers-title" data-mask-heading>The countable part</h2>
     <ul class="kpi__list kpi__list--3">
       <li class="kpi">
-        <p class="kpi__value"><span data-counter data-counter-to="3" data-counter-decimals="0">3</span></p>
-        <p class="kpi__label">sites built and live</p>
+        <p class="kpi__value"><span data-counter data-counter-to="10" data-counter-suffix="+" data-counter-decimals="0">10+</span></p>
+        <p class="kpi__label">years in digital, SEO and paid media</p>
       </li>
       <li class="kpi">
-        <p class="kpi__value"><span data-counter data-counter-to="3" data-counter-decimals="0">3</span></p>
-        <p class="kpi__label">sectors served</p>
+        <p class="kpi__value"><span data-counter data-counter-to="4" data-counter-decimals="0">4</span></p>
+        <p class="kpi__label">core service disciplines</p>
       </li>
-      <li class="kpi">
-        <p class="kpi__value"><span data-counter data-counter-to="2" data-counter-decimals="0">2</span></p>
-        <p class="kpi__label">hosted on Cloudflare</p>
+      <!-- PLACEHOLDER: replace before launch — real Lighthouse scores for the live sites -->
+      <li class="kpi" data-placeholder="true">
+        <p class="kpi__value"><span data-counter data-counter-to="98" data-counter-decimals="0">98</span></p>
+        <p class="kpi__label">average Lighthouse performance score</p>
       </li>
     </ul>
   </div>
