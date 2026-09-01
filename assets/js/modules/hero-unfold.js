@@ -149,6 +149,7 @@ export function initHeroUnfold({ gsap, ScrollTrigger, reduced, isMobile }) {
   let mesh;
   let texture;
   let trigger;
+  let holdTrigger;
   let tickerFn;
   let onWindowResize;
 
@@ -327,8 +328,31 @@ export function initHeroUnfold({ gsap, ScrollTrigger, reduced, isMobile }) {
     },
   });
 
+  // Hold: once the panel finishes forming (stage's top settling at 96px,
+  // the exact point the trigger above ends at), pin it there for one more
+  // viewport height of scroll before the page continues. Without this the
+  // panel is only fully formed for an instant — the moment scroll crosses
+  // that point — and immediately starts scrolling away with the rest of
+  // the page, since nothing was holding it in place. A separate trigger
+  // rather than extending the one above: that one's whole progress range
+  // (0-1) drives the morph itself, and stretching it to also cover a hold
+  // period would mean the morph and the hold fight over the same progress
+  // value. The mesh keeps tracking `stage` for its end position/scale
+  // every tick regardless (see tickerFn above reading a fresh rect each
+  // frame), so pinning `stage` here — freezing its rect — automatically
+  // keeps the WebGL plane locked in place too, with no extra plumbing.
+  holdTrigger = ScrollTrigger.create({
+    trigger: stage,
+    start: 'top 96px',
+    end: () => '+=' + window.innerHeight,
+    pin: true,
+    pinSpacing: true,
+    invalidateOnRefresh: true,
+  });
+
   return function cleanup() {
     if (trigger) trigger.kill();
+    if (holdTrigger) holdTrigger.kill();
     if (tickerFn) gsap.ticker.remove(tickerFn);
     if (onWindowResize) window.removeEventListener('resize', onWindowResize);
 
