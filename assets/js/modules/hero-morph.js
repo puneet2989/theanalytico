@@ -15,12 +15,14 @@
  * 6. This module returns a cleanup function.
  * 7. Shows the final frame, static, no stage-change animation, when
  *    prefers-reduced-motion: reduce matches.
- * 8. Mobile: no pin (pinned scroll is jank-prone on mobile browsers — see
- *    showcase-hero.js for the same trade-off elsewhere in this project).
- *    Still scroll-linked, not autoplaying: a non-pinned, scrubbed
- *    ScrollTrigger ties the frame to how far the section has scrolled
- *    through the viewport, so it advances and reverses with scroll like
- *    the desktop version, it just never holds the section in place.
+ * 8. Mobile pins too, same as desktop, but with pinType: 'transform'
+ *    rather than the default position: fixed — the latter is what
+ *    causes the classic mobile Safari scroll-jank/jump (fighting the
+ *    dynamic address bar's own show/hide), not pinning itself. See
+ *    showcase-hero.js for a case that avoids pinning on mobile entirely
+ *    instead; this module needs the hold-in-place read the user asked
+ *    for, so it takes the transform-pin route rather than dropping the
+ *    pin altogether.
  * 9. Never animates width, height, top, or left. Canvas drawing and the
  *    stage-change pop (transform/opacity only) are not layout properties.
  * 10. Queries elements with data-* attributes only, never a class selector.
@@ -155,31 +157,17 @@ export function initHeroMorph({ gsap, ScrollTrigger, reduced, isMobile }) {
     captions.forEach((el, i) => {
       el.style.opacity = i === activeStage ? '1' : '0';
     });
-  } else if (isMobile) {
-    // 'top top' to 'bottom top': exactly one viewport-height of scroll,
-    // matching the section's own 100svh height. An earlier version spanned
-    // 'top bottom' to 'bottom top' (the section's full height PLUS a
-    // whole viewport extra), so the morph was still barely a third done
-    // by the time the section was squarely on screen, and mostly finished
-    // scrolling past before it completed — reading as stuck/not scrubbing.
-    trigger = ScrollTrigger.create({
-      trigger: stage,
-      start: 'top top',
-      end: 'bottom top',
-      scrub: true,
-      invalidateOnRefresh: true,
-      onUpdate: (self) => {
-        drawFrame(Math.round(self.progress * (frameCount - 1)));
-        updateStage(self.progress);
-      },
-    });
   } else {
+    // pinType: 'transform' on mobile — avoids the classic mobile Safari
+    // jank/jump (position: fixed fighting the dynamic address bar);
+    // desktop keeps the default ('fixed').
     trigger = ScrollTrigger.create({
       trigger: stage,
       start: 'top top',
       end: () => '+=' + Math.round(window.innerHeight * 1.75),
       pin: true,
       pinSpacing: true,
+      pinType: isMobile ? 'transform' : 'fixed',
       scrub: true,
       invalidateOnRefresh: true,
       onUpdate: (self) => {

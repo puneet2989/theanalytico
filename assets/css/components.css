@@ -536,6 +536,19 @@ html[data-drawer-open="true"] {
   overflow: hidden;
 }
 
+/* Mobile: height follows the mobile sprite's own aspect ratio instead of
+   filling the viewport. A full-height, portrait container "cover"-fit
+   against a landscape (640x356) frame forced a ~2.4x scale-up, leaving
+   only the centre quarter of the shape's width on screen — badly
+   oversized and cropped. Matching the container to the frame's own
+   proportions means cover-fit crops nothing. */
+@media (max-width: 768px) {
+  .hero__morph {
+    height: auto;
+    aspect-ratio: 640 / 356;
+  }
+}
+
 /* Full-bleed visual again — no side column, no gap of empty background.
    hero-morph.js crops to fill (cover), the same way object-fit: cover
    would on an <img>; height is independent of the source's 1284x716
@@ -594,7 +607,11 @@ html[data-drawer-open="true"] {
 .hero__morph-caption {
   position: absolute;
   inset-inline: clamp(20px, 6vw, 32px);
-  inset-block-end: clamp(28px, 8vh, 64px);
+  /* % (of .hero__morph-captions' own box), not vh — on mobile that box is
+     now aspect-ratio-short rather than viewport-tall, and vh would have
+     sized this offset off the full viewport instead of the shape's own,
+     much shorter, band. */
+  inset-block-end: clamp(10px, 10%, 28px);
   display: flex;
   flex-direction: column;
   align-items: center;
