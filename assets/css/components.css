@@ -536,16 +536,17 @@ html[data-drawer-open="true"] {
   overflow: hidden;
 }
 
-/* Mobile: height follows the mobile sprite's own aspect ratio instead of
-   filling the viewport. A full-height, portrait container "cover"-fit
-   against a landscape (640x356) frame forced a ~2.4x scale-up, leaving
-   only the centre quarter of the shape's width on screen — badly
-   oversized and cropped. Matching the container to the frame's own
-   proportions means cover-fit crops nothing. */
+/* Mobile: a shorter band than the full viewport. Full height against a
+   landscape (640x356) frame forced a ~2.4x cover-fit scale-up, showing
+   only the centre quarter of the shape's width — badly oversized and
+   cropped. Matching the box exactly to the frame's own aspect ratio
+   fixed the crop but read as a tiny strip pinned under the header.
+   60svh is the middle ground: still a real, prominent crop (cover-fit
+   always crops some of a landscape source against a portrait box), but
+   big enough to dominate the screen rather than disappear under it. */
 @media (max-width: 768px) {
   .hero__morph {
-    height: auto;
-    aspect-ratio: 640 / 356;
+    height: 60svh;
   }
 }
 
