@@ -536,17 +536,22 @@ html[data-drawer-open="true"] {
   overflow: hidden;
 }
 
-/* Mobile: a shorter band than the full viewport. Full height against a
-   landscape (640x356) frame forced a ~2.4x cover-fit scale-up, showing
-   only the centre quarter of the shape's width — badly oversized and
-   cropped. Matching the box exactly to the frame's own aspect ratio
-   fixed the crop but read as a tiny strip pinned under the header.
-   60svh is the middle ground: still a real, prominent crop (cover-fit
-   always crops some of a landscape source against a portrait box), but
-   big enough to dominate the screen rather than disappear under it. */
+/* Mobile: full viewport height again (matches the pin, so there is no
+   dead gap of empty background below a shorter pinned box — an earlier
+   version pinned only a 60svh band, which held its position at the very
+   top under the header while the remaining 40vh sat empty beneath it,
+   reading as "stuck to the top" rather than centred). The shape and its
+   caption become flex children below instead of full-bleed absolute
+   layers, so justify-content: center here centres that whole group
+   vertically in the screen — equal space above and below, not anchored
+   to the top edge. */
 @media (max-width: 768px) {
   .hero__morph {
-    height: 60svh;
+    height: 100svh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: var(--s-4);
   }
 }
 
@@ -557,6 +562,21 @@ html[data-drawer-open="true"] {
 .hero__morph-visual {
   position: absolute;
   inset: 0;
+}
+
+/* Mobile: a real box in flex flow (not a full-bleed absolute layer) so
+   the parent's justify-content: center above can centre it. Height, not
+   the frame's own aspect ratio, still 60vh — see the mobile hero-morph
+   height history above; the same "big enough to dominate the screen,
+   not shrunk to fit with zero crop" reasoning applies here. */
+@media (max-width: 768px) {
+  .hero__morph-visual {
+    position: relative;
+    inset: auto;
+    flex: none;
+    width: 100%;
+    height: 60svh;
+  }
 }
 
 [data-hero-morph-fallback] {
@@ -587,6 +607,15 @@ html[data-drawer-open="true"] {
   pointer-events: none;
 }
 
+/* Mobile: captions no longer overlay the shape (they sit in their own
+   flex slot below it, on the section's own dark background instead), so
+   the scrim has nothing left to do its contrast job for. */
+@media (max-width: 768px) {
+  .hero__morph-scrim {
+    display: none;
+  }
+}
+
 /* Captions sit inside each stage's own negative space rather than one
    fixed corner: the frame's hollow centre, the open air the megaphone
    projects into, the infinity symbol's two hollow loops, and the flat
@@ -603,6 +632,25 @@ html[data-drawer-open="true"] {
   position: absolute;
   inset: 0;
   pointer-events: none;
+}
+
+/* Mobile: an in-flow flex item (sized, not full-bleed) so it sits right
+   below the visual and both can be centred together as a group by the
+   stage's justify-content: center. individual [data-hero-morph-caption]
+   entries stay absolutely stacked inside it (unchanged) so the
+   crossfade between stages still works — only this outer box's own
+   position changed. Height is a fixed estimate generous enough for the
+   tallest stage's tag + wrapped lines; slight overflow beyond it isn't
+   clipped (only .hero__morph itself clips, and there's plenty of room
+   inside that). */
+@media (max-width: 768px) {
+  .hero__morph-captions {
+    position: relative;
+    inset: auto;
+    flex: none;
+    width: 100%;
+    height: 170px;
+  }
 }
 
 .hero__morph-caption {
