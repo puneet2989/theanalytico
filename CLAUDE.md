@@ -1,6 +1,6 @@
 # TheAnalytico — project conventions
 
-Marketing site for TheAnalytico, an agency selling **web design, SEO, paid advertising (Meta + Google), and AI services** to local businesses.
+Marketing site for TheAnalytico, an agency selling **web design, SEO, paid advertising (Meta + Google), and AI services** to businesses worldwide. Dublin is the operating base (kept in structured data and contact details for local search), not the target market — visible copy should not read as Dublin/Ireland-only or "local business" scoped.
 
 ## Non-negotiables
 
@@ -60,19 +60,18 @@ Spacing scale: 4 8 12 16 24 32 48 64 96 128 (px), exposed as `--s-1` … `--s-10
 
 ## Logo and header
 
-Wordmark only, no illustration. Inline SVG in `assets/logo/`, never an `<img>`, so it can animate and inherit `currentColor`.
+Wordmark only — no monogram, no separate mark, no illustration. Inline SVG in `assets/logo/`, never an `<img>`, so it can animate and inherit `currentColor`.
 
-- **Monogram**: `tA` as a single connected ligature form, geometric, stroke-based.
-- **Wordmark**: `the` / `analytico` stacked on two lines beside the monogram, lowercase, tight leading.
+- **Wordmark**: `the` / `analytico` stacked on two lines, lowercase, tight leading. This is the only logo asset, used in every header state including the compact pinned one — there is no fallback mark to shrink to.
 
 Header has two states, driven by scroll position:
 
 | State | Trigger | Appearance |
 |---|---|---|
-| `top` | `scrollY < 40` | Full-width bar, transparent, monogram **+** stacked wordmark, nav links, `Contact Us` pill on the right |
-| `pinned` | `scrollY >= 40` | Centred floating pill, max-width ~1120px, `backdrop-filter: blur(16px)`, monogram **only**, same nav |
+| `top` | `scrollY < 40` | Full-width bar, transparent, full-size stacked wordmark, nav links, `Contact Us` pill on the right |
+| `pinned` | `scrollY >= 40` | Centred floating pill, max-width ~1120px, `backdrop-filter: blur(16px)`, wordmark scaled/condensed down, same nav |
 
-Transition is a single GSAP timeline on width, radius, padding, background, and wordmark opacity/width. Duration 0.45s, `power3.out`. It must not thrash layout: animate `transform` and `opacity`, plus `max-width` on the shell only.
+Transition is a single GSAP timeline on width, radius, padding, background, and wordmark scale/opacity. Duration 0.45s, `power3.out`. It must not thrash layout: animate `transform` and `opacity`, plus `max-width` on the shell only.
 
 ## Motion rules
 
@@ -83,16 +82,17 @@ Transition is a single GSAP timeline on width, radius, padding, background, and 
 - `will-change` only while an animation is live; remove it on complete.
 - Never animate `width`, `height`, `top`, or `left`. Transform and opacity only, with the header shell as the single documented exception.
 - Content must be readable with JS disabled. Reveal animations set their start state from JS, not CSS, so no-JS users see finished content.
+- Scroll-tied story sequences (hero, major section transitions) are narrative progression, not ambient/constant motion: they advance as scroll advances and hold their end state once a sequence completes — no idle looping while the viewport sits still. This does not apply to discrete micro-interactions (hover states, cursor-follow) which remain interaction-driven as normal.
 
 ## Effect inventory to implement
 
-1. Hero: oversized headline with inline image chips and a hand-drawn accent doodle
-2. Hero visual: scroll-scrubbed tilt that straightens as it enters
-3. Headings: clip-path mask rise, word-by-word stagger
+1. Hero: single scroll-scrubbed morphing form (Higgsfield-generated video, one continuous camera, no discrete objects/logo target) advancing through states that represent each service, then resolving directly into the kinetic hero headline — narrative progression, holds its end state, no idle looping. Loaded as a blob URL (Cloudflare static assets don't honour Range requests, so a plain network `<video>` never becomes scrubbable — see `websites/global-template/00-CLOUDFLARE-PLATFORM-LIMITS.md`).
+2. Kinetic headline: word-by-word clip-path reveal, timed to the hero morph's resolution rather than a fixed delay
+3. Headings (non-hero): clip-path mask rise, word-by-word stagger
 4. Header: full bar → floating pill (see above)
 5. Section curtain: rounded next-section slide over previous
 6. Cursor: soft gradient blob, lerped follow, desktop only
-7. Service cards: self-running inner loops (mockup slide, cycle, icon fan)
+7. Service cards: hover/enter-triggered inner motion (mockup slide, cycle, icon fan) — triggered, not self-running/ambient, per the narrative-progression motion rule
 8. Work cards: image scale on hover, label chip slide-in
 9. Peek carousel, drag plus arrow controls — testimonials (placeholder content in preview mode)
 10. Process/capability cards: tilted at rest, rotate straight on enter
@@ -144,7 +144,7 @@ Three shipped sites. All confirmed returning HTTP 200 on 13 Aug 2026. Client app
 
 `../rmyf` is an unpublished Next.js project. Excluded from the portfolio. Do not reference it.
 
-Sector spread across film, professional services, and wellness supports the local-business pitch. Say what is verifiable: built, shipped, live, hosted on Cloudflare. Do not claim traffic lifts, rankings, or revenue results — no analytics evidence exists.
+Sector spread across film, professional services, and wellness supports a broad, sector-agnostic pitch rather than a single niche. Say what is verifiable: built, shipped, live, hosted on Cloudflare. Do not claim traffic lifts, rankings, or revenue results — no analytics evidence exists.
 
 Case study screenshots go in `assets/img/work/`, captured from the live URLs. No headless browser is installed; install one before the capture step.
 

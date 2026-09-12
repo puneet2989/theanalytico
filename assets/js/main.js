@@ -41,8 +41,7 @@ import { initPeekCarousel } from './modules/peek-carousel.js';
 import { initTiltCards } from './modules/tilt-cards.js';
 import { initKpiCounter } from './modules/kpi-counter.js';
 import { initRevealStagger } from './modules/reveal-stagger.js';
-import { initHeroUnfold } from './modules/hero-unfold.js';
-import { initHeroArrow } from './modules/hero-arrow.js';
+import { initHeroMorph } from './modules/hero-morph.js';
 import { initProcessDial } from './modules/process-dial.js';
 import { initProcessPath } from './modules/process-path.js';
 import { initTestimonialMarquee } from './modules/testimonial-marquee.js';
@@ -122,9 +121,8 @@ safeInit('testimonial-dissolve', () =>
 // 5. Every other module, in no particular order relative to each other.
 const remainingModules = [
   ['hero-headline', initHeroHeadline],
-  ['hero-arrow', initHeroArrow],
   ['hero-tilt', initHeroTilt],
-  ['hero-unfold', initHeroUnfold],
+  ['hero-morph', initHeroMorph],
   ['heading-mask', initHeadingMask],
   ['section-curtain', initSectionCurtain],
   ['flowmap-trail', initFlowmapTrail],

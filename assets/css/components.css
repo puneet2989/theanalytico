@@ -128,6 +128,29 @@ html[data-header-boot="pinned"] .logo__line2 {
   font-size: var(--fs-h4);
 }
 
+/* Dark-hero override: index.html opens on a full-bleed dark video band
+   (.hero--dark). While the header is in its "top" state (transparent bar,
+   no pill background yet) dark ink text would be unreadable against it.
+   Scoped to [data-header-state="top"] only — once scrollY passes 40px the
+   header gets its own light pill background (rule above), which reads
+   fine regardless of what is behind it, so no override is needed there. */
+[data-theme="hero-dark"] [data-header-state="top"] .logo__line2 {
+  color: var(--surface);
+}
+
+[data-theme="hero-dark"] [data-header-state="top"] .header__list a {
+  color: var(--surface-60);
+}
+
+[data-theme="hero-dark"] [data-header-state="top"] .header__list a:hover,
+[data-theme="hero-dark"] [data-header-state="top"] .header__list a[aria-current="page"] {
+  color: var(--surface);
+}
+
+[data-theme="hero-dark"] [data-header-state="top"] .header__burger-bar {
+  background: var(--surface);
+}
+
 .header__nav {
   display: none;
 }
@@ -354,6 +377,22 @@ html[data-drawer-open="true"] {
   box-shadow: none;
 }
 
+/* The base ghost styling (dark text, pale border) is tuned for light
+   section backgrounds — on the hero's near-black background it's
+   barely visible. Inverted to a light border/text here, inverting to
+   solid on hover the same way the base version does. */
+.hero--dark .btn--ghost {
+  color: var(--surface);
+  border-color: var(--surface-35);
+}
+
+.hero--dark .btn--ghost:hover,
+.hero--dark .btn--ghost:focus-visible {
+  background: var(--surface);
+  color: var(--ink);
+  border-color: var(--surface);
+}
+
 .btn--pill.header__cta {
   padding: var(--s-2) var(--s-5);
   background: var(--ink);
@@ -378,9 +417,14 @@ html[data-drawer-open="true"] {
 
 .hero {
   position: relative;
-  padding-block-start: calc(72px + var(--s-9));
+  background: var(--ink-black);
   border-radius: 0;
   margin-block-start: 0;
+  padding-block-start: 0;
+}
+
+.hero__content {
+  padding-block-start: var(--s-9);
 }
 
 .eyebrow {
@@ -430,7 +474,7 @@ html[data-drawer-open="true"] {
   font-weight: var(--fw-medium);
   line-height: var(--lh-display);
   letter-spacing: var(--ls-display);
-  color: var(--ink-black);
+  color: var(--surface);
 }
 
 /* hero-headline.js and heading-mask.js both wrap each word in an
@@ -443,36 +487,6 @@ html[data-drawer-open="true"] {
 [data-mask-heading] .word {
   padding-bottom: 0.2em;
   margin-bottom: -0.2em;
-}
-
-.hero__chip {
-  display: inline-block;
-  vertical-align: middle;
-  border-radius: var(--radius-md);
-  object-fit: cover;
-  margin-inline: var(--s-2);
-}
-
-.hero__doodle {
-  display: inline-block;
-  vertical-align: middle;
-  width: 120px;
-  height: 12px;
-  margin-inline-start: var(--s-2);
-  color: var(--accent);
-}
-
-/* Sketched arrow between headline words. Own hook so its box does not
-   depend on .hero__doodle's dimensions: the arrow's viewBox (258x92) has a
-   different aspect ratio than the accent doodle's. Path is fully stroked
-   by default — draw-on dash values are applied only by JS. */
-[data-hero-arrow] {
-  display: inline-block;
-  vertical-align: middle;
-  width: 96px;
-  height: 34px;
-  margin-inline: var(--s-2);
-  color: var(--accent);
 }
 
 /* WebGL flowmap canvas mount. Empty div in the markup, once, directly in
@@ -507,93 +521,31 @@ html[data-drawer-open="true"] {
   z-index: var(--z-raised);
 }
 
-/* Inline video chip, styled to match .hero__chip's image sibling: same
-   radius, same vertical alignment, same inline-block line-box behaviour.
-   The chip class supplies those; this adds the overflow clip the radius
-   needs (the video is a child of the chip span, not the chip itself) and
-   fills the chip with the video via object-fit: cover.
-   The box is pinned to an explicit 120x80 — matching the image chip's
-   width/height attributes exactly — because a percentage on the video
-   itself has no effect unless the chip has a definite size of its own.
-   Without this, the video ignores its width="120" height="80" attributes
-   and asserts its intrinsic size instead. */
-[data-hero-media] {
-  width: 120px;
-  height: 80px;
-  overflow: hidden;
-}
-
-[data-hero-video] {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/* Unfold stage: fixed aspect ratio reserves the box before canvas or video
-   paint, so there is zero layout shift — that part is unchanged. 16/9, not
-   8/5: the hero source (reel-teaser-sm, 854x480) is 16:9. Sized to the
-   real source so the primary hero visual is shown in full rather than
-   cropped by object-fit: cover, which stays on the fallback video below
-   as a safety net if a different-ratio source is ever swapped in.
-   No shadow and a background matching the section (--bg-blue, since the
-   hero is .section--blue): the canvas now renders in a fixed layer above
-   the whole page rather than inside this box, and the fallback video is
-   hidden once WebGL takes over, so an empty stage must read as part of
-   the section background, not a visible placeholder panel. Radius stays,
-   so the flattened plane still reads as landing into rounded corners. */
-/* Full width on mobile: at narrow widths there's no spare room to spare,
-   and the request to trim this panel down was specifically about desktop
-   looking oversized, not mobile — a 75% cut here left the phone version
-   looking cramped and narrow rather than wide and clear. */
-[data-hero-unfold-stage] {
+/* Hero morph stage: full-viewport-height dark band, pinned by hero-morph.js
+   for its own scroll distance while the sprite sheet is scrubbed. The
+   fallback <img> (frame 0, also the poster) is visible by default — the
+   no-JS/pre-load state — and covers the source's dark margins the same
+   way object-fit: cover would on a video. The canvas has no CSS
+   equivalent for that crop; hero-morph.js computes it by hand and starts
+   transparent (opacity: 0) until the sprite has loaded and the first
+   frame is drawn, at which point JS hides the fallback and reveals it. */
+.hero__morph {
   position: relative;
   width: 100%;
-  margin-inline: auto;
-  margin-block-start: var(--s-8);
-  aspect-ratio: 16 / 9;
-  border-radius: var(--radius-section);
+  height: 100svh;
   overflow: hidden;
-  background: var(--bg-blue);
 }
 
-/* Width trimmed to 75% (centred) rather than touching the aspect-ratio:
-   the WebGL plane maps the video texture straight across the stage's
-   rect with no object-fit logic of its own, so changing the aspect ratio
-   would stretch/distort the footage. Narrowing the box while keeping
-   16/9 intact shrinks the settled height by the same 25%, with the
-   video's proportions untouched. Desktop only (see above) — mobile keeps
-   the full-width base rule. */
-@media (min-width: 768px) {
-  [data-hero-unfold-stage] {
-    width: 75%;
-  }
-}
-
-/* Full-viewport fixed layer, not confined to the stage box: the WebGL
-   plane travels from the inline headline chip out to the stage, so it has
-   to be free to draw anywhere on screen. Sized with 100%/inset:0 rather
-   than 100vw/100vh — on platforms where the vertical scrollbar is
-   non-overlay, 100vw includes the scrollbar's own width, making the box
-   wider than the visible viewport and forcing a horizontal scrollbar.
-   100% on a fixed element resolves against the initial containing block,
-   which already excludes the scrollbar, so it cannot introduce overflow.
-   z-index sits above ordinary hero content (which has no explicit
-   z-index) but below the header (var(--z-header), 200), so the plane can
-   draw over the headline without ever covering the floating pill or nav.
-   pointer-events: none keeps it inert everywhere it now covers. */
-[data-hero-unfold-canvas] {
-  position: fixed;
+/* Full-bleed visual again — no side column, no gap of empty background.
+   hero-morph.js crops to fill (cover), the same way object-fit: cover
+   would on an <img>; height is independent of the source's 1284x716
+   aspect ratio. */
+.hero__morph-visual {
+  position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: var(--z-sticky);
-  pointer-events: none;
 }
 
-/* No-JS / no-WebGL fallback. Visible and covering the stage by default;
-   JS hides it only after WebGL confirms it can take over — never hidden
-   here under any circumstance. */
-[data-hero-unfold-fallback] {
+[data-hero-morph-fallback] {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -601,10 +553,212 @@ html[data-drawer-open="true"] {
   object-fit: cover;
 }
 
+[data-hero-morph-canvas] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+}
+
+/* Dark gradient behind the caption band only, not the whole frame — keeps
+   the text legible against whatever part of the bright chrome shape
+   happens to be behind it, without dimming the rest of the visual. */
+.hero__morph-scrim {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 0;
+  block-size: 45%;
+  background: linear-gradient(to top, rgba(10, 10, 10, 0.75), transparent);
+  pointer-events: none;
+}
+
+/* Captions sit inside each stage's own negative space rather than one
+   fixed corner: the frame's hollow centre, the open air the megaphone
+   projects into, the infinity symbol's two hollow loops, and the flat
+   ground the AI-services shape casts a shadow on. Mobile-first: the base
+   rules below are a single generic centred-bottom treatment (the mobile
+   sprite is a different crop, played once, non-interactive on load, so
+   matching text to its exact negative space isn't worth tuning
+   separately); the desktop media query further down repositions each
+   stage to its bespoke spot. Individual captions stack in the same
+   full-bleed layer (absolute) and crossfade with a small upward reveal;
+   index 0's resting state (visible) is the CSS default, so a no-JS
+   visitor sees the first line rather than nothing. */
+.hero__morph-captions {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.hero__morph-caption {
+  position: absolute;
+  inset-inline: clamp(20px, 6vw, 32px);
+  inset-block-end: clamp(28px, 8vh, 64px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  opacity: 0;
+}
+
+.hero__morph-caption[data-hero-morph-caption="0"] {
+  opacity: 1;
+}
+
+.hero__morph-tag {
+  margin-block-end: var(--s-3);
+  background: var(--surface-20);
+  backdrop-filter: blur(8px);
+  color: var(--surface);
+}
+
+.hero__morph-caption-text,
+.hero__morph-line {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: clamp(1.125rem, 1rem + 1vw, 1.5rem);
+  font-weight: var(--fw-medium);
+  line-height: var(--lh-heading);
+  letter-spacing: var(--ls-heading);
+  color: var(--surface);
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.55);
+}
+
+/* Desktop enhancement, not a mobile override: each stage gets its own
+   anchor instead of the generic bottom-centre box above. Written as a
+   min-width addition (rather than resetting properties inside a
+   max-width block) so it can set inset-inline-start/inset-block-start
+   directly without fighting the base rule's equal-specificity, later
+   in the mobile-first cascade. */
+@media (min-width: 769px) {
+  .hero__morph-caption {
+    inset-inline: auto;
+    inset-block-end: auto;
+  }
+
+  /* Stage 0, web design: inside the hollow centre of the frame shape.
+     Sized to read as a confident pull-quote filling most of the hollow
+     width, not a caption lost in the middle of it. */
+  .hero__morph-caption--center {
+    inset-inline-start: 50%;
+    inset-block-start: 44%;
+    transform: translate(-50%, -50%);
+    width: min(480px, 58vw);
+  }
+
+  .hero__morph-caption--center .hero__morph-caption-text {
+    font-size: clamp(1.75rem, 1.2rem + 2.2vw, 2.75rem);
+  }
+
+  /* Stage 1, paid advertising: further right and higher, clear of the
+     megaphone's bell (an earlier version sat close enough to touch it),
+     each line at a slightly different angle so the lines read as sound
+     radiating out of the bell rather than a flat paragraph. */
+  .hero__morph-caption--right {
+    inset-inline-start: 72%;
+    inset-block-start: 34%;
+    align-items: flex-start;
+    text-align: left;
+    width: min(420px, 36vw);
+  }
+
+  .hero__morph-caption--right .hero__morph-tag {
+    align-self: center;
+    margin-block-end: clamp(28px, 5vh, 56px);
+  }
+
+  .hero__morph-caption--right .hero__morph-line {
+    font-size: clamp(1.5rem, 1.05rem + 1.7vw, 2.25rem);
+    white-space: nowrap;
+    transform-origin: left center;
+  }
+
+  /* Rotation lifts/drops the far (right) end of each line well past what
+     its own line-height accounts for — a small margin here still reads
+     as the lines rubbing together, so the gap has to be generous enough
+     to absorb that rotation, not just separate the text baselines. */
+  .hero__morph-line--up {
+    transform: rotate(-7deg);
+  }
+
+  .hero__morph-line--flat {
+    align-self: center;
+    margin-block-start: 0.6em;
+    transform: rotate(0deg);
+  }
+
+  .hero__morph-line--down {
+    margin-block-start: 0.6em;
+    transform: rotate(7deg);
+  }
+
+  /* Stage 2, SEO: the sentence splits across the infinity symbol's two
+     hollow loops. inset: 0 gives this wrapper the full visual's own
+     dimensions, so the two halves' percentage positions below resolve
+     against that box rather than collapsing to zero (an absolutely
+     positioned box with no in-flow content otherwise has no width to
+     resolve child percentages against). */
+  .hero__morph-caption--split {
+    inset: 0;
+  }
+
+  .hero__morph-tag--split {
+    position: absolute;
+    inset-inline-start: 50%;
+    inset-block-start: clamp(96px, 18%, 160px);
+    transform: translateX(-50%);
+  }
+
+  /* Top-anchored (translateX only, no vertical centering): the two
+     halves wrap to a different number of lines (two short words versus
+     a long clause), so centering each block around the same vertical
+     midpoint made their tops drift apart by however many lines they
+     differed by — worse at shorter/wider viewports, where the canvas's
+     cover-fit crop also shrinks the gear loops. Anchoring both to the
+     same top edge instead means they always start level, regardless of
+     how either one wraps. */
+  .hero__morph-caption-text--left,
+  .hero__morph-caption-text--right {
+    position: absolute;
+    inset-block-start: 40%;
+    transform: translateX(-50%);
+  }
+
+  /* "Technical SEO" is short, so it can go big and still fit the loop in
+     two lines. Its other half is a much longer clause — sized down from
+     that so it still wraps inside its own loop rather than spilling past
+     the gear teeth. */
+  .hero__morph-caption-text--left {
+    inset-inline-start: 32%;
+    width: min(240px, 27vw);
+    font-size: clamp(2.5rem, 2rem + 2.2vw, 3.5rem);
+  }
+
+  .hero__morph-caption-text--right {
+    inset-inline-start: 68%;
+    width: min(220px, 25vw);
+    font-size: clamp(1.375rem, 1.1rem + 1vw, 1.875rem);
+  }
+
+  /* Stage 3, AI services: one flat line resting under the shape, like a
+     caption sitting on the ground it casts a shadow on. */
+  .hero__morph-caption--base {
+    inset-inline-start: 50%;
+    inset-block-start: 82%;
+    transform: translateX(-50%);
+    width: min(560px, 80vw);
+  }
+
+  .hero__morph-caption--base .hero__morph-caption-text {
+    font-size: clamp(1.5rem, 1.1rem + 1.6vw, 2.25rem);
+  }
+}
+
 .hero__lead {
   margin-block-start: var(--s-5);
   font-size: var(--fs-lead);
-  color: var(--ink-soft);
+  color: var(--surface-60);
   max-width: var(--container-text);
 }
 

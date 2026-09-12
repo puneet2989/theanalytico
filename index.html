@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-header-boot="top">
+<html lang="en" data-header-boot="top" data-theme="hero-dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,7 +18,7 @@
   <meta name="twitter:description" content="TheAnalytico builds fast websites and runs SEO, Meta and Google ads, and AI automation for local businesses. Based in Dublin, working worldwide.">
   <meta name="twitter:image" content="https://theanalytico.com/assets/img/og-default.png">
 
-  <meta name="theme-color" content="#e8f2fa">
+  <meta name="theme-color" content="#0a0a0a">
 
   <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
   <link rel="icon" href="/assets/img/favicon-32.png" sizes="32x32" type="image/png">
@@ -103,20 +103,49 @@
 
 <main id="main">
 
-<section id="hero" class="section section--blue hero">
-  <div class="container">
-    <h1 class="hero__title" data-hero-headline>We build websites that bring<img class="hero__chip" src="/assets/img/hero/chip-1.webp" width="120" height="80" alt="Coffee shop interior" aria-hidden="true" data-hero-chip> local businesses<span class="hero__chip" data-hero-media><video data-hero-video muted loop playsinline preload="metadata" poster="/assets/video/reel-teaser-poster.webp" width="120" height="80" aria-hidden="true"><source src="/assets/video/reel-teaser-sm.webm" type="video/webm"><source src="/assets/video/reel-teaser-sm.mp4" type="video/mp4"></video></span> more<svg class="hero__doodle" viewBox="0 0 258.001 92.0106" preserveAspectRatio="none" fill="none" aria-hidden="true" data-hero-arrow><path data-hero-arrow-path class="hero-arrow__stroke" stroke="#e5804b" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none" d="M4.00069 82.8423C19.0382 56.3869 64.0773 3.57925 115.131 4.00253C134.167 4.16036 142.382 12.6036 146.49 24.1087C150.842 36.2972 148.819 54.3525 144.29 66.9665C138.761 82.3641 129.373 90.9504 121.733 87.0727C110.8 81.5232 109.333 62.3606 122.834 45.8022C133.79 32.3644 150.839 15.4298 185.551 19.8758C202.056 21.9897 207.522 24.9853 224.062 34.6884C232.779 39.8023 243.706 49.4253 253.77 56.9135"/><path data-hero-arrow-head class="hero-arrow__head" stroke="#e5804b" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none" d="M253.77 56.9135C252.853 59.559 238.916 60.6172 208.107 60.6172M253.77 56.9135C255.054 53.9152 251.679 37.1223 225.712 12.9949"/></svg>&nbsp;customers.</h1>
+<section id="hero" class="section hero hero--dark">
+  <div class="hero__morph" data-hero-morph-stage>
+    <div class="hero__morph-visual" data-hero-morph-visual>
+      <img class="hero__morph-fallback" data-hero-morph-fallback src="/assets/video/hero-morph-poster.webp" width="1284" height="716" alt="" aria-hidden="true">
+      <canvas class="hero__morph-canvas" data-hero-morph-canvas aria-hidden="true"
+        data-sprite-src="/assets/video/hero-morph-sprite.webp"
+        data-sprite-cols="8" data-sprite-rows="5"
+        data-sprite-frame-w="1284" data-sprite-frame-h="716"
+        data-sprite-frames="40"
+        data-sprite-src-mobile="/assets/video/hero-morph-sprite-mobile.webp"
+        data-sprite-cols-mobile="6" data-sprite-rows-mobile="4"
+        data-sprite-frame-w-mobile="640" data-sprite-frame-h-mobile="356"
+        data-sprite-frames-mobile="24"></canvas>
+    </div>
+    <div class="hero__morph-scrim" aria-hidden="true"></div>
+    <div class="hero__morph-captions" data-hero-morph-captions aria-hidden="true">
+      <div class="hero__morph-caption hero__morph-caption--center" data-hero-morph-caption="0">
+        <span class="eyebrow hero__morph-tag">Web Design</span>
+        <p class="hero__morph-caption-text">Sites built to convert, not just look good.</p>
+      </div>
+      <div class="hero__morph-caption hero__morph-caption--right" data-hero-morph-caption="1">
+        <span class="eyebrow hero__morph-tag">Paid Advertising</span>
+        <p class="hero__morph-line hero__morph-line--up">Campaigns that</p>
+        <p class="hero__morph-line hero__morph-line--flat">get you seen,</p>
+        <p class="hero__morph-line hero__morph-line--down">on Meta and Google.</p>
+      </div>
+      <div class="hero__morph-caption hero__morph-caption--split" data-hero-morph-caption="2">
+        <span class="eyebrow hero__morph-tag hero__morph-tag--split">SEO</span>
+        <p class="hero__morph-caption-text hero__morph-caption-text--left">Technical SEO</p>
+        <p class="hero__morph-caption-text hero__morph-caption-text--right">that keeps working long after launch.</p>
+      </div>
+      <div class="hero__morph-caption hero__morph-caption--base" data-hero-morph-caption="3">
+        <span class="eyebrow hero__morph-tag">AI Services</span>
+        <p class="hero__morph-caption-text">AI chatbots, automation and reporting, built in.</p>
+      </div>
+    </div>
+  </div>
+  <div class="container hero__content">
+    <h1 class="hero__title" data-hero-headline>We build websites that bring businesses more customers.</h1>
     <p class="hero__lead">Web design, SEO, paid advertising and AI services for businesses that need to be found and chosen. Built fast, hosted on Cloudflare.</p>
     <div class="hero__actions">
       <a class="btn btn--primary" href="/contact">Start a project</a>
       <a class="btn btn--ghost" href="/work">See our work</a>
-    </div>
-    <div data-hero-unfold-stage>
-      <canvas data-hero-unfold-canvas aria-hidden="true"></canvas>
-      <video data-hero-unfold-fallback muted loop playsinline preload="none" poster="/assets/video/reel-teaser-poster.webp" width="1280" height="800" aria-hidden="true">
-        <source src="/assets/video/reel-teaser-sm.webm" type="video/webm">
-        <source src="/assets/video/reel-teaser-sm.mp4" type="video/mp4">
-      </video>
     </div>
   </div>
 </section>
