@@ -156,9 +156,15 @@ export function initHeroMorph({ gsap, ScrollTrigger, reduced, isMobile }) {
       el.style.opacity = i === activeStage ? '1' : '0';
     });
   } else if (isMobile) {
+    // 'top top' to 'bottom top': exactly one viewport-height of scroll,
+    // matching the section's own 100svh height. An earlier version spanned
+    // 'top bottom' to 'bottom top' (the section's full height PLUS a
+    // whole viewport extra), so the morph was still barely a third done
+    // by the time the section was squarely on screen, and mostly finished
+    // scrolling past before it completed — reading as stuck/not scrubbing.
     trigger = ScrollTrigger.create({
       trigger: stage,
-      start: 'top bottom',
+      start: 'top top',
       end: 'bottom top',
       scrub: true,
       invalidateOnRefresh: true,
