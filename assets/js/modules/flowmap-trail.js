@@ -44,9 +44,19 @@
  * The page must be identical, and just as legible, with JS disabled: this
  * module only ever adds a decorative <canvas> inside an already-empty,
  * aria-hidden container. Nothing here is required content.
+ *
+ * OGL is loaded with a dynamic import(), placed after every guard above
+ * (reduced, isMobile, coarse pointer, missing mount point, no WebGL), not a
+ * static top-level import. A static import downloads and parses the vendor
+ * file before any guard ever runs, since ES module imports resolve before
+ * the importing module's own body executes — every phone paid for OGL's
+ * 134KB and got no effect from it. The guards therefore still have to run
+ * first and return synchronously; only the dynamic import (and the WebGL
+ * setup it gates) is asynchronous. The returned cleanup function is
+ * created synchronously either way, closing over a `cancelled` flag so a
+ * cleanup that runs before the import resolves prevents the effect from
+ * ever being set up at all (same pattern as hero-morph.js's sprite load).
  */
-
-import { Renderer, Program, Mesh, Triangle, Flowmap, Vec2 } from '../vendor/ogl.mjs';
 
 const NOOP = () => {};
 
@@ -125,7 +135,9 @@ function supportsWebGL() {
 }
 
 export function initFlowmapTrail({ gsap, ScrollTrigger, lenis, reduced, isMobile }) {
-  // Gate first, animate second — in the exact required order.
+  // Gate first, animate second — in the exact required order. Every guard
+  // here runs before the dynamic import() below, so none of them ever pay
+  // for the 134KB vendor fetch.
   if (reduced) return NOOP;
   if (isMobile) return NOOP;
   if (window.matchMedia('(pointer: coarse)').matches) return NOOP;
@@ -135,6 +147,28 @@ export function initFlowmapTrail({ gsap, ScrollTrigger, lenis, reduced, isMobile
 
   if (!supportsWebGL()) return NOOP;
 
+  let cancelled = false;
+  let innerCleanup = null;
+
+  import('../vendor/ogl.mjs')
+    .then((ogl) => {
+      if (cancelled) return;
+      innerCleanup = setupEffect(ogl, gsap, container);
+    })
+    .catch((err) => {
+      // eslint-disable-next-line no-console
+      console.warn('[flowmap-trail] failed to load OGL, effect disabled:', err);
+    });
+
+  return function cleanup() {
+    cancelled = true;
+    if (innerCleanup) innerCleanup();
+  };
+}
+
+// Everything below only runs once the dynamic import() above has resolved.
+// Returns a cleanup function, or null if WebGL setup itself failed.
+function setupEffect({ Renderer, Program, Mesh, Triangle, Flowmap }, gsap, container) {
   let renderer;
   let gl;
   let canvas;
@@ -182,7 +216,7 @@ export function initFlowmapTrail({ gsap, ScrollTrigger, lenis, reduced, isMobile
     // eslint-disable-next-line no-console
     console.warn('[flowmap-trail] WebGL init failed, effect disabled:', err);
     if (canvas && canvas.parentNode) canvas.parentNode.removeChild(canvas);
-    return NOOP;
+    return null;
   }
 
   let width = 0;

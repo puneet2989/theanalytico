@@ -70,6 +70,20 @@ export function initHeaderPill({ gsap, ScrollTrigger, lenis, reduced, isMobile }
     const gutterPx = parseFloat(rootStyles.getPropertyValue('--s-4')) || 16;
     const pinnedMaxWidth = `${Math.min(pillMaxPx, window.innerWidth - gutterPx * 2)}px`;
 
+    // Read the pill's background/shadow from the same tokens components.css
+    // uses, rather than duplicating hex/rgba values here — this GSAP tween
+    // sets them as inline styles every frame, which always outranks the CSS
+    // rule of the same name (same reason the max-width clamp above has to
+    // live here too), so hardcoding a second, separate value in this file is
+    // exactly how the 13 Sep 2026 P2-2 fix (background/border/shadow moved
+    // to --header-pill-bg and a two-layer --shadow-pill in components.css)
+    // silently kept rendering the old rgba(255,255,255,0.85)/single-layer
+    // shadow it replaced: the inline values here never changed, so they
+    // always won. Falls back to the pre-fix literal only if the custom
+    // property is somehow missing, never to a different, undocumented value.
+    const pillBg = rootStyles.getPropertyValue('--header-pill-bg').trim() || 'rgba(255,255,255,0.85)';
+    const pillShadow = rootStyles.getPropertyValue('--shadow-pill').trim() || '0 4px 24px rgba(26,26,26,0.08)';
+
     tl = gsap.timeline({
       paused: true,
       defaults: { duration: 0.45, ease: 'power3.out' },
@@ -104,8 +118,8 @@ export function initHeaderPill({ gsap, ScrollTrigger, lenis, reduced, isMobile }
         borderRadius: '999px',
         paddingTop: '10px',
         paddingBottom: '10px',
-        backgroundColor: 'rgba(255,255,255,0.7)',
-        boxShadow: '0 4px 24px rgba(26,26,26,0.08)'
+        backgroundColor: pillBg,
+        boxShadow: pillShadow
       },
       0
     ).fromTo(

@@ -43,3 +43,6 @@ package-lock.json
 # reload loop in `wrangler dev` (cache write triggers watcher triggers
 # reload triggers cache write...)
 .wrangler/
+
+# Raw AI-generated source video, encoded into clips under assets/video/
+raw-video/

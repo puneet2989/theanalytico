@@ -39,3 +39,8 @@ Thumbs.db
 # Local scratch
 *.log
 /tmp/
+
+# Raw AI-generated source downloads. Large source files, encoded into the
+# clips under assets/video/ and never shipped as-is. Kept out of git and out
+# of served assets.
+raw-video/

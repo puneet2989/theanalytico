@@ -32,7 +32,7 @@ body {
   letter-spacing: var(--ls-body);
   font-weight: var(--fw-body);
   color: var(--ink);
-  background: var(--bg-blue);
+  background: var(--surface);
 }
 
 h1,
@@ -46,6 +46,22 @@ h6 {
   font-weight: var(--fw-medium);
   letter-spacing: var(--ls-heading);
   line-height: var(--lh-heading);
+}
+
+h1 {
+  font-size: var(--fs-h1);
+}
+
+h2 {
+  font-size: var(--fs-h2);
+}
+
+h3 {
+  font-size: var(--fs-h3);
+}
+
+h4 {
+  font-size: var(--fs-h4);
 }
 
 p,
@@ -137,25 +153,30 @@ ol[class] {
 
 .section {
   position: relative;
-  border-start-start-radius: var(--radius-section);
-  border-start-end-radius: var(--radius-section);
-  border-end-start-radius: 0;
-  border-end-end-radius: 0;
-  margin-block-start: calc(var(--radius-section) * -1);
-  padding-block-start: calc(var(--section-pad-y) + (var(--radius-section) / 2));
-  padding-block-end: var(--section-pad-y);
+  padding-block: var(--section-pad-y);
 }
 
-.section--blue {
-  background: var(--bg-blue);
-}
-
+/* Monochrome alternation only (CLAUDE.md, "Design tokens", 12 Sep 2026):
+   white and near-black, full-bleed, no corner radius, no overlap. The
+   three class names are unchanged from the retired pastel rotation
+   (renaming them is a markup change, out of scope here) but now resolve
+   to one of two values rather than three distinct hues. .section--blue
+   and .section--cream both mean the light variant; .section--grey means
+   the dark one. This does not (and mathematically cannot, without also
+   changing which class each section in the markup carries) produce a
+   perfect two-value alternation everywhere a page repeats the old
+   blue/cream/grey cycle — see the file-level note in components.css
+   above the dark-section overrides for which pages still have an
+   adjacent same-colour pair, and why it's left for the markup pass. */
+.section--blue,
 .section--cream {
-  background: var(--bg-cream);
+  background: var(--surface);
+  color: var(--ink);
 }
 
 .section--grey {
-  background: var(--bg-grey);
+  background: var(--ink-black);
+  color: var(--surface);
 }
 
 /* ---- Reduced motion --------------------------------------------------- */

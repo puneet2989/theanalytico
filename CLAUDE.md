@@ -6,7 +6,10 @@ Marketing site for TheAnalytico, an agency selling **web design, SEO, paid adver
 
 - Static site. Plain HTML, CSS, vanilla JS. **No bundler, no framework, no npm build step.**
 - Hosted on **Cloudflare Pages** (free tier). Server logic only via Pages Functions in `functions/`.
-- Every page must pass Lighthouse **95+ on Performance, Accessibility, Best Practices, SEO** on mobile. The client sells SEO; a slow site kills the pitch.
+- Every page must pass Lighthouse **95+ on Accessibility, Best Practices, SEO** on mobile, and **92+ on Performance**.
+  The Performance floor was 95 and moved to 92 on 12 Sep 2026, deliberately and with the client's agreement.
+  Reason: the reference tier the client is targeting (`hobro.digital`, `unitedcarriers.com`) ships 22.3MB and 1.3MB of WebGL respectively; measured, not estimated. Matching that visual density lands at 90–95 however carefully it is built. A design agency scoring 92 and looking expensive beats one scoring 98 and looking like a template. See [docs/DESIGN-DIRECTION-v2.md](docs/DESIGN-DIRECTION-v2.md).
+  92 is a floor, not a budget to spend down to. Accessibility, Best Practices and SEO stay at 95+ and are not negotiable.
 - No inline `<style>` blocks and no inline `on*` handlers, except the critical-CSS block in `<head>` and the nav anti-flash script.
 - British English in all user-facing copy.
 
@@ -37,24 +40,28 @@ examples/                          reference recording, never shipped
 
 ## Design tokens
 
-Light pastel palette, sampled from the reference. Define once in `assets/css/tokens.css`, never hardcode a hex elsewhere.
+**Monochrome chrome. Colour comes from the client work, never from the site's own furniture.** Decided 12 Sep 2026, replacing the earlier pastel palette. All four reference sites do this, and it resolves the five-competing-colour-systems problem the pastel rotation plus four card gradients had created. Define once in `assets/css/tokens.css`, never hardcode a hex elsewhere.
 
 ```css
 --ink:        #1a1a1a;   /* body text, buttons, logo */
---ink-soft:   #6b6b6b;   /* secondary text */
---ink-black:  #0a0a0a;   /* headings */
---surface:    #ffffff;   /* cards */
---bg-blue:    #e8f2fa;   /* pale blue section */
---bg-cream:   #f9f0ea;   /* warm cream section */
---bg-grey:    #f3f3f3;   /* neutral section */
+--ink-soft:   #6b6b6b;   /* secondary text, mono labels */
+--ink-black:  #0a0a0a;   /* headings, dark sections */
+--surface:    #ffffff;   /* light sections, cards */
 --line:       #e3e3e3;
---accent:     #e5804b;   /* terracotta, doodles and highlights */
---accent-2:   #9999ff;   /* periwinkle, secondary highlight */
+--accent:     #e5804b;   /* terracotta, the ONLY accent */
 ```
 
-Alternating section backgrounds: blue → cream → grey → blue. Sections carry a large top radius (`--radius-section: 48px`) and overlap the section above them.
+`--bg-blue`, `--bg-cream`, `--bg-grey`, `--accent-2` and the four `--gradient-*` service ramps are retired. Do not reintroduce them.
 
-Type scale is fluid, `clamp()` only, no media-query font sizes. Headings use negative tracking (`-0.03em`) and weight 500–600, never 700+. Reference feel is large, tight, confident.
+Sections alternate **white and near-black only**. The three portfolio captures supply every other hue on the page. `--accent` is reserved for a single job at a time (active nav state, primary CTA); it is not a decorative colour and must not appear more than twice per viewport.
+
+Full-bleed is the default. Sections run edge to edge. `--container-max` applies to text columns, not to section backgrounds, and `--radius-section` is retired: the boxed-card-inside-a-boxed-section pattern is what made the old build read as a template.
+
+Type is two-tier with nothing in between: a display tier (120px+ at 1440px, the page's only large type) and a monospace label tier (~12px, uppercase, `0.08em` tracking) carrying all metadata. Avoid an 18–22px prose tier doing explanatory work; that is what the reference sites conspicuously lack.
+
+Type scale is fluid, `clamp()` only, no media-query font sizes. Headings use negative tracking (`-0.03em`). Display weight may exceed 600 — the earlier "never 700+" rule is lifted, since every reference achieves the "large, tight, confident" feel partly through weight.
+
+Section headings must bind to the type-scale tokens in `base.css`. `--fs-h2` was orphaned for the whole of the first build, which left every section heading smaller than the H3s nested inside it.
 
 Spacing scale: 4 8 12 16 24 32 48 64 96 128 (px), exposed as `--s-1` … `--s-10`.
 
@@ -86,7 +93,7 @@ Transition is a single GSAP timeline on width, radius, padding, background, and 
 
 ## Effect inventory to implement
 
-1. Hero: single scroll-scrubbed morphing form (Higgsfield-generated video, one continuous camera, no discrete objects/logo target) advancing through states that represent each service, then resolving directly into the kinetic hero headline — narrative progression, holds its end state, no idle looping. Loaded as a blob URL (Cloudflare static assets don't honour Range requests, so a plain network `<video>` never becomes scrubbable — see `websites/global-template/00-CLOUDFLARE-PLATFORM-LIMITS.md`).
+1. Hero: single scroll-scrubbed morphing form (Higgsfield-generated, one continuous camera, no discrete objects/logo target) advancing through states that represent each service, then resolving directly into the kinetic hero headline — narrative progression, holds its end state, no idle looping. Rendered from a pre-decoded sprite-sheet image drawn to a `<canvas>` (one frame region per scroll tick via `drawImage`), not a `<video>`: Cloudflare static assets don't honour Range requests, so a plain network `<video>` never becomes scrubbable, and even a blob-URL `<video>` throttles/coalesces rapid `currentTime` seeks on a fast scroll — a sprite sheet has no per-seek decode cost. Desktop and mobile load separate sprite sheets (mobile's is smaller, fewer frames). See `assets/js/modules/hero-morph.js`.
 2. Kinetic headline: word-by-word clip-path reveal, timed to the hero morph's resolution rather than a fixed delay
 3. Headings (non-hero): clip-path mask rise, word-by-word stagger
 4. Header: full bar → floating pill (see above)
@@ -122,7 +129,7 @@ Street address, postcode, company registration number, opening hours, founding y
 
 Four pillars. Each gets a full block on `services.html` and a card on `index.html`.
 
-1. **Web Design** — design and build, responsive, fast, conversion-focused
+1. **Web Design** — design and build, responsive, fast, conversion-focused, **plus ongoing maintenance and care plans**. Maintenance is a real part of the business model and was missing from the site entirely; decided 12 Sep 2026 to fold it in here as an ongoing phase rather than give it a fifth pillar, so the four-pillar structure survives. It must be visible on `services.html`, not implied.
 2. **SEO** — technical, on-page, local search
 3. **Paid Advertising** — Meta and Google campaigns, setup and management
 4. **AI Services** — five named capabilities:

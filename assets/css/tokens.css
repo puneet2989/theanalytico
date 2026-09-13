@@ -39,18 +39,39 @@
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
+/* Space Mono, regular only — the monospace label tier named in CLAUDE.md's
+   two-tier type rule (DESIGN-DIRECTION-v2.md, "oryzo.ai", items 3 and 4).
+   oryzo covers its whole range with one variable face; that would mean
+   replacing Space Grotesk, which the Typography section confirms as
+   settled for both headings and the wordmark, so it is out of scope for
+   a decoration pass. This is the fallback the same doc names explicitly:
+   keep Space Grotesk for display, add one static monospace weight for
+   labels. Latin-only woff2 straight from Google Fonts' own latin subset
+   (matches the unicode-range already used for every face above). One
+   weight only — labels never need a second. */
+@font-face {
+  font-family: "Space Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../fonts/space-mono-400.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
 :root {
-  /* ---- Colour: base palette --------------------------------------- */
+  /* ---- Colour: base palette ---------------------------------------------
+     Monochrome chrome (CLAUDE.md, "Design tokens", rewritten 12 Sep 2026).
+     --bg-blue, --bg-cream, --bg-grey and --accent-2 are retired along with
+     the pastel section rotation they existed for. Do not reintroduce them:
+     colour now comes from the portfolio work, not from site furniture.
+     --accent survives as the only accent, reserved for one job at a time
+     (active nav state, primary CTA) — never a decorative background. */
   --ink:        #1a1a1a;
   --ink-soft:   #6b6b6b;
   --ink-black:  #0a0a0a;
   --surface:    #ffffff;
-  --bg-blue:    #e8f2fa;
-  --bg-cream:   #f9f0ea;
-  --bg-grey:    #f3f3f3;
   --line:       #e3e3e3;
   --accent:     #e5804b;
-  --accent-2:   #9999ff;
 
   /* ---- Colour: derived / translucent -------------------------------- */
   --ink-05: rgba(26, 26, 26, 0.05);
@@ -60,30 +81,39 @@
   --surface-70: rgba(255, 255, 255, 0.70);
   --surface-85: rgba(255, 255, 255, 0.85);
   --accent-12: rgba(229, 128, 75, 0.12);
-  --accent-2-12: rgba(153, 153, 255, 0.12);
   --focus-ring: #1a1a1a;
 
+  /* --header-pill-bg: the pinned header pill's background. Neither pure
+     --surface nor pure --ink works alone — the pill crosses both white and
+     near-black sections, and a flat tint the colour of one background is
+     necessarily invisible against a section of that exact colour (measured:
+     --surface-85 was 1.00:1, fully invisible, against a white hero — the
+     P2-2 defect this token exists to fix). A neutral light grey at high
+     opacity instead: 14.65:1 against --ink-black (still excellent), and
+     while its own contrast against --surface is a modest 1.18:1, the pill's
+     border (--ink-12) and a strengthened --shadow-pill (below) carry the
+     separation there — edge and depth cues, not fill colour, same
+     technique any "frosted pill on either background" nav uses. --ink text
+     inside the pill stays legible either way: 14.76:1 on white, 12.88:1 on
+     near-black. */
+  --header-pill-bg: rgba(235, 235, 235, 0.94);
+
   /* ---- Colour: added to satisfy contrast, flagged by the architect -- */
-  /* --accent-strong: error text on --surface. 5.52:1 against #ffffff. */
+  /* --accent-strong: error text on --surface. 5.52:1 against #ffffff.
+     Also used as a button hover-fill with white text (same 5.52:1, contrast
+     is symmetric) — safe on either a light or a near-black section, since
+     that pairing is only ever accent-strong against white text, never
+     against a section background directly. Do not use --accent-strong as
+     a TEXT colour sitting directly on --ink-black: 3.59:1, fails 4.5:1. On
+     a near-black section, text-role uses plain --accent instead (7.09:1). */
   --accent-strong: #a84f1f;
-  /* --surface-60: light text on --ink (footer legal line). 6.90:1 against #1a1a1a. */
+  /* --surface-60: light text on --ink (footer legal line), 6.90:1 against
+     #1a1a1a. Also the near-black section's secondary/soft text colour
+     (.section--grey): 7.30:1 against --ink-black, the darker of the two. */
   --surface-60: rgba(255, 255, 255, 0.60);
 
-  /* ---- Colour: service card gradients (defect 1) -----------------------
-     Each is a dark base (uniform top-to-bottom, not a light-to-dark ramp)
-     with one bright radial "splash" blob confined to the middle ~45-55%
-     of the card, roughly where the service card's floating video panel
-     sits. The title (top) and body/link (bottom) always land on the dark
-     base, clear of the blob's falloff, so the same white-on-dark contrast
-     ratios apply regardless of where text sits in the card:
-     web 14.9:1, seo 12.2:1, paid 16.7:1, ai 16.0:1 — all pass 4.5:1. */
-  --gradient-web:  radial-gradient(60% 42% at 50% 46%, #5b8def 0%, rgba(20, 34, 92, 0) 72%), linear-gradient(180deg, #14225c 0%, #0b1638 100%);
-  --gradient-seo:  radial-gradient(60% 42% at 50% 46%, #34d399 0%, rgba(11, 61, 46, 0) 72%), linear-gradient(180deg, #0b3d2e 0%, #062018 100%);
-  --gradient-paid: radial-gradient(60% 42% at 50% 46%, #fb7185 0%, rgba(59, 10, 36, 0) 72%), linear-gradient(180deg, #3b0a24 0%, #1f0512 100%);
-  --gradient-ai:   radial-gradient(60% 42% at 50% 46%, #a78bfa 0%, rgba(42, 14, 92, 0) 72%), linear-gradient(180deg, #2a0e5c 0%, #170733 100%);
-
-  /* ---- Colour: translucent white surfaces for content sitting on the
-     service-card gradients (mockup loop chrome, dots, bars) ------------ */
+  /* ---- Colour: translucent white surfaces for chrome sitting on photos
+     or dark fills (mockup loop chrome, dots, bars, dark-section borders) - */
   --surface-20: rgba(255, 255, 255, 0.20);
   --surface-35: rgba(255, 255, 255, 0.35);
   --surface-55: rgba(255, 255, 255, 0.55);
@@ -120,6 +150,7 @@
   /* ---- Font family ---------------------------------------------------- */
   --font-heading: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
   --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Space Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
 
   /* ---- Spacing scale -------------------------------------------------- */
   --s-1: 4px;
@@ -133,15 +164,12 @@
   --s-9: 96px;
   --s-10: 128px;
 
-  /* Floor raised from 48px to 72px: at narrow (phone) widths this clamp
-     was hitting its minimum exactly, and --radius-section (the fixed 48px
-     the NEXT section pulls itself up by, to overlap this one) is also
-     48px — a section's own bottom padding and the following section's
-     overlap cancelled out exactly, leaving zero visual gap between
-     whatever sits at a section's bottom (button pills, card grids) and
-     the next section's rounded top edge. 72px leaves a comfortable ~24px
-     of breathing room at every width instead of only at wider ones where
-     the fluid part of the clamp had already overtaken 48px. */
+  /* 72px floor: comfortable top/bottom breathing room for a full-bleed
+     section at every width, not just the wider ones where the fluid part
+     of the clamp overtakes 72px on its own. (Sections no longer overlap
+     one another — see --radius-section's retirement, below — so this no
+     longer has to also clear a neighbouring section's corner-radius
+     overlap the way it did under the retired pastel rotation.) */
   --section-pad-y: clamp(72px, 3vw + 32px, 96px);
   --section-pad-x: clamp(20px, 3vw, 48px);
   --gap-card: var(--s-5);
@@ -153,15 +181,22 @@
   --radius-md: 16px;
   --radius-lg: 24px;
   --radius-xl: 32px;
-  --radius-section: 48px;
   --radius-pill: 999px;
+  /* --radius-section is retired (CLAUDE.md, "Design tokens", 12 Sep 2026):
+     sections run full-bleed, edge to edge, with no corner radius and no
+     overlap onto the section before them. Do not reintroduce it. */
 
   /* ---- Shadows -------------------------------------------------------- */
   --shadow-xs: 0 1px 2px rgba(26, 26, 26, 0.04);
   --shadow-sm: 0 2px 8px rgba(26, 26, 26, 0.06);
   --shadow-md: 0 8px 24px rgba(26, 26, 26, 0.08);
   --shadow-lg: 0 16px 48px rgba(26, 26, 26, 0.10);
-  --shadow-pill: 0 4px 24px rgba(26, 26, 26, 0.08);
+  /* Two layers, not one: the soft 24px spread alone (the pre-13-Sep-2026
+     value) is too faint to read as an edge when --header-pill-bg is close
+     in value to the section behind it (a white hero, chiefly). The tight
+     1px/2px layer gives the pill a hairline contact shadow that still
+     shows even where the soft layer all but disappears. */
+  --shadow-pill: 0 4px 24px rgba(26, 26, 26, 0.10), 0 1px 2px rgba(26, 26, 26, 0.18);
 
   /* ---- Easings ---------------------------------------------------------- */
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);

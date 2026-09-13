@@ -56,6 +56,14 @@ const ScrollTrigger = window.ScrollTrigger;
 
 gsap.registerPlugin(ScrollTrigger);
 
+// Mobile's URL bar hides/shows while the user scrolls, changing
+// window.innerHeight and firing a resize mid-scrub. Every ScrollTrigger
+// with invalidateOnRefresh: true (hero-morph.js's pin included) would
+// otherwise recompute its end distance on that resize and jump the scrub
+// position. This is the one config call ScrollTrigger provides for
+// exactly that case, set once here rather than per module (13 Sep 2026).
+ScrollTrigger.config({ ignoreMobileResize: true });
+
 const reducedMQL = window.matchMedia('(prefers-reduced-motion: reduce)');
 const mobileMQL = window.matchMedia('(max-width: 768px)');
 const reduced = reducedMQL.matches;
@@ -107,22 +115,24 @@ safeInit('contact-form', () =>
   initContactForm({ gsap, ScrollTrigger, lenis, reduced, isMobile })
 );
 
-// 4. testimonial-marquee.js MUST run before testimonial-dissolve.js.
-// The marquee clones slide DOM to make the loop seamless, and cloneNode
-// does not copy a canvas bitmap. Cloning first means the dissolve module
-// then builds a real canvas for every figure, originals and clones alike.
-safeInit('testimonial-marquee', () =>
-  initTestimonialMarquee({ gsap, ScrollTrigger, lenis, reduced, isMobile })
-);
-safeInit('testimonial-dissolve', () =>
-  initTestimonialDissolve({ gsap, ScrollTrigger, lenis, reduced, isMobile })
-);
-
-// 5. Every other module, in no particular order relative to each other.
+// 4. Every other module, in no particular order relative to each other,
+// EXCEPT that hero-morph must be in this list rather than after it: it is
+// the one module whose pin reserves extra page height (its pin-spacer),
+// and every ScrollTrigger created before that spacer exists in the DOM
+// measures a page ~1.75 viewport-heights shorter than the page's real,
+// final layout. GSAP does not appear to correct this on a later refresh()
+// for triggers already created against the shorter layout — confirmed by
+// hand for this exact class of bug (see hero-morph.js's own history) —
+// so the fix is ordering, not a refresh() call: nothing that creates a
+// ScrollTrigger of its own may run before hero-morph does. hero-headline
+// specifically moved below hero-morph on 12 Sep 2026 (DESIGN-DIRECTION-v2.md,
+// "hero, rebuilt"): its trigger element, the h1, now lives inside the
+// pinned stage itself rather than in normal flow after it, so it needs the
+// same correctly-measured geometry, not just the pin-spacer's extra height.
 const remainingModules = [
-  ['hero-headline', initHeroHeadline],
   ['hero-tilt', initHeroTilt],
   ['hero-morph', initHeroMorph],
+  ['hero-headline', initHeroHeadline],
   ['heading-mask', initHeadingMask],
   ['section-curtain', initSectionCurtain],
   ['flowmap-trail', initFlowmapTrail],
@@ -141,6 +151,24 @@ const remainingModules = [
 for (const [name, initFn] of remainingModules) {
   safeInit(name, () => initFn({ gsap, ScrollTrigger, lenis, reduced, isMobile }));
 }
+
+// 5. testimonial-marquee.js and testimonial-dissolve.js run last, after
+// hero-morph above, for the pin-spacer reason in the comment on 4: both
+// create their own ScrollTrigger (the marquee's pause-on-scroll-out state,
+// the dissolve crossfade per figure), so both used to measure the
+// testimonials section's scroll position ~1.75 viewport-heights too early
+// and freeze the marquee mid-drift — cut off mid-word at both edges — the
+// entire time the section was actually on screen. Their own relative
+// order is unchanged: the marquee clones slide DOM to make the loop
+// seamless, and cloneNode does not copy a canvas bitmap, so the marquee
+// must still run before the dissolve module builds a real canvas for
+// every figure, originals and clones alike.
+safeInit('testimonial-marquee', () =>
+  initTestimonialMarquee({ gsap, ScrollTrigger, lenis, reduced, isMobile })
+);
+safeInit('testimonial-dissolve', () =>
+  initTestimonialDissolve({ gsap, ScrollTrigger, lenis, reduced, isMobile })
+);
 
 // Refresh ScrollTrigger once fonts settle, so trigger positions account
 // for the final layout metrics.

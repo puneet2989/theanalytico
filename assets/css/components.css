@@ -101,13 +101,22 @@ section[id] {
    the floating pill's background/blur/shadow ran edge to edge with no
    inset at all. The calc() term guarantees a minimum gutter at every
    width, including mobile. */
+/* Background separates from BOTH a white and a near-black section — see
+   --header-pill-bg's own comment in tokens.css for the measured numbers on
+   each. This pill now crosses both: a white hero sits at the top of
+   index.html (13 Sep 2026), and every page still alternates into
+   .section--grey lower down. A flat --surface-85 fill (the pre-13-Sep-2026
+   value) was invisible against the white hero — 1.00:1, the P2-2 defect
+   this replaces. The border and two-layer --shadow-pill do the job the
+   fill colour alone can't on a light section. */
 [data-header-state="pinned"] .header__shell,
 html[data-header-boot="pinned"] .header__shell {
   max-width: min(var(--header-pill-max), calc(100% - var(--s-4) * 2));
   margin-block-start: var(--s-5);
   padding-block: var(--s-3);
   border-radius: var(--radius-pill);
-  background: var(--surface-70);
+  background: var(--header-pill-bg);
+  border: 1px solid var(--ink-12);
   backdrop-filter: blur(16px);
   box-shadow: var(--shadow-pill);
 }
@@ -128,28 +137,16 @@ html[data-header-boot="pinned"] .logo__line2 {
   font-size: var(--fs-h4);
 }
 
-/* Dark-hero override: index.html opens on a full-bleed dark video band
-   (.hero--dark). While the header is in its "top" state (transparent bar,
-   no pill background yet) dark ink text would be unreadable against it.
-   Scoped to [data-header-state="top"] only — once scrollY passes 40px the
-   header gets its own light pill background (rule above), which reads
-   fine regardless of what is behind it, so no override is needed there. */
-[data-theme="hero-dark"] [data-header-state="top"] .logo__line2 {
-  color: var(--surface);
-}
-
-[data-theme="hero-dark"] [data-header-state="top"] .header__list a {
-  color: var(--surface-60);
-}
-
-[data-theme="hero-dark"] [data-header-state="top"] .header__list a:hover,
-[data-theme="hero-dark"] [data-header-state="top"] .header__list a[aria-current="page"] {
-  color: var(--surface);
-}
-
-[data-theme="hero-dark"] [data-header-state="top"] .header__burger-bar {
-  background: var(--surface);
-}
+/* No dark-hero override needed here any more. index.html used to open on a
+   full-bleed dark video band (.hero--dark, [data-theme="hero-dark"]) and the
+   header's transparent "top" state needed light text to read against it —
+   that override lived here. 13 Sep 2026: the hero's source material changed
+   to ink-in-water on a WHITE background (see .hero, below), so the header's
+   ordinary light-section colours (.logo__line2, .header__list a,
+   .header__burger-bar, all --ink already) are correct over it without any
+   override, and [data-theme="hero-dark"] no longer appears anywhere in
+   index.html. Contrast re-verified for the record: --ink (#1a1a1a) on
+   --surface (#ffffff) is 17.40:1. */
 
 .header__nav {
   display: none;
@@ -378,19 +375,45 @@ html[data-drawer-open="true"] {
 }
 
 /* The base ghost styling (dark text, pale border) is tuned for light
-   section backgrounds — on the hero's near-black background it's
-   barely visible. Inverted to a light border/text here, inverting to
-   solid on hover the same way the base version does. */
-.hero--dark .btn--ghost {
+   section backgrounds — on a near-black one it's barely visible. Inverted
+   to a light border/text here, inverting to solid on hover the same way
+   the base version does. Originally hero-only, back when the hero was a
+   dark chrome-morph band; extended to .section--grey once the monochrome
+   palette (CLAUDE.md, "Design tokens", 12 Sep 2026) made near-black an
+   ordinary section background rather than a hero-only one (index.html
+   #work, services.html #cta, work.html #sodolt/#cta, insights.html #cta
+   all put a .btn--ghost directly on a .section--grey background, not
+   inside a white .card). The hero itself dropped back out of this rule on
+   13 Sep 2026, when its background changed again, to white — its buttons
+   now take the ordinary light-section .btn--ghost styling below with no
+   override at all. */
+.section--grey .btn--ghost {
   color: var(--surface);
   border-color: var(--surface-35);
 }
 
-.hero--dark .btn--ghost:hover,
-.hero--dark .btn--ghost:focus-visible {
+.section--grey .btn--ghost:hover,
+.section--grey .btn--ghost:focus-visible {
   background: var(--surface);
   color: var(--ink);
   border-color: var(--surface);
+}
+
+/* .btn--primary's resting fill (--ink) has almost no boundary against a
+   --ink-black section (1.14:1) — invisible as a button shape, even though
+   its white text stays perfectly legible. Inverted resting fill only;
+   hover keeps the same --accent-strong fill the light-section version
+   uses (5.52:1 with white text either way, and --accent-strong against
+   --ink-black clears the 3:1 non-text/UI boundary minimum at 3.59:1). */
+.section--grey .btn--primary {
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.section--grey .btn--primary:hover,
+.section--grey .btn--primary:focus-visible {
+  background: var(--accent-strong);
+  color: var(--surface);
 }
 
 .btn--pill.header__cta {
@@ -415,16 +438,98 @@ html[data-drawer-open="true"] {
 
 /* ---- Hero furniture -------------------------------------------------------- */
 
+/* White, not near-black: the hero's source footage changed 13 Sep 2026 from
+   a chrome morph on black to ink dispersing in water on white. Background
+   colours differ between the hero and the four service panels deliberately
+   (panels stay near-black) — this is not the monochrome section-alternation
+   rule from CLAUDE.md "Design tokens" (that rule is white/near-black
+   alternating by section; the hero is simply white because its own footage
+   is). Every colour that used to assume a dark hero — title, lead, buttons,
+   the scroll cue, the telemetry strip, and the header's transparent "top"
+   state — is flipped below; see each rule's own comment for its measured
+   contrast ratio. */
+/* padding-block: 0 on both sides, not just the top — .hero__morph already
+   fills the section's entire box at 100svh (plus its own pin-spacer,
+   inserted by ScrollTrigger, below that). The base .section rule's
+   padding-block-end still applied here until 13 Sep 2026, adding a
+   trailing ~75px of matching-colour dead space after the pin-spacer and
+   before #services started — small next to the ~400px gap .hero__content
+   used to leave (see .hero__content's own comment), but the same defect. */
 .hero {
   position: relative;
-  background: var(--ink-black);
+  background: var(--surface);
   border-radius: 0;
   margin-block-start: 0;
-  padding-block-start: 0;
+  padding-block: 0;
 }
 
+/* A real flex child of .hero__morph now, composed together with
+   .hero__heading-group in one pinned viewport rather than sitting in
+   normal document flow after the pin ends (13 Sep 2026 — that gap used to
+   measure ~400px of nothing between the video and these buttons, plus
+   more again before #services). Comes after .hero__morph-visual in the
+   markup, so mix-blend-mode itself does not apply an extra multiply pass
+   to this element — but paint order alone doesn't make the video stop
+   being visible behind it: .hero__lead has no opaque fill of its own, so
+   without a backdrop here the ink shows straight through the text exactly
+   as it does behind .hero__heading-group, which is right for a headline
+   and wrong for body copy and buttons that need to stay reliably usable.
+
+   13 Sep 2026, revised again: the --surface-85 + blur chip this comment
+   used to describe is gone. Measured against the corrected footage
+   (post-colour-fix, see .hero__morph-visual's own comment), a hard-edged
+   translucent panel here read as a patch — visible rectangle, blurred ink
+   bleeding through its own edge. Removed outright rather than softened.
+   .hero__lead sits in --ink-soft, which cannot clear 4.5:1 against any
+   point of this footage on its own (verified: even the corrected footage's
+   lightest sampled point puts --ink-soft under 4:1) — the honest fix is
+   the same soft mask-image wash .hero__heading-group now carries for
+   exactly this reason, sized to this group's own box below, not a revival
+   of the deleted panel. See .hero__content-wash. */
 .hero__content {
-  padding-block-start: var(--s-9);
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding-inline: var(--section-pad-x);
+}
+
+/* Same technique and same reasoning as .hero__headline-wash below, scoped
+   to this group instead: a solid --surface fill, feathered by mask-image
+   into a soft ellipse with no hard edge, sitting above the video
+   (z-index: -1, but .hero__content itself is z-index: 2 so the whole
+   subtree still paints above the video sibling) and below the lead text
+   and buttons. inset is generous relative to this smaller box, since it
+   has less content to clear than the headline group. */
+.hero__content-wash {
+  position: absolute;
+  inset: -30% -20%;
+  z-index: -1;
+  background: var(--surface);
+  mask-image: radial-gradient(ellipse 60% 60% at 50% 50%, #000 0%, #000 45%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 60% 60% at 50% 50%, #000 0%, #000 45%, transparent 100%);
+  pointer-events: none;
+}
+
+/* Space Mono, not Inter: this is the "monospace label tier" CLAUDE.md's
+   two-tier type rule names explicitly, so it should actually be set in a
+   monospace face rather than Inter with a tracking hack (DESIGN-DIRECTION-v2.md,
+   "oryzo.ai", items 3-4; tokens.css --font-mono). font-weight is a literal
+   400, not var(--fw-medium): only one Space Mono weight is self-hosted, and
+   setting a weight the face doesn't have just makes the browser fake it.
+   .label-mono is the bare version of this tier (no pill), shared here so
+   .eyebrow and anything else carrying metadata — the hero telemetry strip
+   included — stay on the same four declarations rather than each
+   redeclaring them. */
+.label-mono,
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--fs-micro);
+  font-weight: 400;
+  letter-spacing: var(--ls-caps);
+  text-transform: uppercase;
+  color: var(--ink-soft);
 }
 
 .eyebrow {
@@ -432,32 +537,55 @@ html[data-drawer-open="true"] {
   padding: var(--s-1) var(--s-4);
   border-radius: var(--radius-pill);
   background: var(--ink-05);
-  font-family: var(--font-body);
-  font-size: var(--fs-micro);
-  font-weight: var(--fw-medium);
-  letter-spacing: var(--ls-caps);
-  text-transform: uppercase;
-  color: var(--ink-soft);
 }
 
-/* ---- Section header stack: centred everywhere except the hero ------------- */
+/* ---- Section header stack: left-aligned by default --------------------------
+   Centre-aligning the eyebrow/heading/lead on every non-hero section was
+   flagged as the most template-like decision in the stylesheet (see
+   DESIGN-DIRECTION-v2.md, "The blunt diagnosis" — none of the four reference
+   sites centre this stack). Left-align is now the default, inherited from
+   .eyebrow's own `display: inline-block` and .section__lead's own
+   `max-width` (both already correct with no centring applied); nothing here
+   overrides them. A section can still opt back into the old centred stack
+   with .section--center, defined below, which no page currently uses —
+   applying it to a specific section is a markup change, out of scope here. */
 
-.section:not(.hero) .eyebrow {
+.section--center .eyebrow {
   display: block;
   width: fit-content;
   margin-inline: auto;
   text-align: center;
 }
 
-.section:not(.hero) [data-mask-heading] {
+.section--center [data-mask-heading] {
   text-align: center;
 }
 
-.section:not(.hero) .section__lead,
-.section:not(.hero) .cta__lead {
+.section--center .section__lead,
+.section--center .cta__lead {
   max-width: var(--container-text);
   margin-inline: auto;
   text-align: center;
+}
+
+/* ---- Editorial furniture: hairline rule marker -------------------------
+   oryzo.ai and haoqi.design both use dotted rules and thin open boxes as
+   pure-CSS section furniture (DESIGN-DIRECTION-v2.md, "oryzo.ai", item 3).
+   A pseudo-element rather than a markup addition: it needs no aria-hidden
+   attribute of its own because generated content is never exposed to
+   assistive tech, so it can't touch anything a screen reader announces.
+   Scoped to [data-mask-heading] only, which already excludes the hero
+   (hero-headline.js drives .hero__title instead, per heading-mask.js). */
+[data-mask-heading]::before {
+  content: "";
+  display: block;
+  width: var(--s-6);
+  margin-block-end: var(--s-3);
+  border-block-start: 1px dotted var(--line);
+}
+
+.section--center [data-mask-heading]::before {
+  margin-inline: auto;
 }
 
 .section__actions {
@@ -468,13 +596,175 @@ html[data-drawer-open="true"] {
   margin-block-start: var(--s-6);
 }
 
+/* ---- Dark section (.section--grey) text overrides -------------------------
+   Monochrome palette (CLAUDE.md, "Design tokens", 12 Sep 2026): sections
+   now alternate white and near-black rather than three light pastels, so
+   near-black is no longer a hero-only background. Everything below is an
+   element that sets its own explicit colour (so it does not inherit
+   .section--grey's `color: var(--surface)`, set in base.css) AND that can
+   sit directly on the section background rather than on a .card's own
+   always-white surface — .card__title/__body/__meta/__link and anything
+   else nested inside .card, .card--service or .slide never need an entry
+   here, because those components carry `background: var(--surface)`
+   themselves regardless of the section around them.
+
+   Colours used, both already-existing tokens verified against
+   --ink-black (0a0a0a):
+   --surface  (#ffffff) on --ink-black: 19.80:1 — primary text (headings).
+   --surface-60 (rgba(255,255,255,.6)) on --ink-black: 7.30:1 — secondary/
+     soft text (leads, dd values, disclaimers).
+   --accent (#e5804b) on --ink-black: 7.09:1 — accent text/links on dark
+     (NOT --accent-strong, which is 3.59:1 here and fails 4.5:1 — that
+     token stays valid only as a light-section text colour or as a button
+     fill with white text on top, per its own tokens.css comment).
+   --surface-20 (rgba(255,255,255,.2)) — dark-section hairline dividers,
+     replacing --line the same way --surface-35 already replaces it for
+     the .section--grey ghost button border above; a divider is decorative,
+     not text, so it isn't held to the 4.5:1 minimum. */
+
+.section--grey [data-mask-heading],
+.section--grey .page__title {
+  color: var(--surface);
+}
+
+.section--grey .eyebrow {
+  background: var(--surface-20);
+  color: var(--surface);
+}
+
+.section--grey .section__lead,
+.section--grey .cta__lead,
+.section--grey .page__lead {
+  color: var(--surface-60);
+}
+
+.section--grey .kpi__value {
+  color: var(--surface);
+}
+
+.section--grey .kpi__label,
+.section--grey .kpi__disclaimer {
+  color: var(--surface-60);
+}
+
+.section--grey .faq__list dt {
+  color: var(--surface);
+}
+
+.section--grey .faq__list dd {
+  color: var(--surface-60);
+}
+
+.section--grey .facts__list {
+  border-block-start-color: var(--surface-20);
+}
+
+.section--grey [data-mask-heading]::before {
+  border-block-start-color: var(--surface-20);
+}
+
+.section--grey .facts__list dt {
+  color: var(--surface-60);
+}
+
+.section--grey .facts__list dd {
+  color: var(--surface);
+}
+
+.section--grey .contact__phone {
+  color: var(--surface);
+}
+
+.section--grey .contact__phone a:hover,
+.section--grey .contact__phone a:focus-visible {
+  color: var(--accent);
+}
+
+/* Present and legible from the first frame, behind the ink-in-water form
+   (DESIGN-DIRECTION-v2.md, "hero, rebuilt", 12 Sep 2026 — the oryzo
+   technique; source footage and full-bleed/blend approach changed 13 Sep
+   2026, see .hero and .hero__morph-visual above). A real flex child of
+   .hero__morph now, not absolutely positioned — .hero__morph's own
+   justify-content: center places the whole group, no per-element inset
+   maths needed here any more.
+
+   13 Sep 2026, revised again: this group now needs its own stacking
+   context. .hero__headline-wash (below) has to paint above the video but
+   below this group's own text, and h1/p are plain non-positioned inline
+   content — CSS stacking rules paint non-positioned in-flow content in a
+   fixed band that sits below anything z-index:0-or-higher and positioned,
+   with no way to slot a layer between that band and a zero/auto-positioned
+   sibling like the video. Promoting the whole group to its own stacking
+   context (position: relative + an explicit z-index, compared directly
+   against .hero__morph-visual's z-index: 0 below) sidesteps that: the
+   wash lives inside this context at z-index: -1, so it paints behind this
+   group's own text, while the group as a whole still paints above the
+   video sibling. This is the same reason "no z-index needed" no longer
+   holds — that assumption was only true with no third layer between the
+   two. */
+.hero__heading-group {
+  position: relative;
+  z-index: 2;
+  padding-inline: var(--section-pad-x);
+}
+
+/* Soft insurance for the darkest ink pixels the colour correction on
+   .hero__morph-visual still leaves (measured worst case: ~4.2:1 for
+   --ink-black at the floor romin lifts blacks to, just under the 4.5:1
+   floor). A solid --surface fill, masked into a large, very gradually
+   feathered ellipse rather than a rectangle with a visible edge — "no
+   rectangle, no border, no blur panel" ruled out a hard-edged panel, and
+   the earlier attempt at a real box (see .hero__content's own history)
+   confirmed why: any visible transition here reads as a patch. Sized well
+   beyond the text's own box (inset -14%/-10%) so the 100%-opaque core
+   covers the headline and the service-ticker line below it with margin,
+   and the falloff to fully transparent happens entirely outside that
+   footprint — verified against real scrub-position screenshots, not
+   assumed from the numbers alone. z-index: -1 relative to this group's
+   own stacking context (see .hero__heading-group above) puts it above the
+   video and below h1/p. No text-shadow anywhere in this group: the wash is
+   the fix, not a shadow layered on top of an otherwise-unfixed problem. */
+.hero__headline-wash {
+  position: absolute;
+  inset: -30% -16%;
+  z-index: -1;
+  background: var(--surface);
+  mask-image: radial-gradient(ellipse 85% 76% at 50% 50%, #000 0%, #000 50%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 85% 76% at 50% 50%, #000 0%, #000 50%, transparent 100%);
+  pointer-events: none;
+}
+
+/* No max-width/nowrap: at ~92px (the --fs-display ceiling) this nine-word
+   sentence would need roughly two viewport-widths on a single line, so
+   forcing it onto one cropped line would cut away about half the
+   headline, not the trailing word or two the brief's crop allowance is
+   meant for — wrapping within .hero__heading-group's own inline padding is
+   the actual composition call here, and nothing stops a shorter future
+   headline from overrunning and cropping at .hero__morph's own
+   overflow: hidden edge instead. */
 .hero__title {
-  margin-block-start: var(--s-4);
+  margin: 0;
   font-size: var(--fs-display);
   font-weight: var(--fw-medium);
   line-height: var(--lh-display);
   letter-spacing: var(--ls-display);
-  color: var(--surface);
+  color: var(--ink-black);
+}
+
+/* The one moving line the pinned services section doesn't already cover
+   (DESIGN-DIRECTION-v2.md movement 3 handles all four pillars properly;
+   this is not a second version of that). Real DOM text — deliberately not
+   aria-hidden, unlike the four-caption slideshow this hero replaced, which
+   hid ~30 words behind aria-hidden. .label-mono supplies the mono/caps/
+   tracking treatment already used for every other metadata line on the
+   page; this adds only the spacing under the headline. hero-morph.js
+   swaps the word on scroll via textContent, not innerHTML, and never
+   touches this element's aria attributes — a plain <p> is not an implicit
+   live region, so the swap does not spam a screen reader with every scroll
+   tick, but the current word is still announced whenever focus/reading
+   order reaches it, and still present in a text-only fetch of the page. */
+.hero__service-ticker {
+  margin-block-start: var(--s-4);
 }
 
 /* hero-headline.js and heading-mask.js both wrap each word in an
@@ -512,71 +802,82 @@ html[data-drawer-open="true"] {
   height: 100%;
 }
 
-/* Hero content wrapper: needs its own positioned stacking context above
-   the flowmap canvas (z-index: var(--z-base), 0), since it would
-   otherwise stack at the auto/default level and the canvas would cover
-   the headline instead of sitting behind it. */
-.hero > .container {
-  position: relative;
-  z-index: var(--z-raised);
-}
+/* Hero morph stage: full-viewport-height, pinned by hero-morph.js for its
+   own scroll distance while the video is scrubbed via currentTime.
+   z-index: var(--z-raised) protects everything inside it — headline,
+   ticker, lead, buttons, video — from the fixed flowmap canvas as one
+   group, since they all share this stacking context; nothing inside needs
+   its own separate z-index for that reason (DESIGN-DIRECTION-v2.md,
+   "hero, rebuilt", 12 Sep 2026, revised 13 Sep 2026).
 
-/* Hero morph stage: full-viewport-height dark band, pinned by hero-morph.js
-   for its own scroll distance while the sprite sheet is scrubbed. The
-   fallback <img> (frame 0, also the poster) is visible by default — the
-   no-JS/pre-load state — and covers the source's dark margins the same
-   way object-fit: cover would on a video. The canvas has no CSS
-   equivalent for that crop; hero-morph.js computes it by hand and starts
-   transparent (opacity: 0) until the sprite has loaded and the first
-   frame is drawn, at which point JS hides the fallback and reveals it. */
+   Flex, not absolute positioning, for the headline group and the content
+   group below: they are the composition (headline, ticker, lead, buttons
+   all read as one unit, per the 13 Sep 2026 fix for the ~400px dead gap
+   that used to sit between the pinned stage and a separate, later
+   .hero__content in normal document flow — see git history). Both are
+   real flex children; .hero__morph-visual, .hero__telemetry and
+   .hero__scroll-cue stay position: absolute, which removes them from flex
+   layout entirely regardless of where they sit in DOM order, so they can
+   still be full-bleed/corner-anchored overlays without disturbing the
+   two-item flex distribution. justify-content: center pulls the two flex
+   children together into one cluster rather than pushing them to the
+   stage's extreme top and bottom edges, which would only relocate the
+   dead-space problem. Identical at every breakpoint now — no mobile
+   override needed, unlike the box-sized-visual approach this replaced.
+
+   13 Sep 2026: centring used to sit .hero__heading-group across the
+   footage's own darkest, most sustained ink mass (measured: a 3x3
+   darkness grid across 17 sampled frames put the vertical-centre band at
+   ~168/255, the darkest of all nine cells). Relocating the group (two
+   margin attempts, a narrower 60% column) never fully fixed it and cost
+   its own regressions (header-pill collision). Resolved differently:
+   .hero__morph-visual's colour correction now puts a floor under how dark
+   any pixel can go (romin, see below), and .hero__heading-group carries
+   its own soft mask (.hero__headline-wash) for the residual worst case.
+   Centring itself was never the actual problem. */
 .hero__morph {
   position: relative;
+  z-index: var(--z-raised);
   width: 100%;
   height: 100svh;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--s-6);
 }
 
-/* Mobile: full viewport height again (matches the pin, so there is no
-   dead gap of empty background below a shorter pinned box — an earlier
-   version pinned only a 60svh band, which held its position at the very
-   top under the header while the remaining 40vh sat empty beneath it,
-   reading as "stuck to the top" rather than centred). The shape and its
-   caption become flex children below instead of full-bleed absolute
-   layers, so justify-content: center here centres that whole group
-   vertically in the screen — equal space above and below, not anchored
-   to the top edge. */
-@media (max-width: 768px) {
-  .hero__morph {
-    height: 100svh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: var(--s-4);
-  }
-}
+/* Full-bleed, edge to edge, no margin, no boxed treatment — the fix for
+   the "small grey box floating in white" defect (13 Sep 2026). The video
+   is opaque (H.264, no alpha channel) so full-bleed alone would fully
+   hide .hero__heading-group behind it, same as the bug; mix-blend-mode:
+   multiply is what actually restores partial occlusion: white/light water
+   pixels multiply against the --surface backdrop and the heading group's
+   dark text near-unchanged (white is the multiplicative identity), while
+   black ink pixels multiply it down to fully covered. This is the
+   "black ink covers the type, light water lets it show through" effect
+   the oryzo technique was always meant to be — the earlier inset-box
+   approach was a workaround for having shipped an opaque, unblended video,
+   not the intended design. Requires .hero's own background to be flat
+   --surface for the multiply math to read as intended (confirmed above)
+   and requires this element to sit later in DOM order than
+   .hero__heading-group, so it has that group as backdrop to blend
+   against — .hero__content, .hero__telemetry and .hero__scroll-cue all
+   come later still, so none of them are affected by the blend; they
+   render as normal, fully opaque content on top of it.
 
-/* Full-bleed visual again — no side column, no gap of empty background.
-   hero-morph.js crops to fill (cover), the same way object-fit: cover
-   would on an <img>; height is independent of the source's 1284x716
-   aspect ratio. */
+   13 Sep 2026: z-index: 0 is now explicit, not incidental. Both
+   .hero__heading-group and .hero__content promoted themselves to their
+   own stacking contexts (z-index: 2) to host a wash layer between this
+   video and their own text — that comparison needs this element's
+   z-index stated plainly rather than relying on z-index: auto's default
+   behaviour, which is what it was relying on before those groups needed
+   a third layer. */
 .hero__morph-visual {
   position: absolute;
   inset: 0;
-}
-
-/* Mobile: a real box in flex flow (not a full-bleed absolute layer) so
-   the parent's justify-content: center above can centre it. Height, not
-   the frame's own aspect ratio, still 60vh — see the mobile hero-morph
-   height history above; the same "big enough to dominate the screen,
-   not shrunk to fit with zero crop" reasoning applies here. */
-@media (max-width: 768px) {
-  .hero__morph-visual {
-    position: relative;
-    inset: auto;
-    flex: none;
-    width: 100%;
-    height: 60svh;
-  }
+  z-index: 0;
+  mix-blend-mode: multiply;
 }
 
 [data-hero-morph-fallback] {
@@ -587,244 +888,92 @@ html[data-drawer-open="true"] {
   object-fit: cover;
 }
 
-[data-hero-morph-canvas] {
+[data-hero-morph-video] {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
+  object-fit: cover;
   opacity: 0;
 }
 
-/* Dark gradient behind the caption band only, not the whole frame — keeps
-   the text legible against whatever part of the bright chrome shape
-   happens to be behind it, without dimming the rest of the visual. */
-.hero__morph-scrim {
+/* Persistent scroll affordance: oryzo.ai keeps its equivalent visible for
+   the whole of its scroll narrative rather than fading it after the first
+   viewport (DESIGN-DIRECTION-v2.md, "oryzo.ai", item 3). Living inside
+   .hero__morph — the pinned stage itself — means that behaviour is free:
+   hero-morph.js pins this box for its full scroll distance, so anything
+   positioned inside it holds position for that whole distance with no
+   scroll-linked code of its own. 13 Sep 2026: the video is full-bleed now
+   (see .hero__morph-visual above), so this corner sits over unpredictable
+   footage — sometimes flat water, sometimes dense ink — rather than the
+   guaranteed-flat stage background it had before. A small opaque-ish chip
+   (same --surface-85 + blur idea as the header pill, before that pill's
+   own fix needed something stronger for a *large* area — small chips
+   don't have the pill's problem of sitting on a same-colour section) keeps
+   the label legible regardless of what's under it at a given scroll
+   position, checked across the scrub, not just at rest. */
+.hero__scroll-cue {
   position: absolute;
-  inset-inline: 0;
-  inset-block-end: 0;
-  block-size: 45%;
-  background: linear-gradient(to top, rgba(10, 10, 10, 0.75), transparent);
-  pointer-events: none;
+  inset-block-start: var(--s-6);
+  inset-inline-end: var(--s-6);
+  z-index: var(--z-raised);
+  padding: var(--s-2) var(--s-2) var(--s-2) var(--s-3);
+  border-inline-start: 1px dotted var(--line);
+  background: var(--surface-85);
+  backdrop-filter: blur(8px);
+  border-radius: var(--radius-sm);
 }
 
-/* Mobile: captions no longer overlay the shape (they sit in their own
-   flex slot below it, on the section's own dark background instead), so
-   the scrim has nothing left to do its contrast job for. */
+/* Mobile: the top-right corner is where .hero__title now needs to read
+   clearly instead (see its own mobile query below) — a phone screen
+   doesn't have room for both, and a scroll affordance matters less on
+   touch, where the next gesture is obvious without a hint. */
 @media (max-width: 768px) {
-  .hero__morph-scrim {
+  .hero__scroll-cue {
     display: none;
   }
 }
 
-/* Captions sit inside each stage's own negative space rather than one
-   fixed corner: the frame's hollow centre, the open air the megaphone
-   projects into, the infinity symbol's two hollow loops, and the flat
-   ground the AI-services shape casts a shadow on. Mobile-first: the base
-   rules below are a single generic centred-bottom treatment (the mobile
-   sprite is a different crop, played once, non-interactive on load, so
-   matching text to its exact negative space isn't worth tuning
-   separately); the desktop media query further down repositions each
-   stage to its bespoke spot. Individual captions stack in the same
-   full-bleed layer (absolute) and crossfade with a small upward reveal;
-   index 0's resting state (visible) is the CSS default, so a no-JS
-   visitor sees the first line rather than nothing. */
-.hero__morph-captions {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
+.hero__scroll-cue-label {
+  font-family: var(--font-mono);
+  font-size: var(--fs-micro);
+  letter-spacing: var(--ls-caps);
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  writing-mode: vertical-rl;
 }
 
-/* Mobile: an in-flow flex item (sized, not full-bleed) so it sits right
-   below the visual and both can be centred together as a group by the
-   stage's justify-content: center. individual [data-hero-morph-caption]
-   entries stay absolutely stacked inside it (unchanged) so the
-   crossfade between stages still works — only this outer box's own
-   position changed. Height is a fixed estimate generous enough for the
-   tallest stage's tag + wrapped lines; slight overflow beyond it isn't
-   clipped (only .hero__morph itself clips, and there's plenty of room
-   inside that). */
-@media (max-width: 768px) {
-  .hero__morph-captions {
-    position: relative;
-    inset: auto;
-    flex: none;
-    width: 100%;
-    height: 170px;
-  }
-}
-
-.hero__morph-caption {
+/* Telemetry strip: haoqi-style truthful chrome along the stage's bottom
+   edge (DESIGN-DIRECTION-v2.md, "hero, rebuilt" — scroll progress plus
+   "Dublin / Worldwide", both real; no invented metrics). Same persistence
+   logic as .hero__scroll-cue above: it lives inside the pinned
+   .hero__morph stage, so it holds position for the whole scrub with no
+   extra scroll-linked code here. Progress text is written by
+   hero-morph.js's own onUpdate tick; "00%" in the markup is only the
+   pre-JS/pre-scroll resting value. */
+/* Same reasoning as .hero__scroll-cue above: this strip now sits over the
+   full-bleed video's own unpredictable content along its whole width, not
+   a guaranteed-flat stage background, so it needs its own legibility
+   floor rather than relying on .label-mono's plain --ink-soft against
+   whatever happens to be behind it at a given scroll position. */
+.hero__telemetry {
   position: absolute;
-  inset-inline: clamp(20px, 6vw, 32px);
-  /* % (of .hero__morph-captions' own box), not vh — on mobile that box is
-     now aspect-ratio-short rather than viewport-tall, and vh would have
-     sized this offset off the full viewport instead of the shape's own,
-     much shorter, band. */
-  inset-block-end: clamp(10px, 10%, 28px);
+  inset-inline: 0;
+  inset-block-end: 0;
+  z-index: var(--z-raised);
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
   align-items: center;
-  text-align: center;
-  opacity: 0;
-}
-
-.hero__morph-caption[data-hero-morph-caption="0"] {
-  opacity: 1;
-}
-
-.hero__morph-tag {
-  margin-block-end: var(--s-3);
-  background: var(--surface-20);
+  padding: var(--s-5) var(--section-pad-x);
+  border-block-start: 1px dotted var(--line);
+  background: var(--surface-85);
   backdrop-filter: blur(8px);
-  color: var(--surface);
-}
-
-.hero__morph-caption-text,
-.hero__morph-line {
-  margin: 0;
-  font-family: var(--font-heading);
-  font-size: clamp(1.125rem, 1rem + 1vw, 1.5rem);
-  font-weight: var(--fw-medium);
-  line-height: var(--lh-heading);
-  letter-spacing: var(--ls-heading);
-  color: var(--surface);
-  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.55);
-}
-
-/* Desktop enhancement, not a mobile override: each stage gets its own
-   anchor instead of the generic bottom-centre box above. Written as a
-   min-width addition (rather than resetting properties inside a
-   max-width block) so it can set inset-inline-start/inset-block-start
-   directly without fighting the base rule's equal-specificity, later
-   in the mobile-first cascade. */
-@media (min-width: 769px) {
-  .hero__morph-caption {
-    inset-inline: auto;
-    inset-block-end: auto;
-  }
-
-  /* Stage 0, web design: inside the hollow centre of the frame shape.
-     Sized to read as a confident pull-quote filling most of the hollow
-     width, not a caption lost in the middle of it. */
-  .hero__morph-caption--center {
-    inset-inline-start: 50%;
-    inset-block-start: 44%;
-    transform: translate(-50%, -50%);
-    width: min(480px, 58vw);
-  }
-
-  .hero__morph-caption--center .hero__morph-caption-text {
-    font-size: clamp(1.75rem, 1.2rem + 2.2vw, 2.75rem);
-  }
-
-  /* Stage 1, paid advertising: further right and higher, clear of the
-     megaphone's bell (an earlier version sat close enough to touch it),
-     each line at a slightly different angle so the lines read as sound
-     radiating out of the bell rather than a flat paragraph. */
-  .hero__morph-caption--right {
-    inset-inline-start: 72%;
-    inset-block-start: 34%;
-    align-items: flex-start;
-    text-align: left;
-    width: min(420px, 36vw);
-  }
-
-  .hero__morph-caption--right .hero__morph-tag {
-    align-self: center;
-    margin-block-end: clamp(28px, 5vh, 56px);
-  }
-
-  .hero__morph-caption--right .hero__morph-line {
-    font-size: clamp(1.5rem, 1.05rem + 1.7vw, 2.25rem);
-    white-space: nowrap;
-    transform-origin: left center;
-  }
-
-  /* Rotation lifts/drops the far (right) end of each line well past what
-     its own line-height accounts for — a small margin here still reads
-     as the lines rubbing together, so the gap has to be generous enough
-     to absorb that rotation, not just separate the text baselines. */
-  .hero__morph-line--up {
-    transform: rotate(-7deg);
-  }
-
-  .hero__morph-line--flat {
-    align-self: center;
-    margin-block-start: 0.6em;
-    transform: rotate(0deg);
-  }
-
-  .hero__morph-line--down {
-    margin-block-start: 0.6em;
-    transform: rotate(7deg);
-  }
-
-  /* Stage 2, SEO: the sentence splits across the infinity symbol's two
-     hollow loops. inset: 0 gives this wrapper the full visual's own
-     dimensions, so the two halves' percentage positions below resolve
-     against that box rather than collapsing to zero (an absolutely
-     positioned box with no in-flow content otherwise has no width to
-     resolve child percentages against). */
-  .hero__morph-caption--split {
-    inset: 0;
-  }
-
-  .hero__morph-tag--split {
-    position: absolute;
-    inset-inline-start: 50%;
-    inset-block-start: clamp(96px, 18%, 160px);
-    transform: translateX(-50%);
-  }
-
-  /* Top-anchored (translateX only, no vertical centering): the two
-     halves wrap to a different number of lines (two short words versus
-     a long clause), so centering each block around the same vertical
-     midpoint made their tops drift apart by however many lines they
-     differed by — worse at shorter/wider viewports, where the canvas's
-     cover-fit crop also shrinks the gear loops. Anchoring both to the
-     same top edge instead means they always start level, regardless of
-     how either one wraps. */
-  .hero__morph-caption-text--left,
-  .hero__morph-caption-text--right {
-    position: absolute;
-    inset-block-start: 40%;
-    transform: translateX(-50%);
-  }
-
-  /* "Technical SEO" is short, so it can go big and still fit the loop in
-     two lines. Its other half is a much longer clause — sized down from
-     that so it still wraps inside its own loop rather than spilling past
-     the gear teeth. */
-  .hero__morph-caption-text--left {
-    inset-inline-start: 32%;
-    width: min(240px, 27vw);
-    font-size: clamp(2.5rem, 2rem + 2.2vw, 3.5rem);
-  }
-
-  .hero__morph-caption-text--right {
-    inset-inline-start: 68%;
-    width: min(220px, 25vw);
-    font-size: clamp(1.375rem, 1.1rem + 1vw, 1.875rem);
-  }
-
-  /* Stage 3, AI services: one flat line resting under the shape, like a
-     caption sitting on the ground it casts a shadow on. */
-  .hero__morph-caption--base {
-    inset-inline-start: 50%;
-    inset-block-start: 82%;
-    transform: translateX(-50%);
-    width: min(560px, 80vw);
-  }
-
-  .hero__morph-caption--base .hero__morph-caption-text {
-    font-size: clamp(1.5rem, 1.1rem + 1.6vw, 2.25rem);
-  }
 }
 
 .hero__lead {
   margin-block-start: var(--s-5);
   font-size: var(--fs-lead);
-  color: var(--surface-60);
+  color: var(--ink-soft);
   max-width: var(--container-text);
 }
 
@@ -892,6 +1041,22 @@ html[data-drawer-open="true"] {
   box-shadow: var(--shadow-md);
 }
 
+/* Decorative only — the h3 right after it already names the thing.
+   aria-hidden is on the <svg> in the markup, not set here; this rule is
+   sizing and colour only. Monochrome, currentColor, no per-card or
+   per-pillar tint (CLAUDE.md, "Design tokens", 12 Sep 2026 — colour comes
+   from the portfolio work, not site furniture, and an icon set is site
+   furniture). Same position in every card: first child, above the h3 —
+   including the AI Services cards, where it sits above .card__step too,
+   not between the step number and the title. */
+.card__icon {
+  display: block;
+  width: 28px;
+  height: 28px;
+  margin-block-end: var(--s-4);
+  color: var(--ink);
+}
+
 .card__title {
   font-size: var(--fs-h3);
   font-weight: var(--fw-medium);
@@ -910,6 +1075,17 @@ html[data-drawer-open="true"] {
   margin-block-start: var(--s-2);
   font-size: var(--fs-small);
   color: var(--ink-soft);
+}
+
+/* Work cards read their stack line as metadata, not prose (DESIGN-DIRECTION-v2.md,
+   "oryzo.ai", item 3: mono labels carrying project/sector/stack rather than
+   a sentence). Same text node, same colour, only the tier changes — nothing
+   here touches markup or the string a screen reader announces. */
+.card--work .card__meta {
+  font-family: var(--font-mono);
+  font-size: var(--fs-micro);
+  letter-spacing: var(--ls-caps);
+  text-transform: uppercase;
 }
 
 .card__link {
@@ -959,48 +1135,34 @@ html[data-drawer-open="true"] {
   }
 }
 
-/* Colour-blob panels, one per card, assigned by source order: 1 Web Design
-   (blue), 2 SEO (green), 3 Paid Advertising (magenta), 4 AI Services
-   (violet). Reference layout: heading pinned to the top, the video/mockup
-   floats as an inset panel roughly centred (clear colour margin left and
-   right, not edge to edge), description pinned to the bottom. The DOM order
-   stays media -> title -> body -> link (sensible reading/tab order); the
-   `order` property below does the visual reordering. Auto top/bottom
-   margins on the media panel are what centre it in the leftover space
-   between the title and the body once both have taken the height they need. */
+/* Plain white card, same surface/border as every other .card (the four
+   unrelated navy/green/maroon/purple gradients this used to carry are
+   retired along with --gradient-web/seo/paid/ai — CLAUDE.md, "Design
+   tokens", 12 Sep 2026: colour comes from the client work, never from
+   the site's own furniture, and a service-card mockup video isn't client
+   work). Reference layout unchanged: heading pinned to the top, the
+   video/mockup floats as an inset panel roughly centred, description
+   pinned to the bottom. The DOM order stays media -> title -> body ->
+   link (sensible reading/tab order); the `order` property below does the
+   visual reordering. Auto top/bottom margins on the media panel are what
+   centre it in the leftover space between the title and the body once
+   both have taken the height they need. */
 .card--service {
   position: relative;
   display: flex;
   flex-direction: column;
   aspect-ratio: 3 / 4;
   padding: var(--s-6);
-  color: var(--surface);
-  border: none;
+  background: var(--surface);
+  border: 1px solid var(--line);
   overflow: hidden;
   box-shadow: var(--shadow-md);
-}
-
-.services__grid > .card--service:nth-child(1) {
-  background: var(--gradient-web);
-}
-
-.services__grid > .card--service:nth-child(2) {
-  background: var(--gradient-seo);
-}
-
-.services__grid > .card--service:nth-child(3) {
-  background: var(--gradient-paid);
-}
-
-.services__grid > .card--service:nth-child(4) {
-  background: var(--gradient-ai);
 }
 
 .card--service .card__title {
   order: 1;
   margin-block-start: 0;
   font-size: var(--fs-h4);
-  color: var(--surface);
 }
 
 /* Fills the card's own padded content box — no extra inset of its own.
@@ -1026,13 +1188,11 @@ html[data-drawer-open="true"] {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  color: var(--surface);
 }
 
 .card--service .card__link {
   order: 4;
   margin-block-start: var(--s-3);
-  color: var(--surface);
 }
 
 /* Video panel replacing the old self-running loop shapes. .card__media
@@ -1086,6 +1246,13 @@ html[data-drawer-open="true"] {
   object-fit: cover;
 }
 
+/* Thin open box, not a filled pill: the editorial-chrome treatment
+   (DESIGN-DIRECTION-v2.md, "oryzo.ai", item 3) reads as furniture rather
+   than a UI badge. background/color are untouched from the previous
+   solid-pill version on purpose — this sits over an arbitrary client
+   screenshot, so the opaque --surface fill stays load-bearing for
+   contrast regardless of what's underneath; only the shape and type
+   changed. */
 .card--work__chip {
   position: absolute;
   inset-block-end: var(--s-3);
@@ -1093,8 +1260,12 @@ html[data-drawer-open="true"] {
   padding: var(--s-2) var(--s-4);
   background: var(--surface);
   color: var(--ink);
-  border-radius: var(--radius-pill);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
   font-size: var(--fs-micro);
+  letter-spacing: var(--ls-caps);
+  text-transform: uppercase;
 }
 
 /* ---- Process / capability cards ------------------------------------------------ */
@@ -1168,11 +1339,14 @@ html[data-drawer-open="true"] {
    stroke-dasharray to the path's full length so the line renders as one
    continuous stroke once JS runs — a CSS dash pattern would be invisible in
    practice, so it is not worth the confusion of two competing dasharray
-   authors. --accent-2 (periwinkle) is used rather than --accent so the
-   route line reads as a distinct, quieter layer from the accent border/
-   numeral already used for the active step, at low opacity to keep it a
-   wayfinding hint rather than a graphic element, on both the cream
-   (about.html) and grey (contact.html) backgrounds this list sits on. */
+   authors. Plain --ink, not --accent: this is a quiet wayfinding hint, not
+   the nav-state/primary-CTA job --accent is reserved for under the
+   monochrome palette (CLAUDE.md, "Design tokens", 12 Sep 2026), and the
+   retired --accent-2 it used before existed only to look distinct from
+   --accent, a problem that doesn't exist once neither line nor numeral
+   uses --accent at all. Needs a light-on-dark variant below because this
+   list sits on both a light section (about.html, #how-we-work) and a
+   near-black one (contact.html, #next). */
 [data-process-path-svg] {
   position: absolute;
   inset: 0;
@@ -1183,10 +1357,14 @@ html[data-drawer-open="true"] {
 }
 
 [data-process-path-line] {
-  stroke: var(--accent-2);
+  stroke: var(--ink);
   stroke-width: var(--stroke-hairline);
   stroke-linecap: round;
   opacity: var(--opacity-hint);
+}
+
+.section--grey [data-process-path-line] {
+  stroke: var(--surface);
 }
 
 /* Single rule for the step numeral. .card__step and [data-dial-num] land
@@ -1230,8 +1408,9 @@ html[data-drawer-open="true"] {
   }
 }
 
-/* Modifier for 3-item KPI strips (work.html) — the shared .kpi__list grid
-   above is 4-column for index.html's KPI row and must stay that way. */
+/* Modifier for 3-item KPI strips (index.html and work.html both dropped to
+   three real, checkable figures — the shared .kpi__list grid above stays
+   4-column only for a list that actually renders four items). */
 @media (min-width: 768px) {
   .kpi__list--3 {
     grid-template-columns: repeat(3, 1fr);
@@ -1289,58 +1468,8 @@ html[data-drawer-open="true"] {
   border-radius: var(--radius-lg);
   padding: var(--s-6);
   box-shadow: var(--shadow-sm);
-  /* Grid, not flex: the card has three children (media, quote, citation) and a
-     row-flex would lay them out as three columns. Grid lets the media occupy a
-     single left column spanning both text rows, with no markup change.
-     Mobile-first: one column, portrait above the quote. */
   display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--s-4) var(--s-6);
-  align-content: start;
-}
-
-@media (min-width: 640px) {
-  .slide {
-    grid-template-columns: auto minmax(0, 1fr);
-    align-items: center;
-  }
-
-  .slide [data-dissolve] {
-    grid-row: 1 / span 2;
-  }
-}
-
-/* Dissolve figure: two stacked frames plus a canvas the JS module lays
-   over them for the crossfade. All three occupy the exact same square box
-   so swapping between them cannot shift layout. Both images stay visible
-   by default — the no-JS path. */
-/* Portrait sits beside the quote, not above it, so the card reads as a row and
-   stays short. flex-shrink is 0 so the image keeps its square regardless of
-   quote length. The dissolve canvas is sized from this box at runtime. */
-[data-dissolve] {
-  position: relative;
-  flex: 0 0 auto;
-  inline-size: 168px;
-  max-width: 100%;
-  aspect-ratio: 1 / 1;
-  margin-block-end: 0;
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-}
-
-[data-dissolve-frame] {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-[data-dissolve] canvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+  gap: var(--s-4);
 }
 
 .slide__quote {
@@ -1641,11 +1770,23 @@ main > .section:first-child:not(.hero) {
 }
 
 /* ---- Pillar / principle card grid (services, work, about) ------------------------ */
-/* Cards inside reuse .card as-is; only the grid wrapper is new. */
+/* Cards inside reuse .card as-is; only the grid wrapper is new.
+
+   13 Sep 2026: a single fixed column count can't serve every list here —
+   services.html alone carries 4, 4, 4, 5 and 3-item lists, and a flat
+   repeat(3, 1fr) at 1024px+ rendered the three 4-item lists as 3 + 1 (an
+   orphan on its own row) and would do the same to the 5-item list at
+   3 + 2 if that pair weren't explicitly centred below. Picked per list by
+   :has() on child count, not a modifier class on the markup — the class
+   list doesn't need to know its own item count, the CSS does the
+   counting. align-items: stretch (the grid default, set explicitly here
+   so it survives a future change to this rule) is what gives every card
+   in a row the same height regardless of how much body copy it holds. */
 
 .pillar__list {
   display: grid;
   grid-template-columns: 1fr;
+  align-items: stretch;
   gap: var(--gap-grid);
   margin-block-start: var(--s-6);
 }
@@ -1654,12 +1795,64 @@ main > .section:first-child:not(.hero) {
   .pillar__list {
     grid-template-columns: repeat(2, 1fr);
   }
+
+  /* 3-item lists go straight to 3 across as soon as the grid leaves
+     single-column — 2 columns here would split them 2 + 1, the same
+     defect this whole fix removes, just at the tablet breakpoint instead
+     of desktop. */
+  .pillar__list:has(> :nth-child(3):last-child) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  /* 5-item lists stay single-column through tablet. 2 columns would
+     split them 2 + 2 + 1 — the same lone-orphan problem the 3+2 desktop
+     fix below exists to avoid, and there isn't enough width at this
+     breakpoint to run the 3+2 centred layout comfortably. */
+  .pillar__list:has(> :nth-child(5):last-child) {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (min-width: 1024px) {
   .pillar__list {
     grid-template-columns: repeat(3, 1fr);
   }
+
+  /* 4-item lists: 4 across, never 3 + 1. */
+  .pillar__list:has(> :nth-child(4):last-child) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  /* 5-item lists: 3 + 2, both rows centred. Six column tracks, every
+     card spanning two of them — three cards fill row one exactly; the
+     last two are explicitly placed starting at track 2 and track 4 (of
+     6), so one empty track's worth of space sits on each side of the
+     pair instead of the pair sitting flush left with a dead gap on the
+     right, which is what a plain repeat(3, 1fr) would otherwise do with
+     a 5th item. */
+  .pillar__list:has(> :nth-child(5):last-child) {
+    grid-template-columns: repeat(6, 1fr);
+  }
+
+  .pillar__list:has(> :nth-child(5):last-child) > :nth-child(-n+3) {
+    grid-column: span 2;
+  }
+
+  .pillar__list:has(> :nth-child(5):last-child) > :nth-child(4) {
+    grid-column: 2 / span 2;
+  }
+
+  .pillar__list:has(> :nth-child(5):last-child) > :nth-child(5) {
+    grid-column: 4 / span 2;
+  }
+}
+
+/* Web Design's maintenance add-on (CLAUDE.md, "Services", pillar 1, 12 Sep
+   2026): sits after .pillar__list as its own .card, not a fifth grid item,
+   so it reads as a distinct ongoing phase rather than one more build-phase
+   feature blended into the same row. */
+.pillar__addon {
+  margin-block-start: var(--gap-grid);
 }
 
 /* ---- FAQ list (services, contact) -------------------------------------------------- */

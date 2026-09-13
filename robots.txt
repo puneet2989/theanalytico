@@ -1,5 +1,2 @@
 User-agent: *
-Allow: /
-Disallow: /api/
-
-Sitemap: https://theanalytico.com/sitemap.xml
+Disallow: /
