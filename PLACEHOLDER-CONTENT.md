@@ -1,10 +1,12 @@
 # PLACEHOLDER-CONTENT.md — content to replace
 
-**Current mode: LIVE, indexable, dev and prod identical.**
+**Current mode: LAUNCHED. Live and indexable as of 15 Sep 2026.**
 
-The preview gates have been removed at the client's instruction: `noindex` is off every page, `robots.txt` allows crawling, and the `X-Robots-Tag` on `/*` is gone. The site is publishable and search engines may index it.
+The final launch pass (15 Sep 2026) resolved everything in this file: business facts confirmed and applied, the `#team` section and social-profile marker deleted, KC Accountants/SodoLT/"10+ years" accepted as-is, the KPI row replaced, schema updated to Rush/Co. Dublin with opening hours, the three insight posts written and published, a privacy policy written and linked, and the testimonials replaced with the client's real, approved quotes (see below). `noindex` has been removed from every page except `logo-options.html` (a dev scratch page, also excluded from being served at all via `.assetsignore`), and `robots.txt` now allows crawling. See the site's own `CLAUDE.md` for the current facts table and schema notes; the rows below are kept for history, not as open items.
 
-This file is now a list of provisional content still in place, not a set of gates. Work top to bottom as the business starts driving traffic. Nothing here stops a deploy.
+**Testimonials, resolved 15 Sep 2026**: the client supplied the real, approved quotes from Raj (ArdLens), Kat (KC Accountants) and Piotr (SodoLT), published verbatim on `index.html` `#testimonials`. `data-placeholder="true"` removed from the carousel and all three slides. First names only, as supplied — no surnames, job titles, or photographs were given, and none are shown. No `Review`/`AggregateRating` structured data was added: see `CLAUDE.md`, "Testimonials and review schema", for why.
+
+This file is now a list of provisional content still worth revisiting as the business starts driving traffic (KC Accountants' interim domain, the maintenance-plan price/SLA, the retention-period review after two years), not a set of launch gates. Nothing here blocks a deploy.
 
 ## How to use this file
 

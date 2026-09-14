@@ -55,7 +55,7 @@
  * setup it gates) is asynchronous. The returned cleanup function is
  * created synchronously either way, closing over a `cancelled` flag so a
  * cleanup that runs before the import resolves prevents the effect from
- * ever being set up at all (same pattern as hero-morph.js's sprite load).
+ * ever being set up at all.
  */
 
 const NOOP = () => {};

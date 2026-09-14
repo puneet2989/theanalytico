@@ -46,3 +46,9 @@ package-lock.json
 
 # Raw AI-generated source video, encoded into clips under assets/video/
 raw-video/
+
+# Development scratch page — a logo-direction comparison, never a real site
+# page. Its own noindex tag only stops search engines; excluding it here
+# stops the file being served as a URL at all, which is the actual
+# requirement (15 Sep 2026, final launch pass).
+logo-options.html

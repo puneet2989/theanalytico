@@ -3,6 +3,48 @@
    apply on one page live here, not in components.css.
    ========================================================================== */
 
+/* ---- Long-form prose: the three insight posts and the privacy policy ---
+   The only long-form pages on the site, added at launch (15 Sep 2026).
+   Reuses existing type-scale tokens throughout — no new colour, no new
+   font size — just spacing between consecutive prose elements that the
+   site's own reset (`* { margin: 0 }` in base.css) otherwise leaves flush
+   against each other. Lists are left as plain, unclassed <ul>/<ol> in the
+   markup deliberately: base.css only strips list-style from `ul[class]`/
+   `ol[class]`, so an unclassed list here keeps ordinary browser bullets/
+   numbers and indent for free, which is what long-form prose needs and
+   every other list on the site (always classed, always a card grid)
+   doesn't. */
+.post-body,
+.legal-body {
+  max-width: var(--container-text);
+}
+
+.post-body > * + *,
+.legal-body > * + * {
+  margin-block-start: var(--s-5);
+}
+
+.post-body h2,
+.legal-body h2 {
+  margin-block-start: var(--s-8);
+  font-size: var(--fs-h3);
+}
+
+.post-body h3,
+.legal-body h3 {
+  margin-block-start: var(--s-6);
+  font-size: var(--fs-h4);
+}
+
+.post-body li + li,
+.legal-body li + li {
+  margin-block-start: var(--s-2);
+}
+
+.post-meta {
+  color: var(--ink-soft);
+}
+
 /* ---- work.html: #showcase, a full-bleed video section ----------------
    Not the page hero (that stays #intro, above) — this is a mid-page
    section, so it sits inside the normal .section rounded-corner/padding

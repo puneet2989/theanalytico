@@ -1,4 +1,9 @@
 TURNSTILE_SECRET_KEY=
-RESEND_API_KEY=
-CONTACT_FROM_EMAIL=
-CONTACT_TO_EMAIL=
+SMTP_USER=
+SMTP_PASS=
+
+# Optional. Uncomment to override the default.
+# SMTP_HOST=          (default: smtp.purelymail.com)
+# SMTP_PORT=          (default: 465)
+# MAIL_TO=            (default: same as SMTP_USER)
+# RATE_LIMIT=         (KV namespace binding; unbound = rate limiting silently skipped)

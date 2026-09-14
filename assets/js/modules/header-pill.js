@@ -103,21 +103,28 @@ export function initHeaderPill({ gsap, ScrollTrigger, lenis, reduced, isMobile }
 
     // Monogram (`mark`) is intentionally not part of this timeline. The
     // client wants it visible, unscaled, in both states.
+    // paddingTop/paddingBottom match components.css's --s-3 (12px) in both
+    // states, not two different values: reduced 14 Sep 2026 alongside the
+    // CSS rules of the same name to close the dead-space band around the
+    // pinned pill. Read from --s-3 rather than hardcoded again, so the two
+    // never drift apart the way they did before this fix.
+    const paddingBlockPx = `${parseFloat(rootStyles.getPropertyValue('--s-3')) || 12}px`;
+
     tl.fromTo(
       shell,
       {
         maxWidth: '1280px',
         borderRadius: '0px',
-        paddingTop: '16px',
-        paddingBottom: '16px',
+        paddingTop: paddingBlockPx,
+        paddingBottom: paddingBlockPx,
         backgroundColor: 'rgba(255,255,255,0)',
         boxShadow: '0 0 0 rgba(26,26,26,0)'
       },
       {
         maxWidth: pinnedMaxWidth,
         borderRadius: '999px',
-        paddingTop: '10px',
-        paddingBottom: '10px',
+        paddingTop: paddingBlockPx,
+        paddingBottom: paddingBlockPx,
         backgroundColor: pillBg,
         boxShadow: pillShadow
       },

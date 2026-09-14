@@ -85,7 +85,7 @@ section[id] {
   min-height: 72px;
   max-width: var(--container-max);
   margin-inline: auto;
-  padding-block: var(--s-4);
+  padding-block: var(--s-3);
   padding-inline: var(--section-pad-x);
   border-radius: 0;
   background: transparent;
@@ -109,10 +109,22 @@ section[id] {
    value) was invisible against the white hero — 1.00:1, the P2-2 defect
    this replaces. The border and two-layer --shadow-pill do the job the
    fill colour alone can't on a light section. */
+/* margin-block-start reduced --s-5 -> --s-2 and the top state's own
+   padding-block reduced --s-4 -> --s-3 (above) on 14 Sep 2026: together
+   these left a large empty band above and below the pinned pill that read
+   as dead space rather than a floating pill close to the viewport edge.
+   Both states now share the same --s-3 padding-block, so the pill's own
+   vertical rhythm no longer jumps between states.
+   header-pill.js's GSAP timeline sets paddingTop/paddingBottom as inline
+   styles every frame for animated (non-reduced-motion) users, which always
+   outranks this CSS rule — its hardcoded pixel values were updated to
+   match --s-3 (12px) in the same pass so the animated and CSS-only paths
+   agree. Only margin-block-start lives here alone, since the timeline
+   never touches it. */
 [data-header-state="pinned"] .header__shell,
 html[data-header-boot="pinned"] .header__shell {
   max-width: min(var(--header-pill-max), calc(100% - var(--s-4) * 2));
-  margin-block-start: var(--s-5);
+  margin-block-start: var(--s-2);
   padding-block: var(--s-3);
   border-radius: var(--radius-pill);
   background: var(--header-pill-bg);
@@ -136,17 +148,6 @@ html[data-header-boot="pinned"] .logo__line1 {
 html[data-header-boot="pinned"] .logo__line2 {
   font-size: var(--fs-h4);
 }
-
-/* No dark-hero override needed here any more. index.html used to open on a
-   full-bleed dark video band (.hero--dark, [data-theme="hero-dark"]) and the
-   header's transparent "top" state needed light text to read against it —
-   that override lived here. 13 Sep 2026: the hero's source material changed
-   to ink-in-water on a WHITE background (see .hero, below), so the header's
-   ordinary light-section colours (.logo__line2, .header__list a,
-   .header__burger-bar, all --ink already) are correct over it without any
-   override, and [data-theme="hero-dark"] no longer appears anywhere in
-   index.html. Contrast re-verified for the record: --ink (#1a1a1a) on
-   --surface (#ffffff) is 17.40:1. */
 
 .header__nav {
   display: none;
@@ -173,6 +174,50 @@ html[data-header-boot="pinned"] .logo__line2 {
 .header__list a[aria-current="page"] {
   font-weight: var(--fw-medium);
   color: var(--accent-strong);
+}
+
+/* Dark-hero override, reintroduced 14 Sep 2026. index.html's hero went
+   back to a flat near-black background (the full-bleed video experiment
+   failed — see CLAUDE.md effect inventory item 1 and .hero's own comment
+   in this file). This exact override existed before, under the same
+   [data-theme="hero-dark"] hook, and was removed on 13 Sep 2026 when the
+   hero was briefly white — see git history for that removal's own
+   reasoning, which no longer applies now the hero is dark again.
+
+   Scoped to [data-header-state="top"]: the pinned pill has its own
+   background (tokens.css, --header-pill-bg) already verified against both
+   a white and a near-black section, so it needs no override once scrolled
+   — only the transparent "top" state sits directly on the hero and needs
+   its text colour flipped.
+
+   data-theme="hero-dark" is set on <body> in index.html only; every other
+   page keeps a light section at the very top and must not get this.
+
+   Contrast, verified against --ink-black (#0a0a0a):
+   --surface (#fff): 19.80:1 — .logo__line2, nav links, burger bars.
+   --accent (#e5804b): 7.09:1 — .logo__line1 ("the"). NOT --accent-strong
+     (3.59:1 here, fails 4.5:1 — see its own tokens.css comment: it is a
+     text-on-white or button-fill colour, never a text-on-dark one). The
+     default .header__list a[aria-current="page"] and :hover colours are
+     --accent-strong for the same reason and need the same swap — the
+     "Home" link carries aria-current="page" on index.html by default, so
+     this is not just a hover-state edge case. */
+[data-theme="hero-dark"] [data-header-state="top"] .logo__line1 {
+  color: var(--accent);
+}
+
+[data-theme="hero-dark"] [data-header-state="top"] .logo__line2,
+[data-theme="hero-dark"] [data-header-state="top"] .header__list a {
+  color: var(--surface);
+}
+
+[data-theme="hero-dark"] [data-header-state="top"] .header__burger-bar {
+  background: var(--surface);
+}
+
+[data-theme="hero-dark"] [data-header-state="top"] .header__list a:hover,
+[data-theme="hero-dark"] [data-header-state="top"] .header__list a[aria-current="page"] {
+  color: var(--accent);
 }
 
 /* Compound selector, not a bare .header__cta: .btn's own `display:
@@ -436,82 +481,6 @@ html[data-drawer-open="true"] {
   box-shadow: var(--shadow-sm);
 }
 
-/* ---- Hero furniture -------------------------------------------------------- */
-
-/* White, not near-black: the hero's source footage changed 13 Sep 2026 from
-   a chrome morph on black to ink dispersing in water on white. Background
-   colours differ between the hero and the four service panels deliberately
-   (panels stay near-black) — this is not the monochrome section-alternation
-   rule from CLAUDE.md "Design tokens" (that rule is white/near-black
-   alternating by section; the hero is simply white because its own footage
-   is). Every colour that used to assume a dark hero — title, lead, buttons,
-   the scroll cue, the telemetry strip, and the header's transparent "top"
-   state — is flipped below; see each rule's own comment for its measured
-   contrast ratio. */
-/* padding-block: 0 on both sides, not just the top — .hero__morph already
-   fills the section's entire box at 100svh (plus its own pin-spacer,
-   inserted by ScrollTrigger, below that). The base .section rule's
-   padding-block-end still applied here until 13 Sep 2026, adding a
-   trailing ~75px of matching-colour dead space after the pin-spacer and
-   before #services started — small next to the ~400px gap .hero__content
-   used to leave (see .hero__content's own comment), but the same defect. */
-.hero {
-  position: relative;
-  background: var(--surface);
-  border-radius: 0;
-  margin-block-start: 0;
-  padding-block: 0;
-}
-
-/* A real flex child of .hero__morph now, composed together with
-   .hero__heading-group in one pinned viewport rather than sitting in
-   normal document flow after the pin ends (13 Sep 2026 — that gap used to
-   measure ~400px of nothing between the video and these buttons, plus
-   more again before #services). Comes after .hero__morph-visual in the
-   markup, so mix-blend-mode itself does not apply an extra multiply pass
-   to this element — but paint order alone doesn't make the video stop
-   being visible behind it: .hero__lead has no opaque fill of its own, so
-   without a backdrop here the ink shows straight through the text exactly
-   as it does behind .hero__heading-group, which is right for a headline
-   and wrong for body copy and buttons that need to stay reliably usable.
-
-   13 Sep 2026, revised again: the --surface-85 + blur chip this comment
-   used to describe is gone. Measured against the corrected footage
-   (post-colour-fix, see .hero__morph-visual's own comment), a hard-edged
-   translucent panel here read as a patch — visible rectangle, blurred ink
-   bleeding through its own edge. Removed outright rather than softened.
-   .hero__lead sits in --ink-soft, which cannot clear 4.5:1 against any
-   point of this footage on its own (verified: even the corrected footage's
-   lightest sampled point puts --ink-soft under 4:1) — the honest fix is
-   the same soft mask-image wash .hero__heading-group now carries for
-   exactly this reason, sized to this group's own box below, not a revival
-   of the deleted panel. See .hero__content-wash. */
-.hero__content {
-  position: relative;
-  z-index: 2;
-  display: inline-flex;
-  flex-direction: column;
-  align-items: flex-start;
-  padding-inline: var(--section-pad-x);
-}
-
-/* Same technique and same reasoning as .hero__headline-wash below, scoped
-   to this group instead: a solid --surface fill, feathered by mask-image
-   into a soft ellipse with no hard edge, sitting above the video
-   (z-index: -1, but .hero__content itself is z-index: 2 so the whole
-   subtree still paints above the video sibling) and below the lead text
-   and buttons. inset is generous relative to this smaller box, since it
-   has less content to clear than the headline group. */
-.hero__content-wash {
-  position: absolute;
-  inset: -30% -20%;
-  z-index: -1;
-  background: var(--surface);
-  mask-image: radial-gradient(ellipse 60% 60% at 50% 50%, #000 0%, #000 45%, transparent 100%);
-  -webkit-mask-image: radial-gradient(ellipse 60% 60% at 50% 50%, #000 0%, #000 45%, transparent 100%);
-  pointer-events: none;
-}
-
 /* Space Mono, not Inter: this is the "monospace label tier" CLAUDE.md's
    two-tier type rule names explicitly, so it should actually be set in a
    monospace face rather than Inter with a tracking hack (DESIGN-DIRECTION-v2.md,
@@ -539,30 +508,52 @@ html[data-drawer-open="true"] {
   background: var(--ink-05);
 }
 
-/* ---- Section header stack: left-aligned by default --------------------------
-   Centre-aligning the eyebrow/heading/lead on every non-hero section was
-   flagged as the most template-like decision in the stylesheet (see
-   DESIGN-DIRECTION-v2.md, "The blunt diagnosis" — none of the four reference
-   sites centre this stack). Left-align is now the default, inherited from
-   .eyebrow's own `display: inline-block` and .section__lead's own
-   `max-width` (both already correct with no centring applied); nothing here
-   overrides them. A section can still opt back into the old centred stack
-   with .section--center, defined below, which no page currently uses —
-   applying it to a specific section is a markup change, out of scope here. */
+/* ---- Section header stack: centred by client direction, 14 Sep 2026 -------
+   Left-align was the default from 12 Sep 2026 to 14 Sep 2026: centring the
+   eyebrow/heading/lead on every non-hero section had been flagged as the
+   most template-like decision in the stylesheet (DESIGN-DIRECTION-v2.md,
+   "The blunt diagnosis" — none of the four reference sites centre this
+   stack). That was an in-house call, not a client instruction, and the
+   client has since overridden it: every section intro across the site
+   (index, services, work, insights, about, contact, and the three insight
+   posts) is centred again via .section--center below, which every one of
+   those sections' <section> elements now carries. Left-align stays the
+   *default* for any future section that doesn't opt in — .eyebrow's own
+   `display: inline-block` and .section__lead's own `max-width` need no
+   override to read as left-aligned.
+   Scope is the intro stack only: eyebrow, [data-mask-heading]/.page__title,
+   .section__lead/.cta__lead/.page__lead. Card grids, work items, process
+   steps, KPI rows, the testimonial carousel, and long-form prose
+   (.post-body, .legal-body) are never touched by this class — do not widen
+   its selector list to reach them. The home hero (#hero) and work.html's
+   showcase hero (#showcase) are excluded on purpose: neither uses this
+   eyebrow/heading/lead pattern, and the home hero has its own scrub-driven
+   layout (CLAUDE.md, effect inventory item 1) that centring would fight.
+   `.section--center` sits on the intro's own `.container`, not the outer
+   `<section>`, and every selector below uses a direct-child combinator, not
+   a plain descendant one: services.html's Web Design pillar nests its own
+   "After launch" card with an unrelated `.eyebrow` of its own (services.html
+   #web-design, the `.pillar__addon` card) several elements below the intro,
+   inside the same section. A descendant selector would have centred that
+   card eyebrow too — body content the client explicitly said must stay as
+   it is. The direct-child scope only ever reaches the intro's own eyebrow,
+   heading and lead, never anything nested deeper in the same section. */
 
-.section--center .eyebrow {
+.section--center > .eyebrow {
   display: block;
   width: fit-content;
   margin-inline: auto;
   text-align: center;
 }
 
-.section--center [data-mask-heading] {
+.section--center > [data-mask-heading],
+.section--center > .page__title {
   text-align: center;
 }
 
-.section--center .section__lead,
-.section--center .cta__lead {
+.section--center > .section__lead,
+.section--center > .cta__lead,
+.section--center > .page__lead {
   max-width: var(--container-text);
   margin-inline: auto;
   text-align: center;
@@ -584,7 +575,7 @@ html[data-drawer-open="true"] {
   border-block-start: 1px dotted var(--line);
 }
 
-.section--center [data-mask-heading]::before {
+.section--center > [data-mask-heading]::before {
   margin-inline: auto;
 }
 
@@ -680,91 +671,135 @@ html[data-drawer-open="true"] {
   color: var(--accent);
 }
 
-/* Present and legible from the first frame, behind the ink-in-water form
-   (DESIGN-DIRECTION-v2.md, "hero, rebuilt", 12 Sep 2026 — the oryzo
-   technique; source footage and full-bleed/blend approach changed 13 Sep
-   2026, see .hero and .hero__morph-visual above). A real flex child of
-   .hero__morph now, not absolutely positioned — .hero__morph's own
-   justify-content: center places the whole group, no per-element inset
-   maths needed here any more.
+/* ---- Hero furniture -------------------------------------------------------- */
 
-   13 Sep 2026, revised again: this group now needs its own stacking
-   context. .hero__headline-wash (below) has to paint above the video but
-   below this group's own text, and h1/p are plain non-positioned inline
-   content — CSS stacking rules paint non-positioned in-flow content in a
-   fixed band that sits below anything z-index:0-or-higher and positioned,
-   with no way to slot a layer between that band and a zero/auto-positioned
-   sibling like the video. Promoting the whole group to its own stacking
-   context (position: relative + an explicit z-index, compared directly
-   against .hero__morph-visual's z-index: 0 below) sidesteps that: the
-   wash lives inside this context at z-index: -1, so it paints behind this
-   group's own text, while the group as a whole still paints above the
-   video sibling. This is the same reason "no z-index needed" no longer
-   holds — that assumption was only true with no third layer between the
-   two. */
-.hero__heading-group {
+/* Type-only hero (14 Sep 2026). The full-bleed video hero (ink-in-water,
+   12-13 Sep 2026) is retired: dense ink made the headline illegible,
+   lifting the blacks to fix that washed the footage out, and the multiply
+   blend hid the header wordmark at scroll 0. The actual problem was
+   full-bleed imagery sitting behind text, not the specific clip — so
+   there is no imagery here at all, video, canvas, or otherwise. See
+   CLAUDE.md's effect inventory item 1 for the same note.
+
+   Flat --ink-black background, full 100svh, no padding (the base .section
+   rule's own padding-block would otherwise add matching-colour dead space
+   above/below this box, the same defect the video hero had to fix twice).
+   overflow: hidden is load-bearing: .hero__title (below) is deliberately
+   nowrap and can run wider than the viewport, and this is what crops it at
+   the edge rather than causing horizontal page scroll. */
+.hero {
   position: relative;
-  z-index: 2;
+  z-index: var(--z-raised);
+  height: 100svh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   padding-inline: var(--section-pad-x);
+  padding-block: 0;
+  background: var(--ink-black);
+  border-radius: 0;
+  margin-block-start: 0;
 }
 
-/* Soft insurance for the darkest ink pixels the colour correction on
-   .hero__morph-visual still leaves (measured worst case: ~4.2:1 for
-   --ink-black at the floor romin lifts blacks to, just under the 4.5:1
-   floor). A solid --surface fill, masked into a large, very gradually
-   feathered ellipse rather than a rectangle with a visible edge — "no
-   rectangle, no border, no blur panel" ruled out a hard-edged panel, and
-   the earlier attempt at a real box (see .hero__content's own history)
-   confirmed why: any visible transition here reads as a patch. Sized well
-   beyond the text's own box (inset -14%/-10%) so the 100%-opaque core
-   covers the headline and the service-ticker line below it with margin,
-   and the falloff to fully transparent happens entirely outside that
-   footprint — verified against real scrub-position screenshots, not
-   assumed from the numbers alone. z-index: -1 relative to this group's
-   own stacking context (see .hero__heading-group above) puts it above the
-   video and below h1/p. No text-shadow anywhere in this group: the wash is
-   the fix, not a shadow layered on top of an otherwise-unfixed problem. */
-.hero__headline-wash {
+/* ---- Line-work layer (14 Sep 2026) --------------------------------------
+   The layer the reference sites carry and this one didn't: structural,
+   not decorative-looking, CSS/inline SVG only, zero image payload,
+   monochrome (stroke: currentColor, inheriting .hero's own white). Both
+   pieces are position: absolute, so they sit outside .hero's flex flow
+   (same reasoning as .hero__scroll-cue/.hero__telemetry) and z-index: -1,
+   negative rather than the usual var(--z-raised) positive, because these
+   two need to paint BEHIND the flex content instead of above it — the
+   opposite of every other absolutely-positioned thing in this section.
+   .hero already provides the stacking context (position: relative;
+   z-index: var(--z-raised)) that -1 resolves against, so this cannot
+   escape behind .hero itself. Both are aria-hidden in the markup and
+   fully static — no animation, scroll-linked or otherwise: nothing here
+   needed motion to do its job, and CLAUDE.md's motion rules are things to
+   satisfy, not a checklist to fill. */
+.hero__grid {
   position: absolute;
-  inset: -30% -16%;
+  inset: 0;
   z-index: -1;
-  background: var(--surface);
-  mask-image: radial-gradient(ellipse 85% 76% at 50% 50%, #000 0%, #000 50%, transparent 100%);
-  -webkit-mask-image: radial-gradient(ellipse 85% 76% at 50% 50%, #000 0%, #000 50%, transparent 100%);
-  pointer-events: none;
+  color: var(--surface);
+  opacity: 0.08;
 }
 
-/* No max-width/nowrap: at ~92px (the --fs-display ceiling) this nine-word
-   sentence would need roughly two viewport-widths on a single line, so
-   forcing it onto one cropped line would cut away about half the
-   headline, not the trailing word or two the brief's crop allowance is
-   meant for — wrapping within .hero__heading-group's own inline padding is
-   the actual composition call here, and nothing stops a shorter future
-   headline from overrunning and cropping at .hero__morph's own
-   overflow: hidden edge instead. */
+/* Haoqi's column rules. preserveAspectRatio="none" stretches the 0-100
+   viewBox to fill .hero__grid non-uniformly — fine for these lines (a
+   vertical line is still a straight vertical line under non-uniform
+   scale) but would distort a "+" the same way, which is why the crosshair
+   marks below are separate, individually-square SVGs rather than more
+   content inside this one. vector-effect: non-scaling-stroke keeps the
+   1px stroke width actually 1px on screen despite that same scale. */
+.hero__grid-lines {
+  display: block;
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1;
+}
+
+/* Each cross is its own small, genuinely square SVG (viewBox 0 0 12 12,
+   width/height 10px) positioned by percentage — sidesteps the
+   non-uniform-scale distortion .hero__grid-lines accepts above, so the
+   "+" actually reads as one at any viewport width. translate(-50%,-50%)
+   centres it on its left/top point instead of that point being its
+   corner. */
+.hero__grid-cross {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1;
+}
+
+/* hobro's single stroked counterweight: offset from the type (bottom-right
+   quadrant, deliberately not centred behind the pillar name or h1), thin
+   stroke, no fill. Higher opacity than the grid — a counterweight is
+   meant to be seen, the grid is meant to be felt. */
+.hero__counterweight {
+  position: absolute;
+  inset-block-end: -8%;
+  inset-inline-end: -6%;
+  z-index: -1;
+  width: min(46vw, 620px);
+  aspect-ratio: 1;
+  color: var(--surface);
+  opacity: 0.18;
+}
+
+.hero__counterweight svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1;
+}
+
+/* 14 Sep 2026: hierarchy flipped. The pillar name (below) carries the
+   most interesting content on this screen and is now the largest thing in
+   the hero; the h1 drops to the new middle register, --fs-display-sub —
+   visual size is not heading level, this is still the document's one h1,
+   still one complete sentence (see hero-headline.js). white, 19.80:1
+   against --ink-black.
+
+   nowrap + no max-width, deliberately: a nine-word sentence needs more
+   than one viewport-width on one line even at this smaller size. Wrapping
+   it was tried first (13 Sep 2026) and rejected the same day this hero
+   was rebuilt — letting it crop at the viewport edge reads as confident,
+   wrapping it read as an accident of the column width. .hero's own
+   overflow: hidden (above) does the actual cropping. */
 .hero__title {
   margin: 0;
-  font-size: var(--fs-display);
+  font-size: var(--fs-display-sub);
   font-weight: var(--fw-medium);
   line-height: var(--lh-display);
   letter-spacing: var(--ls-display);
-  color: var(--ink-black);
-}
-
-/* The one moving line the pinned services section doesn't already cover
-   (DESIGN-DIRECTION-v2.md movement 3 handles all four pillars properly;
-   this is not a second version of that). Real DOM text — deliberately not
-   aria-hidden, unlike the four-caption slideshow this hero replaced, which
-   hid ~30 words behind aria-hidden. .label-mono supplies the mono/caps/
-   tracking treatment already used for every other metadata line on the
-   page; this adds only the spacing under the headline. hero-morph.js
-   swaps the word on scroll via textContent, not innerHTML, and never
-   touches this element's aria attributes — a plain <p> is not an implicit
-   live region, so the swap does not spam a screen reader with every scroll
-   tick, but the current word is still announced whenever focus/reading
-   order reaches it, and still present in a text-only fetch of the page. */
-.hero__service-ticker {
-  margin-block-start: var(--s-4);
+  color: var(--surface);
+  white-space: nowrap;
 }
 
 /* hero-headline.js and heading-mask.js both wrap each word in an
@@ -779,159 +814,98 @@ html[data-drawer-open="true"] {
   margin-bottom: -0.2em;
 }
 
-/* WebGL flowmap canvas mount. Empty div in the markup, once, directly in
-   body (not inside any one section); JS appends a <canvas>. position: fixed
-   + inset: 0 means its box is always the full viewport regardless of
-   scroll, so the trail follows the cursor across every section on the
-   page, not just the hero. z-index: var(--z-sticky) sits above every
-   section's own content (none of which sets a z-index higher than
-   var(--z-raised), 10) but below the fixed header (var(--z-header), 200),
-   so the header stays legible and clickable. Never intercepts pointer
-   events so links/buttons everywhere stay clickable. */
-[data-flowmap] {
-  position: fixed;
-  inset: 0;
-  z-index: var(--z-sticky);
-  overflow: hidden;
-  pointer-events: none;
-}
+/* Pillar name block: the hero's largest element (14 Sep 2026 hierarchy
+   flip), display tier, 100px+ at 1440px, reusing --fs-display rather than
+   a new near-duplicate token — the h1 vacated it for --fs-display-sub
+   above, so nothing else on the page needs it at the same time.
 
-[data-flowmap] canvas {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
-/* Hero morph stage: full-viewport-height, pinned by hero-morph.js for its
-   own scroll distance while the video is scrubbed via currentTime.
-   z-index: var(--z-raised) protects everything inside it — headline,
-   ticker, lead, buttons, video — from the fixed flowmap canvas as one
-   group, since they all share this stacking context; nothing inside needs
-   its own separate z-index for that reason (DESIGN-DIRECTION-v2.md,
-   "hero, rebuilt", 12 Sep 2026, revised 13 Sep 2026).
-
-   Flex, not absolute positioning, for the headline group and the content
-   group below: they are the composition (headline, ticker, lead, buttons
-   all read as one unit, per the 13 Sep 2026 fix for the ~400px dead gap
-   that used to sit between the pinned stage and a separate, later
-   .hero__content in normal document flow — see git history). Both are
-   real flex children; .hero__morph-visual, .hero__telemetry and
-   .hero__scroll-cue stay position: absolute, which removes them from flex
-   layout entirely regardless of where they sit in DOM order, so they can
-   still be full-bleed/corner-anchored overlays without disturbing the
-   two-item flex distribution. justify-content: center pulls the two flex
-   children together into one cluster rather than pushing them to the
-   stage's extreme top and bottom edges, which would only relocate the
-   dead-space problem. Identical at every breakpoint now — no mobile
-   override needed, unlike the box-sized-visual approach this replaced.
-
-   13 Sep 2026: centring used to sit .hero__heading-group across the
-   footage's own darkest, most sustained ink mass (measured: a 3x3
-   darkness grid across 17 sampled frames put the vertical-centre band at
-   ~168/255, the darkest of all nine cells). Relocating the group (two
-   margin attempts, a narrower 60% column) never fully fixed it and cost
-   its own regressions (header-pill collision). Resolved differently:
-   .hero__morph-visual's colour correction now puts a floor under how dark
-   any pixel can go (romin, see below), and .hero__heading-group carries
-   its own soft mask (.hero__headline-wash) for the residual worst case.
-   Centring itself was never the actual problem. */
-.hero__morph {
+   Real DOM text, all four names, never aria-hidden — deliberately not the
+   four-caption slideshow's ~30-word aria-hidden mistake this hero has
+   avoided since 13 Sep 2026. margin-inline/padding-inline bleed the hairline
+   below full width; the block itself still keeps the hero's own
+   --section-pad-x inset for its text. */
+.hero__pillar {
   position: relative;
-  z-index: var(--z-raised);
-  width: 100%;
-  height: 100svh;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: var(--s-6);
+  margin-inline: calc(-1 * var(--section-pad-x));
+  padding-inline: var(--section-pad-x);
+  padding-block-end: var(--s-6);
+  border-block-end: 1px solid var(--surface-20);
 }
 
-/* Full-bleed, edge to edge, no margin, no boxed treatment — the fix for
-   the "small grey box floating in white" defect (13 Sep 2026). The video
-   is opaque (H.264, no alpha channel) so full-bleed alone would fully
-   hide .hero__heading-group behind it, same as the bug; mix-blend-mode:
-   multiply is what actually restores partial occlusion: white/light water
-   pixels multiply against the --surface backdrop and the heading group's
-   dark text near-unchanged (white is the multiplicative identity), while
-   black ink pixels multiply it down to fully covered. This is the
-   "black ink covers the type, light water lets it show through" effect
-   the oryzo technique was always meant to be — the earlier inset-box
-   approach was a workaround for having shipped an opaque, unblended video,
-   not the intended design. Requires .hero's own background to be flat
-   --surface for the multiply math to read as intended (confirmed above)
-   and requires this element to sit later in DOM order than
-   .hero__heading-group, so it has that group as backdrop to blend
-   against — .hero__content, .hero__telemetry and .hero__scroll-cue all
-   come later still, so none of them are affected by the blend; they
-   render as normal, fully opaque content on top of it.
-
-   13 Sep 2026: z-index: 0 is now explicit, not incidental. Both
-   .hero__heading-group and .hero__content promoted themselves to their
-   own stacking contexts (z-index: 2) to host a wash layer between this
-   video and their own text — that comparison needs this element's
-   z-index stated plainly rather than relying on z-index: auto's default
-   behaviour, which is what it was relying on before those groups needed
-   a third layer. */
-.hero__morph-visual {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  mix-blend-mode: multiply;
+/* No fixed height/overflow here in static CSS: motion rule 11 (CLAUDE.md)
+   requires the reveal/mask mechanism to be JS-applied so no-JS users see
+   finished content — here, all four names stacked and fully visible,
+   rather than clipped to one by a CSS rule that has no JS to drive it.
+   hero-headline.js sets overflow: hidden and an explicit height, both
+   inline, once it has something to scrub. */
+.hero__pillar-window {
+  position: relative;
 }
 
-[data-hero-morph-fallback] {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+.hero__pillar-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
-[data-hero-morph-video] {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 0;
+/* padding-bottom, no compensating negative margin — unlike the h1/heading
+   word boxes above, which cancel their own descender padding so wrapped
+   lines don't gain extra gap. Here the padding is meant to add real
+   spacing: hero-headline.js measures each name's own rendered height
+   (padding included) and uses that as both the clip window's height and
+   the per-name scroll step, so a name's own descender (--lh-display is
+   0.90, tighter than this font's natural box, so a "g" or "y" can draw
+   below the line box) has a reserved buffer instead of bleeding into the
+   next name's slot in the shared window when it masks out. Reported
+   14 Sep 2026: without this, the previous name's descender was still
+   visible after the transition to the next one — verified on screen,
+   not assumed, before and after this fix. */
+.hero__pillar-name {
+  margin: 0;
+  padding-bottom: 0.18em;
+  font-size: var(--fs-display);
+  font-weight: var(--fw-medium);
+  line-height: var(--lh-display);
+  letter-spacing: var(--ls-display);
+  color: var(--surface);
+  white-space: nowrap;
 }
 
-/* Persistent scroll affordance: oryzo.ai keeps its equivalent visible for
-   the whole of its scroll narrative rather than fading it after the first
-   viewport (DESIGN-DIRECTION-v2.md, "oryzo.ai", item 3). Living inside
-   .hero__morph — the pinned stage itself — means that behaviour is free:
-   hero-morph.js pins this box for its full scroll distance, so anything
-   positioned inside it holds position for that whole distance with no
-   scroll-linked code of its own. 13 Sep 2026: the video is full-bleed now
-   (see .hero__morph-visual above), so this corner sits over unpredictable
-   footage — sometimes flat water, sometimes dense ink — rather than the
-   guaranteed-flat stage background it had before. A small opaque-ish chip
-   (same --surface-85 + blur idea as the header pill, before that pill's
-   own fix needed something stronger for a *large* area — small chips
-   don't have the pill's problem of sitting on a same-colour section) keeps
-   the label legible regardless of what's under it at a given scroll
-   position, checked across the scrub, not just at rest. */
+/* "01 / 04" through "04 / 04" — legible progression alongside the pillar
+   name, not a substitute for it. Decorative (aria-hidden in the markup,
+   same bucket as the telemetry percentage below): it restates, in mono,
+   information the pillar name itself already carries in full. */
+.hero__pillar-index {
+  display: inline-block;
+  margin-block-start: var(--s-3);
+}
+
+/* .label-mono's own default colour (--ink-soft) is a light-section colour
+   and unreadable on this hero's --ink-black. Scoped here rather than
+   changed at the source: every other .label-mono use on the page (card
+   meta, section eyebrows) is still on a light section. Covers the pillar
+   index above and the two telemetry spans below in one rule.
+   --surface-60 (rgba(255,255,255,.6)) against --ink-black: 7.30:1 — same
+   token/pairing already verified for .section--grey's secondary text,
+   reused here rather than a third grey. */
+.hero .label-mono {
+  color: var(--surface-60);
+}
+
+/* Persistent scroll affordance: visible for the hero's whole scrub rather
+   than fading after the first viewport (DESIGN-DIRECTION-v2.md, "oryzo.ai",
+   item 3). Sits inside .hero, which hero-headline.js pins for its own
+   scroll distance, so this holds position for that whole distance with no
+   scroll-linked code of its own. border colour is --surface-20, the
+   dark-section hairline token (see .section--grey's own comment on it) —
+   --line is a light-section colour and would be close to invisible here. */
 .hero__scroll-cue {
   position: absolute;
   inset-block-start: var(--s-6);
   inset-inline-end: var(--s-6);
   z-index: var(--z-raised);
   padding: var(--s-2) var(--s-2) var(--s-2) var(--s-3);
-  border-inline-start: 1px dotted var(--line);
-  background: var(--surface-85);
-  backdrop-filter: blur(8px);
-  border-radius: var(--radius-sm);
-}
-
-/* Mobile: the top-right corner is where .hero__title now needs to read
-   clearly instead (see its own mobile query below) — a phone screen
-   doesn't have room for both, and a scroll affordance matters less on
-   touch, where the next gesture is obvious without a hint. */
-@media (max-width: 768px) {
-  .hero__scroll-cue {
-    display: none;
-  }
+  border-inline-start: 1px dotted var(--surface-20);
 }
 
 .hero__scroll-cue-label {
@@ -939,23 +913,20 @@ html[data-drawer-open="true"] {
   font-size: var(--fs-micro);
   letter-spacing: var(--ls-caps);
   text-transform: uppercase;
-  color: var(--ink-soft);
+  color: var(--surface-60);
   writing-mode: vertical-rl;
 }
 
-/* Telemetry strip: haoqi-style truthful chrome along the stage's bottom
+/* Telemetry strip: haoqi-style truthful chrome along the hero's bottom
    edge (DESIGN-DIRECTION-v2.md, "hero, rebuilt" — scroll progress plus
-   "Dublin / Worldwide", both real; no invented metrics). Same persistence
-   logic as .hero__scroll-cue above: it lives inside the pinned
-   .hero__morph stage, so it holds position for the whole scrub with no
-   extra scroll-linked code here. Progress text is written by
-   hero-morph.js's own onUpdate tick; "00%" in the markup is only the
-   pre-JS/pre-scroll resting value. */
-/* Same reasoning as .hero__scroll-cue above: this strip now sits over the
-   full-bleed video's own unpredictable content along its whole width, not
-   a guaranteed-flat stage background, so it needs its own legibility
-   floor rather than relying on .label-mono's plain --ink-soft against
-   whatever happens to be behind it at a given scroll position. */
+   "Dublin / Worldwide", both real; no invented metrics). Lives inside
+   .hero, so it holds position for the whole scrub the same way the
+   scroll cue does. Progress text is written by hero-headline.js's own
+   onUpdate tick; "00%" in the markup is only the pre-JS/pre-scroll resting
+   value. border colour is --surface-20 for the same reason as the scroll
+   cue above; no background/blur chip needed on either any more — the flat
+   --ink-black behind them makes legibility trivial where the full-bleed
+   video used to make it a real problem. */
 .hero__telemetry {
   position: absolute;
   inset-inline: 0;
@@ -965,31 +936,7 @@ html[data-drawer-open="true"] {
   justify-content: space-between;
   align-items: center;
   padding: var(--s-5) var(--section-pad-x);
-  border-block-start: 1px dotted var(--line);
-  background: var(--surface-85);
-  backdrop-filter: blur(8px);
-}
-
-.hero__lead {
-  margin-block-start: var(--s-5);
-  font-size: var(--fs-lead);
-  color: var(--ink-soft);
-  max-width: var(--container-text);
-}
-
-.hero__actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--s-4);
-  margin-block-start: var(--s-6);
-}
-
-.hero__visual-img {
-  margin-block-start: var(--s-8);
-  width: 100%;
-  height: auto;
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
+  border-block-start: 1px dotted var(--surface-20);
 }
 
 /* ---- Trust strip ------------------------------------------------------------ */
@@ -1209,6 +1156,215 @@ html[data-drawer-open="true"] {
   object-fit: cover;
 }
 
+/* ---- Services, pinned (Mercury pattern) --------------------------------
+   Movement 3 (docs/specs/12-home-restructure.md §5), replacing the
+   four-card grid above on index.html only — .services__grid/.card--service
+   stay exactly as they were for services.html's own four summary cards,
+   untouched by anything below.
+
+   Mobile-first, per this file's own convention: the base rules here are
+   also the no-JS and reduced-motion state — a plain stacked list, each
+   panel poster inline above its own heading, normal document flow, no
+   pin, all four pillars simply present in source order. The pinned,
+   crossfading desktop behaviour lives entirely inside the min-width:
+   1024px query below, and only applies when motion is not reduced — CSS
+   handles that degradation on its own; services-pin.js separately never
+   calls ScrollTrigger.create for either case, so no pin-spacer height is
+   ever reserved that this CSS wouldn't also be showing correctly. */
+.services-pin {
+  position: relative;
+}
+
+.services-pin__list {
+  list-style: none;
+  margin: var(--s-6) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-8);
+}
+
+.services-pin__panel {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  background: var(--ink-black);
+  margin-block-end: var(--s-5);
+}
+
+.services-pin__poster,
+.services-pin__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Poster is the base layer, always present (the no-JS/reduced-motion
+   fallback content). The video starts at opacity: 0 in markup-adjacent
+   CSS so a panel that never gets its video fetched (never approached,
+   see services-pin.js) never shows a blank/black frame — only
+   services-pin.js, once a panel's video has actually loaded, raises this
+   to 1, mirroring hero-morph.js's old fallback-hide-on-load pattern. */
+.services-pin__video {
+  opacity: 0;
+}
+
+.services-pin__title {
+  margin: 0 0 var(--s-3);
+  font-size: var(--fs-h3);
+}
+
+.services-pin__body {
+  margin: 0 0 var(--s-3);
+  font-size: var(--fs-body);
+  color: var(--ink-soft);
+  max-width: var(--container-text);
+}
+
+.services-pin__link {
+  font-family: var(--font-heading);
+  font-size: var(--fs-small);
+  font-weight: var(--fw-medium);
+  color: var(--accent-strong);
+  text-decoration: none;
+}
+
+.services-pin__link:hover {
+  text-decoration: underline;
+}
+
+/* Desktop + motion allowed: the visual stage is pinned by services-pin.js
+   for a scroll distance proportional to the list (§5's own "list items x
+   one viewport, roughly"); this query only handles the resulting static
+   layout — one shared visual slot on top, full width (each panel
+   absolutely positioned to the same spot, one at a time via opacity), the
+   list below it as a compact four-column row, one item emphasised at a
+   time. Opacity crossfade and the active/inactive item states are both
+   driven continuously by scroll progress in services-pin.js, not a CSS
+   transition — same reasoning as the hero's own scrub-not-timed motion.
+
+   Image-on-top rather than side-by-side (15 Sep 2026, on review — the
+   side-by-side version left the visual at 46% width, and the request was
+   explicitly for it wider and more visible): the panel now spans the full
+   width of .services-pin, 16:9, and the list clears it with a
+   margin-block-start computed from that same ratio (56.25%) — a
+   percentage margin-block-start resolves against the containing block's
+   width, not height, which is exactly the value that clears a same-width
+   16:9 box above it, so this stays correct at any container width without
+   a fixed pixel guess.
+
+   min-width: 769px, not the file's usual 1024px breakpoint: the task for
+   this section was explicit — "gate on prefers-reduced-motion AND
+   max-width 768px" — and main.js's own isMobile flag is that same
+   matchMedia('(max-width: 768px)'). Using a different number here would
+   mean services-pin.js pins the section (min-width 769px+ in its own
+   isMobile check) at a width where this query hasn't yet switched the
+   layout to match, or the reverse — CSS and JS have to agree on the exact
+   same boundary since neither one drives the other. */
+@media (min-width: 769px) and (prefers-reduced-motion: no-preference) {
+  /* Side-by-side, 15 Sep 2026's third layout pass: image left at 78% width
+     (the "75-80%" ask), list right at the remaining ~22%, after a stacked
+     top/bottom version was built, fixed to fit one viewport, then traded
+     for this instead.
+
+     [data-services-pin-stage] moved from .services-pin to .container
+     itself the same day: pinning .services-pin alone let the eyebrow/h2/
+     lead above it — "What we do", "Four ways we get you found and
+     chosen" — scroll out of view before the pin even engaged, reported as
+     the section's own heading not being visible while looking at the
+     panels. Pinning the whole .container keeps that heading in view for
+     the entire scrub instead. GSAP's pin sets the pinned element's own
+     margin and padding to 0px once it engages (confirmed by reading the
+     applied inline style directly) — which is why the header-clearance
+     margin lives on #services .eyebrow (a child of the now-pinned
+     .container, untouched by that zeroing), not as padding on .container
+     itself. */
+  #services .eyebrow {
+    margin-block-start: clamp(112px, 12vh, 144px);
+  }
+
+  /* Compact heading for this pinned context specifically: at
+     .section__lead's/h2's normal size, the heading block alone (eyebrow +
+     two-line h2 + two-line lead) was ~300px before anything else, which
+     left no realistic budget for the panel/list below on anything
+     shorter than a very tall screen. */
+  #services-title {
+    font-size: var(--fs-h3);
+  }
+
+  #services .section__lead {
+    margin-block-start: var(--s-3);
+    font-size: var(--fs-body);
+  }
+
+  /* display: flow-root: without a block formatting context here, a
+     child's block-direction margin can collapse straight through a
+     parent with no padding/border of its own — not at risk from anything
+     in this rule set today (margin-inline-start below is a horizontal
+     clear, which never collapses), but cheap insurance against the same
+     bug an earlier version of this layout hit once already. */
+  .services-pin {
+    display: flow-root;
+    margin-block-start: var(--s-4);
+    --pin-panel-width: 78%;
+    --pin-gap: var(--s-6);
+  }
+
+  /* Reported 15 Sep 2026: once the heading moved into the same pinned
+     view as the panel/list (above), the two together overflowed a full
+     viewport — the panel alone was tall enough that the list's own
+     heading/body/link stack ran off the bottom for the entire pin.
+     block-size: min(...vh, ...px) on the panel below, not aspect-ratio
+     from its own width, is what actually keeps this working across
+     different screen heights rather than just at 1440x900: a
+     width-derived aspect-ratio doesn't know or care how tall the
+     viewport actually is, so it does nothing to prevent this on a
+     shorter screen. The list's own three trims (2-line body clamp,
+     tighter gaps, smaller heading) bring its four items in under the
+     same budget regardless of panel height. */
+  .services-pin__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-3);
+    margin-inline-start: calc(var(--pin-panel-width) + var(--pin-gap));
+  }
+
+  .services-pin__item {
+    opacity: 0.4;
+  }
+
+  .services-pin__item[data-services-pin-active] {
+    opacity: 1;
+  }
+
+  .services-pin__title {
+    margin-block-end: var(--s-1);
+    font-size: var(--fs-h4);
+  }
+
+  .services-pin__body {
+    margin-block-end: var(--s-1);
+    font-size: var(--fs-small);
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .services-pin__panel {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-start: 0;
+    inline-size: var(--pin-panel-width);
+    block-size: min(42vh, 460px);
+    transform: none;
+    margin-block-end: 0;
+  }
+}
+
 /* ---- Work grid ---------------------------------------------------------------- */
 
 .work__grid {
@@ -1408,12 +1564,19 @@ html[data-drawer-open="true"] {
   }
 }
 
-/* Modifier for 3-item KPI strips (index.html and work.html both dropped to
-   three real, checkable figures — the shared .kpi__list grid above stays
-   4-column only for a list that actually renders four items). */
+/* Modifiers for KPI strips that don't render exactly four items — the
+   shared .kpi__list grid above stays 4-column only for a list that
+   actually has four, otherwise the real count leaves empty grid tracks,
+   the same orphan problem fixed on services.html's pillar lists. */
 @media (min-width: 768px) {
   .kpi__list--3 {
     grid-template-columns: repeat(3, 1fr);
+  }
+
+  /* work.html's own KPI strip, 15 Sep 2026: dropped from three items to
+     two once the unverifiable Lighthouse-score figure was removed. */
+  .kpi__list--2 {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
@@ -1684,14 +1847,27 @@ html[data-drawer-open="true"] {
 }
 
 /* "the" keeps its terracotta accent colour on the dark footer too — only
-   "Analytico" switches to white, matching the header's colour split. */
+   "Analytico" switches to white, matching the header's colour split.
+   --accent, not the base .logo__line1 rule's --accent-strong: confirmed
+   by Lighthouse (15 Sep 2026, final launch pass) that --accent-strong
+   against --ink (the footer's background) is 3.15:1, failing 4.5:1 — the
+   same light-background-only token mistake already fixed once for the
+   header's own dark-hero override this session. --accent against --ink is
+   7.09:1 (verified there too), which is what actually holds up here. */
+.footer__brand .logo__line1 {
+  color: var(--accent);
+}
+
 .footer__brand .logo__line2 {
   color: var(--surface);
 }
 
+/* Bumped --fs-small -> --fs-body 14 Sep 2026: at --fs-small this tagline
+   read as small print and left the brand column looking empty next to the
+   nav and contact columns. */
 .footer__brand p {
   margin-block-start: var(--s-4);
-  font-size: var(--fs-small);
+  font-size: var(--fs-body);
   color: var(--surface);
 }
 
@@ -1699,6 +1875,8 @@ html[data-drawer-open="true"] {
   display: flex;
   flex-direction: column;
   gap: var(--s-2);
+  list-style: none;
+  padding-inline-start: 0;
 }
 
 .footer__nav a {
@@ -1733,6 +1911,7 @@ html[data-drawer-open="true"] {
   border-block-start: 1px solid var(--line);
   font-size: var(--fs-micro);
   color: var(--surface-60);
+  text-align: center;
 }
 
 /* ==========================================================================

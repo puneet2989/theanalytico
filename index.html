@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="robots" content="noindex, nofollow">
   <title>Web Design, SEO and AI Services in Dublin | TheAnalytico</title>
   <meta name="description" content="TheAnalytico builds fast websites and runs SEO, Meta and Google ads, and AI automation for local businesses. Based in Dublin, working worldwide.">
   <link rel="canonical" href="https://theanalytico.com/">
@@ -44,20 +43,28 @@
     "description": "Web design, SEO, paid advertising and AI services for local businesses",
     "url": "https://theanalytico.com",
     "telephone": "+353872520034",
+    "email": "info@theanalytico.com",
     "address": {
       "@type": "PostalAddress",
-      "addressLocality": "Dublin",
+      "addressLocality": "Rush",
+      "addressRegion": "Co. Dublin",
       "addressCountry": "IE"
     },
     "areaServed": {
       "@type": "Place",
       "name": "Worldwide"
     },
+    "openingHoursSpecification": {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+      "opens": "09:00",
+      "closes": "17:00"
+    },
     "serviceType": ["Web Design", "SEO", "Paid Advertising", "AI Services"]
   }
   </script>
 </head>
-<body>
+<body data-theme="hero-dark">
 
 <a class="skip-link" href="#main">Skip to content</a>
 
@@ -65,11 +72,12 @@
 
 <header class="header" data-header data-header-state="top">
   <div class="header__shell" data-header-shell>
-    <a class="logo" href="/" aria-label="TheAnalytico home" data-logo>
+    <a class="logo" href="/" data-logo>
       <span class="logo__words" data-logo-wordmark>
         <span class="logo__line1">the</span>
         <span class="logo__line2">Analytico</span>
       </span>
+      <span class="visually-hidden"> Home</span>
     </a>
     <nav class="header__nav" aria-label="Primary">
       <ul class="header__list">
@@ -104,97 +112,110 @@
 
 <main id="main">
 
-<section id="hero" class="section hero">
-  <div class="hero__morph" data-hero-morph-stage>
-    <div class="hero__heading-group">
-      <div class="hero__headline-wash" aria-hidden="true"></div>
-      <h1 class="hero__title" data-hero-headline>We build websites that bring businesses more customers.</h1>
-      <p class="label-mono hero__service-ticker" data-hero-service-ticker><span data-hero-service-ticker-word>Web Design</span></p>
+<section id="hero" class="section hero" data-hero-stage>
+  <div class="hero__grid" aria-hidden="true">
+    <svg class="hero__grid-lines" preserveAspectRatio="none" viewBox="0 0 100 100" focusable="false">
+      <line x1="20" y1="0" x2="20" y2="100" vector-effect="non-scaling-stroke"></line>
+      <line x1="40" y1="0" x2="40" y2="100" vector-effect="non-scaling-stroke"></line>
+      <line x1="60" y1="0" x2="60" y2="100" vector-effect="non-scaling-stroke"></line>
+      <line x1="80" y1="0" x2="80" y2="100" vector-effect="non-scaling-stroke"></line>
+    </svg>
+    <svg class="hero__grid-cross" style="left:20%;top:12%" viewBox="0 0 12 12" width="10" height="10" focusable="false"><path d="M6 2v8M2 6h8"></path></svg>
+    <svg class="hero__grid-cross" style="left:40%;top:12%" viewBox="0 0 12 12" width="10" height="10" focusable="false"><path d="M6 2v8M2 6h8"></path></svg>
+    <svg class="hero__grid-cross" style="left:60%;top:12%" viewBox="0 0 12 12" width="10" height="10" focusable="false"><path d="M6 2v8M2 6h8"></path></svg>
+    <svg class="hero__grid-cross" style="left:80%;top:12%" viewBox="0 0 12 12" width="10" height="10" focusable="false"><path d="M6 2v8M2 6h8"></path></svg>
+    <svg class="hero__grid-cross" style="left:20%;top:88%" viewBox="0 0 12 12" width="10" height="10" focusable="false"><path d="M6 2v8M2 6h8"></path></svg>
+    <svg class="hero__grid-cross" style="left:40%;top:88%" viewBox="0 0 12 12" width="10" height="10" focusable="false"><path d="M6 2v8M2 6h8"></path></svg>
+    <svg class="hero__grid-cross" style="left:60%;top:88%" viewBox="0 0 12 12" width="10" height="10" focusable="false"><path d="M6 2v8M2 6h8"></path></svg>
+    <svg class="hero__grid-cross" style="left:80%;top:88%" viewBox="0 0 12 12" width="10" height="10" focusable="false"><path d="M6 2v8M2 6h8"></path></svg>
+  </div>
+  <div class="hero__counterweight" aria-hidden="true">
+    <svg viewBox="0 0 100 100" focusable="false"><circle cx="50" cy="50" r="46"></circle></svg>
+  </div>
+  <div class="hero__pillar" data-hero-pillar>
+    <div class="hero__pillar-window" data-hero-pillar-window>
+      <ul class="hero__pillar-list" data-hero-pillar-list>
+        <li class="hero__pillar-name">Web Design</li>
+        <li class="hero__pillar-name">SEO</li>
+        <li class="hero__pillar-name">Paid Advertising</li>
+        <li class="hero__pillar-name">AI Services</li>
+      </ul>
     </div>
-    <div class="hero__morph-visual" data-hero-morph-visual>
-      <picture>
-        <source media="(max-width: 768px)" srcset="/assets/video/hero-ink-mobile-poster.webp">
-        <img class="hero__morph-fallback" data-hero-morph-fallback src="/assets/video/hero-ink-poster.webp" width="960" height="516" alt="" aria-hidden="true">
-      </picture>
-      <video class="hero__morph-video" data-hero-morph-video aria-hidden="true" muted playsinline preload="none"
-        data-video-src="/assets/video/hero-ink.mp4"
-        data-video-src-mobile="/assets/video/hero-ink-mobile.mp4"></video>
-    </div>
-    <div class="hero__content">
-      <div class="hero__content-wash" aria-hidden="true"></div>
-      <p class="hero__lead">Web design, SEO, paid advertising and AI services for businesses that need to be found and chosen. Built fast, hosted on Cloudflare.</p>
-      <div class="hero__actions">
-        <a class="btn btn--primary" href="/contact">Start a project</a>
-        <a class="btn btn--ghost" href="/work">See our work</a>
-      </div>
-    </div>
-    <div class="hero__telemetry" data-hero-telemetry aria-hidden="true">
-      <span class="label-mono">Dublin / Worldwide</span>
-      <span class="label-mono" data-hero-telemetry-progress>00%</span>
-    </div>
-    <div class="hero__scroll-cue" aria-hidden="true">
-      <span class="hero__scroll-cue-label">Scroll to continue</span>
-    </div>
+    <span class="label-mono hero__pillar-index" data-hero-pillar-index aria-hidden="true">01 / 04</span>
+  </div>
+  <h1 class="hero__title" data-hero-headline>We build websites that bring businesses more customers.</h1>
+  <div class="hero__telemetry" data-hero-telemetry aria-hidden="true">
+    <span class="label-mono">Dublin / Worldwide</span>
+    <span class="label-mono" data-hero-telemetry-progress>00%</span>
+  </div>
+  <div class="hero__scroll-cue" aria-hidden="true">
+    <span class="hero__scroll-cue-label">Scroll to continue</span>
   </div>
 </section>
 
-<section id="services" class="section section--cream" data-curtain aria-labelledby="services-title">
-  <div class="container">
+<!-- data-curtain deliberately omitted (15 Sep 2026): section-curtain.js's
+     yPercent scrub tween leaves a permanent inline transform (identity,
+     but a transform value, not none) on any [data-curtain] section once
+     its own entrance range is behind you, and CSS makes any transformed
+     element a containing block for position: fixed descendants — this
+     silently broke services-pin.js's own pin (it rendered far off-screen,
+     positioned against #services instead of the viewport). Confirmed the
+     tween keeps re-imposing that transform on later scroll ticks even
+     after a ScrollTrigger onLeave clearProps, so the fix is not adding
+     data-curtain here, not chasing that tween. No real loss: the pin's
+     own crossfade is this section's reveal (docs/specs/12-…md §5), the
+     same as it already is for h2#services-title via heading-mask.js. -->
+<section id="services" class="section section--cream" aria-labelledby="services-title">
+  <div class="container section--center" data-services-pin-stage>
     <p class="eyebrow">What we do</p>
     <h2 id="services-title" data-mask-heading>Four ways we get you found and chosen</h2>
     <p class="section__lead">Pick one or run them together. Most owner-led businesses need a site that converts first, then traffic, then automation.</p>
-    <ul class="services__grid" data-reveal-group>
-      <li class="card card--service" data-reveal-item>
-        <figure class="card__media card__media--video" data-service-media>
-          <video data-service-video muted loop playsinline preload="none" poster="/assets/video/svc-web-poster.webp" width="480" height="300" aria-hidden="true">
-            <source src="/assets/video/svc-web.webm" type="video/webm">
-            <source src="/assets/video/svc-web.mp4" type="video/mp4">
-          </video>
-        </figure>
-        <h3 class="card__title">Web Design</h3>
-        <p class="card__body">Design and build from scratch. Responsive, fast, and shaped around the action you want a visitor to take.</p>
-        <a class="card__link" href="/services#web-design">Web Design details</a>
-      </li>
-      <li class="card card--service" data-reveal-item>
-        <figure class="card__media card__media--video" data-service-media>
-          <video data-service-video muted loop playsinline preload="none" poster="/assets/video/svc-seo-poster.webp" width="480" height="300" aria-hidden="true">
-            <source src="/assets/video/svc-seo.webm" type="video/webm">
-            <source src="/assets/video/svc-seo.mp4" type="video/mp4">
-          </video>
-        </figure>
-        <h3 class="card__title">SEO</h3>
-        <p class="card__body">Technical fixes, on-page structure, and local search so the people nearby find you first.</p>
-        <a class="card__link" href="/services#seo">SEO details</a>
-      </li>
-      <li class="card card--service" data-reveal-item>
-        <figure class="card__media card__media--video" data-service-media>
-          <video data-service-video muted loop playsinline preload="none" poster="/assets/video/svc-ads-poster.webp" width="480" height="300" aria-hidden="true">
-            <source src="/assets/video/svc-ads.webm" type="video/webm">
-            <source src="/assets/video/svc-ads.mp4" type="video/mp4">
-          </video>
-        </figure>
-        <h3 class="card__title">Paid Advertising</h3>
-        <p class="card__body">Meta and Google campaigns, set up properly and managed month to month.</p>
-        <a class="card__link" href="/services#paid-advertising">Paid Advertising details</a>
-      </li>
-      <li class="card card--service" data-reveal-item>
-        <figure class="card__media card__media--video" data-service-media>
-          <video data-service-video muted loop playsinline preload="none" poster="/assets/video/svc-ai-poster.webp" width="480" height="300" aria-hidden="true">
-            <source src="/assets/video/svc-ai.webm" type="video/webm">
-            <source src="/assets/video/svc-ai.mp4" type="video/mp4">
-          </video>
-        </figure>
-        <h3 class="card__title">AI Services</h3>
-        <p class="card__body">Five capabilities, from chatbots to reporting. Full list on the services page.</p>
-        <a class="card__link" href="/services#ai-services">AI Services details</a>
-      </li>
-    </ul>
+    <div class="services-pin">
+      <ol class="services-pin__list" data-services-pin-list>
+        <li class="services-pin__item" data-services-pin-item="0">
+          <div class="services-pin__panel" data-services-pin-panel="0">
+            <img class="services-pin__poster" data-services-pin-poster src="/assets/video/panel-web-poster.webp" alt="" aria-hidden="true" width="1280" height="720">
+            <video class="services-pin__video" data-services-pin-video muted playsinline preload="none" aria-hidden="true" data-video-src="/assets/video/panel-web.mp4"></video>
+          </div>
+          <h3 class="services-pin__title">Web Design</h3>
+          <p class="services-pin__body">Design and build from scratch. Responsive, fast, and shaped around the action you want a visitor to take.</p>
+          <a class="services-pin__link" href="/services#web-design">Web Design details</a>
+        </li>
+        <li class="services-pin__item" data-services-pin-item="1">
+          <div class="services-pin__panel" data-services-pin-panel="1">
+            <img class="services-pin__poster" data-services-pin-poster src="/assets/video/panel-seo-poster.webp" alt="" aria-hidden="true" width="1280" height="720">
+            <video class="services-pin__video" data-services-pin-video muted playsinline preload="none" aria-hidden="true" data-video-src="/assets/video/panel-seo.mp4"></video>
+          </div>
+          <h3 class="services-pin__title">SEO</h3>
+          <p class="services-pin__body">Technical fixes, on-page structure, and local search so the people nearby find you first.</p>
+          <a class="services-pin__link" href="/services#seo">SEO details</a>
+        </li>
+        <li class="services-pin__item" data-services-pin-item="2">
+          <div class="services-pin__panel" data-services-pin-panel="2">
+            <img class="services-pin__poster" data-services-pin-poster src="/assets/video/panel-paid-poster.webp" alt="" aria-hidden="true" width="1280" height="720">
+            <video class="services-pin__video" data-services-pin-video muted playsinline preload="none" aria-hidden="true" data-video-src="/assets/video/panel-paid.mp4"></video>
+          </div>
+          <h3 class="services-pin__title">Paid Advertising</h3>
+          <p class="services-pin__body">Meta and Google campaigns, set up properly and managed month to month.</p>
+          <a class="services-pin__link" href="/services#paid-advertising">Paid Advertising details</a>
+        </li>
+        <li class="services-pin__item" data-services-pin-item="3">
+          <div class="services-pin__panel" data-services-pin-panel="3">
+            <img class="services-pin__poster" data-services-pin-poster src="/assets/video/panel-ai-poster.webp" alt="" aria-hidden="true" width="1280" height="720">
+            <video class="services-pin__video" data-services-pin-video muted playsinline preload="none" aria-hidden="true" data-video-src="/assets/video/panel-ai.mp4"></video>
+          </div>
+          <h3 class="services-pin__title">AI Services</h3>
+          <p class="services-pin__body">Five capabilities, from chatbots to reporting. Full list on the services page.</p>
+          <a class="services-pin__link" href="/services#ai-services">AI Services details</a>
+        </li>
+      </ol>
+    </div>
     <a class="btn btn--ghost" href="/services">View all services</a>
   </div>
 </section>
 
 <section id="work" class="section section--grey" data-curtain aria-labelledby="work-title">
-  <div class="container">
+  <div class="container section--center">
     <p class="eyebrow">Selected work</p>
     <h2 id="work-title" data-mask-heading>Work we are proud of</h2>
     <ul class="work__grid">
@@ -209,13 +230,12 @@
       </li>
       <li class="card card--work" data-work-card>
         <a class="card--work__media" href="https://kc-accountant.puneetcf.workers.dev" target="_blank" rel="noopener">
-          <!-- PLACEHOLDER: replace before launch — KC Accountants production domain; workers.dev URL is client-approved interim -->
-          <img src="/assets/img/work/kc-accountants-card.webp" width="800" height="600" alt="The KC Accountants homepage, showing the services overview" loading="lazy" decoding="async" data-work-img data-placeholder="true">
+          <img src="/assets/img/work/kc-accountants-card.webp" width="800" height="600" alt="The KC Accountants homepage, showing the services overview" loading="lazy" decoding="async" data-work-img>
           <span class="card--work__chip" data-work-chip>Accountancy practice</span>
         </a>
         <h3 class="card__title">KC Accountants</h3>
         <p class="card__meta">Static + Cloudflare Worker</p>
-        <a class="card__link" href="https://kc-accountant.puneetcf.workers.dev" target="_blank" rel="noopener" data-placeholder="true">Visit KC Accountants<span class="visually-hidden"> (opens in a new tab)</span></a>
+        <a class="card__link" href="https://kc-accountant.puneetcf.workers.dev" target="_blank" rel="noopener">Visit KC Accountants<span class="visually-hidden"> (opens in a new tab)</span></a>
       </li>
       <li class="card card--work" data-work-card>
         <a class="card--work__media" href="https://sodolt.com" target="_blank" rel="noopener">
@@ -232,7 +252,7 @@
 </section>
 
 <section id="process" class="section section--blue" data-curtain aria-labelledby="process-title">
-  <div class="container">
+  <div class="container section--center">
     <p class="eyebrow">How it runs</p>
     <h2 id="process-title" data-mask-heading>Four steps, no mystery</h2>
     <div data-dial>
@@ -266,47 +286,39 @@
 </section>
 
 <section id="results" class="section section--cream" data-curtain aria-labelledby="results-title">
-  <div class="container">
+  <div class="container section--center">
     <h2 id="results-title" data-mask-heading>Numbers so far</h2>
     <ul class="kpi__list kpi__list--3">
       <li class="kpi">
-        <p class="kpi__value"><span data-counter data-counter-to="10" data-counter-prefix="" data-counter-suffix="+" data-counter-decimals="0">10+</span></p>
-        <p class="kpi__label">years in digital, SEO and paid media</p>
+        <p class="kpi__value"><span data-counter data-counter-to="24" data-counter-prefix="" data-counter-suffix="" data-counter-decimals="0">24</span></p>
+        <p class="kpi__label">hours to a reply</p>
       </li>
-      <!-- PLACEHOLDER: replace before launch — real organic sessions delta from Search Console or GA4, or delete this KPI -->
-      <li class="kpi" data-placeholder="true">
-        <p class="kpi__value"><span data-counter data-counter-to="42" data-counter-prefix="+" data-counter-suffix="%" data-counter-decimals="0">+42%</span></p>
-        <p class="kpi__label">organic sessions in six months</p>
+      <li class="kpi">
+        <p class="kpi__value"><span data-counter data-counter-to="3" data-counter-prefix="" data-counter-suffix="" data-counter-decimals="0">3</span></p>
+        <p class="kpi__label">sectors: film, professional services, wellness</p>
       </li>
-      <!-- PLACEHOLDER: replace before launch — real LCP measured across the three live sites -->
-      <li class="kpi" data-placeholder="true">
-        <p class="kpi__value"><span data-counter data-counter-to="1.2" data-counter-suffix="s" data-counter-decimals="1">1.2s</span></p>
-        <p class="kpi__label">average largest contentful paint</p>
+      <li class="kpi">
+        <p class="kpi__value"><span data-counter data-counter-to="4" data-counter-prefix="" data-counter-suffix="" data-counter-decimals="0">4</span></p>
+        <p class="kpi__label">services under one roof</p>
       </li>
     </ul>
-    <!-- PLACEHOLDER: replace before launch — delete this disclaimer line once KPIs are real -->
-    <p class="kpi__disclaimer" data-placeholder="true">Preview figures. Real measurements replace these before launch.</p>
   </div>
 </section>
 
 <section id="testimonials" class="section section--grey" data-curtain aria-labelledby="testimonials-title">
-  <div class="container">
+  <div class="container section--center">
     <h2 id="testimonials-title" data-mask-heading>What clients say</h2>
-    <!-- PLACEHOLDER: DRAFT quotes for real, named clients — Raj (ArdLens), Kat (KC Accountants) and Piotr (SodoLT) have not seen or approved this wording. Do not publish until each has signed off on their own quote in writing; replace with their actual words if different. -->
-    <div class="carousel" role="region" aria-label="Client testimonials" aria-roledescription="carousel" data-carousel data-marquee data-placeholder="true">
-      <!-- PLACEHOLDER: DRAFT — needs Raj's written approval before publishing -->
-      <figure class="slide" data-carousel-slide data-placeholder="true">
-        <blockquote class="slide__quote"><p>The site finally shows the footage the way it deserves, fast to load, nothing between the visitor and the film. Enquiries come through the contact form now instead of DMs I'd lose track of.</p></blockquote>
+    <div class="carousel" role="region" aria-label="Client testimonials" aria-roledescription="carousel" data-carousel data-marquee>
+      <figure class="slide" data-carousel-slide>
+        <blockquote class="slide__quote"><p>Before, nobody could really see what we do. Now the site shows our footage the way it should look, quick to load, no distractions, just the film. People get in touch through the contact form now instead of DMs that used to get buried and forgotten.</p></blockquote>
         <figcaption class="slide__cite">Raj, ArdLens</figcaption>
       </figure>
-      <!-- PLACEHOLDER: DRAFT — needs Kat's written approval before publishing -->
-      <figure class="slide" data-carousel-slide data-placeholder="true">
-        <blockquote class="slide__quote"><p>Clients can see exactly what we do and how to get in touch, without wading through jargon. It's the first site we've had that actually looks like a firm people can trust with their numbers.</p></blockquote>
+      <figure class="slide" data-carousel-slide>
+        <blockquote class="slide__quote"><p>We didn't really have a presence online before this. Now people can look at the site and actually understand what we do and how to reach us, no jargon, no confusion. It's the first site we've had that feels like something people would trust with their finances.</p></blockquote>
         <figcaption class="slide__cite">Kat, KC Accountants</figcaption>
       </figure>
-      <!-- PLACEHOLDER: DRAFT — needs Piotr's written approval before publishing -->
-      <figure class="slide" data-carousel-slide data-placeholder="true">
-        <blockquote class="slide__quote"><p>Bookings come through the site now instead of texts back and forth. It loads quickly on a phone, which matters when someone is looking me up between appointments.</p></blockquote>
+      <figure class="slide" data-carousel-slide>
+        <blockquote class="slide__quote"><p>It used to be back and forth texts just to book something in. Now people book straight through the site. It loads fast on a phone too, which makes a real difference when someone's checking us out on their break between appointments.</p></blockquote>
         <figcaption class="slide__cite">Piotr, SodoLT</figcaption>
       </figure>
     </div>
@@ -318,37 +330,33 @@
 </section>
 
 <section id="insights" class="section section--blue" data-curtain aria-labelledby="insights-title">
-  <div class="container">
+  <div class="container section--center">
     <p class="eyebrow">Insights</p>
     <h2 id="insights-title" data-mask-heading>Practical notes on getting found</h2>
-    <!-- PLACEHOLDER: replace before launch — individual post URLs once posts are published; all three currently link to /insights -->
-    <ul class="insights__grid" data-reveal-group data-placeholder="true">
+        <ul class="insights__grid" data-reveal-group>
       <li class="card" data-reveal-item>
         <figure class="card__media">
           <img src="/assets/img/insights/insight-1.webp" width="400" height="250" alt="Market traders serving customers at an outdoor stall" loading="lazy" decoding="async">
         </figure>
-        <!-- PLACEHOLDER: replace before launch — real publication date needed -->
-        <p class="card__date" data-placeholder="true">12 June 2026</p>
+        <p class="card__date"><time datetime="2026-09-15">15 September 2026</time></p>
         <h3 class="card__title">What a local business actually needs on a homepage</h3>
-        <a class="card__link" href="/insights">Read article</a>
+        <a class="card__link" href="/insights/what-a-homepage-needs">Read article</a>
       </li>
       <li class="card" data-reveal-item>
         <figure class="card__media">
           <img src="/assets/img/insights/insight-2.webp" width="400" height="250" alt="Google Analytics open on a mobile phone" loading="lazy" decoding="async">
         </figure>
-        <!-- PLACEHOLDER: replace before launch — real publication date needed -->
-        <p class="card__date" data-placeholder="true">28 April 2026</p>
+        <p class="card__date"><time datetime="2026-09-15">15 September 2026</time></p>
         <h3 class="card__title">Google Business Profile: the fields most people skip</h3>
-        <a class="card__link" href="/insights">Read article</a>
+        <a class="card__link" href="/insights/google-business-profile-fields">Read article</a>
       </li>
       <li class="card" data-reveal-item>
         <figure class="card__media">
           <img src="/assets/img/insights/insight-3.webp" width="400" height="250" alt="A team planning with sticky notes on a whiteboard" loading="lazy" decoding="async">
         </figure>
-        <!-- PLACEHOLDER: replace before launch — real publication date needed -->
-        <p class="card__date" data-placeholder="true">3 March 2026</p>
+        <p class="card__date"><time datetime="2026-09-15">15 September 2026</time></p>
         <h3 class="card__title">Where AI helps a growing business, and where it wastes money</h3>
-        <a class="card__link" href="/insights">Read article</a>
+        <a class="card__link" href="/insights/ai-for-a-growing-business">Read article</a>
       </li>
     </ul>
     <a class="btn btn--ghost" href="/insights">Read all insights</a>
@@ -356,11 +364,11 @@
 </section>
 
 <section id="cta" class="section section--cream" data-curtain aria-labelledby="cta-title">
-  <div class="container container--narrow">
+  <div class="container container--narrow section--center">
     <h2 id="cta-title" data-mask-heading>Tell us what the site has to do</h2>
     <p class="cta__lead">A short call, no charge, no pitch deck. Based in Dublin, working with clients anywhere.</p>
     <div class="cta__actions">
-      <a class="btn btn--primary" href="tel:+353872520034">Call 087-2520034</a>
+      <a class="btn btn--primary" href="tel:+353872520034">Call 087-252-0034</a>
       <a class="btn btn--ghost" href="/contact">Send a message</a>
     </div>
   </div>
@@ -371,13 +379,14 @@
 <footer class="footer">
   <div class="container">
     <div class="footer__brand">
-      <a class="logo" href="/" aria-label="TheAnalytico home" data-logo>
+      <a class="logo" href="/" data-logo>
         <span class="logo__words" data-logo-wordmark>
           <span class="logo__line1">the</span>
           <span class="logo__line2">Analytico</span>
         </span>
+        <span class="visually-hidden"> Home</span>
       </a>
-      <p>Web design, SEO, paid advertising and AI services. Dublin, Ireland.</p>
+      <p>Web design, SEO, paid advertising and AI services.</p>
     </div>
     <nav class="footer__nav" aria-label="Footer">
       <ul>
@@ -390,9 +399,10 @@
       </ul>
     </nav>
     <div class="footer__contact">
-      <p>Dublin, Ireland</p>
-      <p><a href="tel:+353872520034">087-2520034</a></p>
-      <!-- PLACEHOLDER: replace before launch — social profile URLs, business email, company registration number if required -->
+      <p>Rush, Co. Dublin, Ireland</p>
+      <p><a href="tel:+353872520034">087-252-0034</a></p>
+      <p><a href="mailto:info@theanalytico.com">info@theanalytico.com</a></p>
+      <p><a href="/privacy">Privacy policy</a></p>
     </div>
     <p class="footer__legal">© 2026 TheAnalytico. All rights reserved.</p>
   </div>

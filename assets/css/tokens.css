@@ -119,7 +119,26 @@
   --surface-55: rgba(255, 255, 255, 0.55);
 
   /* ---- Fluid type scale -------------------------------------------- */
-  --fs-display: clamp(2.75rem, 1.1rem + 5.4vw, 5.75rem);
+  /* --fs-display raised 13-14 Sep 2026: CLAUDE.md's own type rule requires
+     100px+ at 1440px for the hero's largest element, but this clamp's old
+     ceiling (5.75rem = 92px) saturated below that width. Used by
+     .hero__pillar-name only since 14 Sep 2026, when the hierarchy flipped
+     and the pillar name took over as the hero's largest element — the h1
+     moved to --fs-display-sub below. Verified: 1.1rem + 7.6vw reaches
+     ~127px by 1440px (90rem viewport), comfortably over the 100px floor,
+     and the clamp's true ceiling (8rem = 128px) by ~1453px. */
+  --fs-display: clamp(2.75rem, 1.1rem + 7.6vw, 8rem);
+  /* --fs-display-sub, added 14 Sep 2026: the h1's new middle register,
+     between --fs-display above and the ~12px mono label tier
+     (--fs-micro). CLAUDE.md's "two-tier, nothing in between" rule was
+     written to ban an 18-22px PROSE tier (see its own updated wording in
+     CLAUDE.md, "Design tokens") — a second display-scale register for
+     genuine hierarchy, not paragraph text, is exactly what it was not
+     meant to rule out. Verified: reaches 48px by 1440px, clearly
+     subordinate to --fs-display's ~127px there and clearly above
+     --fs-micro's ~13px — a real third rung, not a near-duplicate of
+     either neighbour. */
+  --fs-display-sub: clamp(1.75rem, 1.35rem + 2.1vw, 3rem);
   --fs-h1:      clamp(2.5rem, 1.35rem + 5.1vw, 5.5rem);
   --fs-h2:      clamp(2rem, 1.3rem + 3.1vw, 3.75rem);
   --fs-h3:      clamp(1.5rem, 1.15rem + 1.55vw, 2.5rem);

@@ -9,6 +9,10 @@
 /insights.html   /insights    301
 /about.html      /about       301
 /contact.html    /contact     301
+/privacy.html    /privacy     301
+/insights/what-a-homepage-needs.html                /insights/what-a-homepage-needs                301
+/insights/google-business-profile-fields.html       /insights/google-business-profile-fields        301
+/insights/ai-for-a-growing-business.html            /insights/ai-for-a-growing-business              301
 
 # Legacy or mistyped paths
 /portfolio       /work        301

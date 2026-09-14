@@ -57,7 +57,9 @@ Sections alternate **white and near-black only**. The three portfolio captures s
 
 Full-bleed is the default. Sections run edge to edge. `--container-max` applies to text columns, not to section backgrounds, and `--radius-section` is retired: the boxed-card-inside-a-boxed-section pattern is what made the old build read as a template.
 
-Type is two-tier with nothing in between: a display tier (120px+ at 1440px, the page's only large type) and a monospace label tier (~12px, uppercase, `0.08em` tracking) carrying all metadata. Avoid an 18–22px prose tier doing explanatory work; that is what the reference sites conspicuously lack.
+Section intros are centred, not left-aligned — reversed 14 Sep 2026. Left-align was decided in-house on 12 Sep 2026 (centring every section's eyebrow/heading/lead was flagged as the most template-like habit in the stylesheet, see `docs/DESIGN-DIRECTION-v2.md`, "The blunt diagnosis"). The client has since overridden that call: every section intro across the site — index, services, work, insights, about, contact, and the three insight posts — is centred again via `.section--center` in `components.css`, which each of those sections' intro `.container` now carries. **Do not revert this to left-aligned on the assumption the 12 Sep decision still holds; it does not, for section intros specifically.** The scope is narrow and stays narrow: only the eyebrow, the heading, and the lead paragraph centre. Card grids, work items, process steps, KPI rows, the testimonial carousel, and long-form prose (`.post-body`, `.legal-body`) are left exactly as they are — `.section--center`'s own selectors use a direct-child combinator specifically so a nested `.eyebrow` inside a card (services.html's "After launch" maintenance card, for one) is never swept up by it. The home hero and work.html's showcase hero are excluded on purpose; neither uses this eyebrow/heading/lead pattern.
+
+Type is a display tier (120px+ at 1440px for the page's largest element) and a monospace label tier (~12px, uppercase, `0.08em` tracking) carrying all metadata, with nothing filling the 18–22px prose gap between them. Clarified 14 Sep 2026: that gap is what this rule bans — an 18–22px tier doing explanatory work, which is what the reference sites conspicuously lack — not a second display-scale register used for genuine hierarchy. A composition can carry two large sizes (for example the home hero's pillar name at display scale and its h1 at a smaller middle register beneath it) provided both are still clearly display-scale type, not a paragraph tier wearing a bigger font.
 
 Type scale is fluid, `clamp()` only, no media-query font sizes. Headings use negative tracking (`-0.03em`). Display weight may exceed 600 — the earlier "never 700+" rule is lifted, since every reference achieves the "large, tight, confident" feel partly through weight.
 
@@ -93,8 +95,9 @@ Transition is a single GSAP timeline on width, radius, padding, background, and 
 
 ## Effect inventory to implement
 
-1. Hero: single scroll-scrubbed morphing form (Higgsfield-generated, one continuous camera, no discrete objects/logo target) advancing through states that represent each service, then resolving directly into the kinetic hero headline — narrative progression, holds its end state, no idle looping. Rendered from a pre-decoded sprite-sheet image drawn to a `<canvas>` (one frame region per scroll tick via `drawImage`), not a `<video>`: Cloudflare static assets don't honour Range requests, so a plain network `<video>` never becomes scrubbable, and even a blob-URL `<video>` throttles/coalesces rapid `currentTime` seeks on a fast scroll — a sprite sheet has no per-seek decode cost. Desktop and mobile load separate sprite sheets (mobile's is smaller, fewer frames). See `assets/js/modules/hero-morph.js`.
-2. Kinetic headline: word-by-word clip-path reveal, timed to the hero morph's resolution rather than a fixed delay
+1. Hero: type-only. Flat `--ink-black` background, white display type, no video, no canvas, no imagery of any kind. Retired 14 Sep 2026 after the full-bleed video hero (a scroll-scrubbed ink-in-water clip, before that a sprite-sheet chrome morph) failed on its third attempt at colour-correcting the footage: dense ink made the headline illegible, lifting the blacks to fix that made the footage look washed out and low quality, and the multiply blend needed to composite it under the header hid the wordmark at scroll 0. The actual defect was full-bleed imagery sitting behind text, not any one clip or encode — no amount of correcting the footage fixes that, so there is no footage.
+   Hierarchy flipped 14 Sep 2026: the four-word pillar name (Web Design / SEO / Paid Advertising / AI Services) carries the most interesting content on the screen and is now the hero's largest element, display tier; the h1 dropped to a new middle register, `--fs-display-sub` (visual size is not heading level — it is still the document's one h1, one complete sentence). The pillar name transitions on scroll via a scrub-driven mask (mask out, mask in — not a fade, not a text swap), with an "01 / 04"–"04 / 04" index alongside it; the h1's own word-by-word reveal plays once on load instead (see item 2). A CSS/inline-SVG line-work layer (faint column rules with crosshairs, a single offset stroked circle, a hairline under the pillar name) sits behind the type, fully static, monochrome, aria-hidden. See `assets/js/modules/hero-headline.js`.
+2. Kinetic headline: word-by-word clip-path reveal on the h1, playing once as it enters the first viewport rather than a fixed delay. Scrubbed motion in the hero belongs to the pillar-name transition instead (item 1) — tying the h1's own reveal to that same scrub left the hero blank until the user scrolled, tried and rejected 14 Sep 2026. Both live in one module, `hero-headline.js`, since the same day.
 3. Headings (non-hero): clip-path mask rise, word-by-word stagger
 4. Header: full bar → floating pill (see above)
 5. Section curtain: rounded next-section slide over previous
@@ -114,16 +117,21 @@ Confirmed by the client. These are the only business facts that may be stated as
 | Field | Value |
 |---|---|
 | Name | TheAnalytico |
-| Location | Dublin, Ireland |
+| Location | Rush, Co. Dublin, Ireland (no street address, no postcode — confirmed 15 Sep 2026, keep out of visible body copy per the worldwide positioning rule; schema and contact-details columns only) |
 | Phone | 087-2520034 (`tel:+353872520034`) |
+| Email | info@theanalytico.com |
+| Opening hours | 09:00–17:00. **Assumption, flagged 15 Sep 2026**: the client gave times, not days. Stated on the site as Monday to Friday — confirm with the client and correct if wrong. |
+| Reply time | Within 24 hours |
 | Service area | Worldwide |
 | Clients | Three shipped sites, named below |
 | Awards | None |
-| Email | not yet supplied — `[EVIDENCE NEEDED: business email]` |
+| Social profiles | None exist |
+| Founder | 10+ years in digital, SEO and paid media, including work delivered alongside another practitioner prior to this site. One-person operation — no team section on the site. |
+| Company | Founded before this website existed; operated without a web presence until now |
 
 ### Still missing
 
-Street address, postcode, company registration number, opening hours, founding year, team names, social profile URLs, headshots.
+Street address (none — see Location above), postcode, company registration number, founding year, team names/headshots (not applicable — one-person operation), a confirmed maintenance/care-plan price and SLA.
 
 ## Services
 
@@ -157,30 +165,36 @@ Case study screenshots go in `assets/img/work/`, captured from the live URLs. No
 
 ## Content rules
 
-**Current mode: LOCAL PREVIEW ONLY. Not for publication.**
+**Current mode: LAUNCHED. Live and indexable as of 15 Sep 2026.** `robots.txt` allows crawling (`Allow: /`, `Disallow: /api/`), and `noindex` is removed from every page except `logo-options.html` — a dev scratch page, never a real site page, excluded from being served at all via `.assetsignore` rather than relying on its own noindex tag.
 
-The client asked for a visually complete mock-up to review layout. Placeholder testimonials, metrics, and result claims are therefore permitted, under strict marking so none of it can reach production by accident.
+The paragraphs below describe the preview-mode rules that governed the site before this pass. They are kept as a record of what was enforced and why — not because the site is still gated. If placeholder content is ever reintroduced (a new page in progress, a section awaiting client sign-off), apply the same four-part marking rule and the same hard limits again, and re-run this file's own verification before removing `noindex` a second time.
 
-Every fabricated fact must satisfy all four:
+Every fabricated fact had to satisfy all four:
 
 1. Wrapped in an element carrying `data-placeholder="true"`
 2. Preceded by `<!-- PLACEHOLDER: replace before launch — <what is needed> -->`
 3. Using obviously non-real attribution: forename plus role plus sector, e.g. "Aoife M., Practice Owner". No full invented surnames, no invented company names beyond the three real portfolio clients, no stock headshots presented as clients.
 4. Listed in `PLACEHOLDER-CONTENT.md` at the repo root — a single launch checklist of every placeholder, its file, and what real data replaces it
 
-Hard limits that survive preview mode:
+Hard limits that survive launch, permanently, not just during preview:
 
-- No fake review or rating **structured data**. JSON-LD stays truthful — `AggregateRating` and `review` are omitted regardless of what the visible page shows. Fake schema is what triggers Google penalties.
+- No fake review or rating **structured data**. JSON-LD stays truthful — `AggregateRating` and `review` are omitted regardless of what the visible page shows. Fake schema is what triggers Google penalties. See "Testimonials and review schema" for the specific, current reasoning on why the real testimonials still carry no review markup.
 - No invented quotes attributed to the three real clients by name. ArdLens, KC Accountants, and SodoLT are real businesses; a quote from "ArdLens" that they never said is different from a generic placeholder.
-- `robots.txt` disallows all crawling while in preview mode, and every page carries `<meta name="robots" content="noindex, nofollow">`. Both are removed at launch via the checklist.
-
-Keep placeholder numbers plausible, not absurd: "3 sites shipped", "+42% organic sessions in 6 months", not "10× revenue overnight".
+- Keep any future placeholder numbers plausible, not absurd: "3 sites shipped", not "10× revenue overnight".
 
 Insight posts may be written as genuine advice content, since expertise claims about a subject are not claims about past clients.
 
 ### Schema consequence
 
-Dublin base plus worldwide service area means: `ProfessionalService` with `address` limited to `addressLocality: "Dublin"` and `addressCountry: "IE"`, and `areaServed` as `{"@type": "Place", "name": "Worldwide"}`. No `streetAddress`, no `postalCode`, no `AggregateRating`, no `review` until real ones exist.
+Rush base plus worldwide service area means: `ProfessionalService` with `address` as `addressLocality: "Rush"`, `addressRegion: "Co. Dublin"`, `addressCountry: "IE"`, and `areaServed` as `{"@type": "Place", "name": "Worldwide"}`. Add `email` and `openingHoursSpecification` (Monday–Friday, 09:00–17:00 — see the opening-hours assumption in "Business facts"). No `streetAddress`, no `postalCode`.
+
+`AggregateRating` stays banned permanently — no rating of any kind exists.
+
+### Testimonials and review schema
+
+The three testimonials on `index.html` (`#testimonials`) are real, client-approved quotes, published verbatim, cited by first name and client only (Raj, ArdLens; Kat, KC Accountants; Piotr, SodoLT) — confirmed 15 Sep 2026, the final launch pass. No surname, job title, or photograph is shown for any of them because none was supplied.
+
+**Do not add `Review` or `AggregateRating` JSON-LD for these, or any future testimonial on this site.** This was tried as an instruction earlier the same day and reversed: reviews a business publishes about itself, on its own site, are not eligible for Google's review rich results under `LocalBusiness`/`Organization` — Google treats self-published, non-independently-collected reviews as self-serving, and marking them up risks a manual action for a benefit that was never actually available. The quotes stay as plain semantic `blockquote`/`figcaption` markup, visible to users, invisible to structured data. This is a standing rule, not a one-off decision — do not re-add review schema later on the assumption it was simply forgotten.
 
 ## Typography
 
@@ -195,7 +209,7 @@ Site-wide JSON-LD: `LocalBusiness` on home, `Service` on services, `Article` on 
 
 - `_headers`: `Cache-Control: public, max-age=31536000, immutable` for `/assets/*`; CSP, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy` site-wide.
 - `_redirects`: strip `.html`, force a single canonical host.
-- Contact form posts to `/api/contact`, handled by `functions/api/contact.js`. Validate server-side, protect with Cloudflare Turnstile, send via Resend. Secrets come from Pages environment variables, never from the repo.
+- Contact form posts to `/api/contact`, handled by `functions/api/contact.js`. Validate server-side, protect with Cloudflare Turnstile, send over raw SMTP to Purelymail (`cloudflare:sockets`) — corrected 15 Sep 2026, this line said Resend, an earlier approach the code no longer uses; see `functions/api/contact.js`'s own header comment and `wrangler.toml`'s notes section. Secrets come from Pages environment variables, never from the repo: `TURNSTILE_SECRET_KEY` and `SMTP_PASS` are the two that actually gate the form.
 
 ## Model policy
 
