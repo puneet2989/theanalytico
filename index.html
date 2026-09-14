@@ -30,9 +30,715 @@
   <link rel="preload" href="/assets/fonts/inter-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/space-grotesk-500.woff2" as="font" type="font/woff2" crossorigin>
 
-  <link rel="stylesheet" href="/assets/css/tokens.css">
-  <link rel="stylesheet" href="/assets/css/base.css">
-  <link rel="stylesheet" href="/assets/css/components.css">
+  <!-- Critical CSS, 14 Sep 2026 (Lighthouse render-blocking-CSS fix).
+       Hand-extracted, not build-generated — this project has no build
+       step. Covers: tokens.css's :root custom properties (no @font-face;
+       those aren't needed for a correct first paint, see critical-css.js's
+       own comment), base.css in full, and a curated header/nav/button/
+       eyebrow/page-intro subset of components.css plus the hero's own rules (index.html only). Keep this in sync by hand if any of those source rules change —
+       see CLAUDE.md, "Render-blocking CSS", for the exact scope and the
+       maintenance cost this carries. -->
+  <style>
+    :root {
+
+      --ink:        #1a1a1a;
+      --ink-soft:   #6b6b6b;
+      --ink-black:  #0a0a0a;
+      --surface:    #ffffff;
+      --line:       #e3e3e3;
+      --accent:     #e5804b;
+
+      --ink-05: rgba(26, 26, 26, 0.05);
+      --ink-08: rgba(26, 26, 26, 0.08);
+      --ink-12: rgba(26, 26, 26, 0.12);
+      --ink-60: rgba(26, 26, 26, 0.60);
+      --surface-70: rgba(255, 255, 255, 0.70);
+      --surface-85: rgba(255, 255, 255, 0.85);
+      --accent-12: rgba(229, 128, 75, 0.12);
+      --focus-ring: #1a1a1a;
+
+      --header-pill-bg: rgba(235, 235, 235, 0.94);
+
+      --accent-strong: #a84f1f;
+
+      --surface-60: rgba(255, 255, 255, 0.60);
+
+      --surface-20: rgba(255, 255, 255, 0.20);
+      --surface-35: rgba(255, 255, 255, 0.35);
+      --surface-55: rgba(255, 255, 255, 0.55);
+
+      --fs-display: clamp(2.75rem, 1.1rem + 7.6vw, 8rem);
+
+      --fs-display-sub: clamp(1.75rem, 1.35rem + 2.1vw, 3rem);
+      --fs-h1:      clamp(2.5rem, 1.35rem + 5.1vw, 5.5rem);
+      --fs-h2:      clamp(2rem, 1.3rem + 3.1vw, 3.75rem);
+      --fs-h3:      clamp(1.5rem, 1.15rem + 1.55vw, 2.5rem);
+      --fs-h4:      clamp(1.25rem, 1.1rem + 0.67vw, 1.625rem);
+      --fs-lead:    clamp(1.125rem, 1.02rem + 0.45vw, 1.375rem);
+      --fs-body:    clamp(1rem, 0.96rem + 0.18vw, 1.125rem);
+      --fs-small:   clamp(0.875rem, 0.85rem + 0.11vw, 0.9375rem);
+      --fs-micro:   clamp(0.75rem, 0.73rem + 0.09vw, 0.8125rem);
+
+      --lh-display: 0.90;
+      --lh-heading: 1.04;
+      --lh-sub:     1.2;
+      --lh-body:    1.6;
+      --lh-tight:   1.05;
+
+      --ls-display: -0.04em;
+      --ls-heading: -0.03em;
+      --ls-body:    -0.005em;
+      --ls-caps:    0.08em;
+
+      --fw-body:     400;
+      --fw-medium:   500;
+      --fw-heading:  600;
+
+      --font-heading: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+      --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
+      --font-mono: "Space Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+
+      --s-1: 4px;
+      --s-2: 8px;
+      --s-3: 12px;
+      --s-4: 16px;
+      --s-5: 24px;
+      --s-6: 32px;
+      --s-7: 48px;
+      --s-8: 64px;
+      --s-9: 96px;
+      --s-10: 128px;
+
+      --section-pad-y: clamp(72px, 3vw + 32px, 96px);
+      --section-pad-x: clamp(20px, 3vw, 48px);
+      --gap-card: var(--s-5);
+      --gap-grid: var(--s-6);
+
+      --radius-xs: 4px;
+      --radius-sm: 8px;
+      --radius-md: 16px;
+      --radius-lg: 24px;
+      --radius-xl: 32px;
+      --radius-pill: 999px;
+
+      --shadow-xs: 0 1px 2px rgba(26, 26, 26, 0.04);
+      --shadow-sm: 0 2px 8px rgba(26, 26, 26, 0.06);
+      --shadow-md: 0 8px 24px rgba(26, 26, 26, 0.08);
+      --shadow-lg: 0 16px 48px rgba(26, 26, 26, 0.10);
+
+      --shadow-pill: 0 4px 24px rgba(26, 26, 26, 0.10), 0 1px 2px rgba(26, 26, 26, 0.18);
+
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+      --ease-soft: cubic-bezier(0.33, 1, 0.68, 1);
+
+      --dur-instant: 120ms;
+      --dur-fast: 200ms;
+      --dur-base: 320ms;
+      --dur-header: 450ms;
+      --dur-slow: 600ms;
+      --dur-reveal: 800ms;
+
+      --stroke-hairline: 1.5px;
+
+      --opacity-hint: 0.45;
+
+      --z-below: -1;
+      --z-base: 0;
+      --z-raised: 10;
+      --z-sticky: 100;
+      --z-header: 200;
+      --z-drawer: 300;
+      --z-cursor: 400;
+
+      --container-max: 1320px;
+      --container-narrow: 760px;
+      --container-text: 66ch;
+      --header-pill-max: 1120px;
+
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html {
+      -webkit-text-size-adjust: 100%;
+    }
+
+    * {
+      margin: 0;
+    }
+
+    html,
+    body {
+      height: 100%;
+    }
+
+    body {
+      font-family: var(--font-body);
+      font-size: var(--fs-body);
+      line-height: var(--lh-body);
+      letter-spacing: var(--ls-body);
+      font-weight: var(--fw-body);
+      color: var(--ink);
+      background: var(--surface);
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      font-family: var(--font-heading);
+      color: var(--ink-black);
+      font-weight: var(--fw-medium);
+      letter-spacing: var(--ls-heading);
+      line-height: var(--lh-heading);
+    }
+
+    h1 {
+      font-size: var(--fs-h1);
+    }
+
+    h2 {
+      font-size: var(--fs-h2);
+    }
+
+    h3 {
+      font-size: var(--fs-h3);
+    }
+
+    h4 {
+      font-size: var(--fs-h4);
+    }
+
+    p,
+    li,
+    dd {
+      text-wrap: pretty;
+    }
+
+    img,
+    svg,
+    video {
+      display: block;
+      max-width: 100%;
+    }
+
+    button,
+    input,
+    textarea,
+    select {
+      font: inherit;
+      color: inherit;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    ul[class],
+    ol[class] {
+      list-style: none;
+      padding-inline-start: 0;
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--focus-ring);
+      outline-offset: 3px;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      inline-size: 1px;
+      block-size: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      clip-path: inset(50%);
+      white-space: nowrap;
+      border: 0;
+      padding: 0;
+      margin: -1px;
+    }
+
+    .skip-link {
+      position: absolute;
+      inset-block-start: var(--s-2);
+      inset-inline-start: var(--s-2);
+      z-index: var(--z-drawer);
+      padding: var(--s-3) var(--s-4);
+      background: var(--surface);
+      color: var(--ink);
+      border-radius: var(--radius-sm);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-200%);
+      transition: transform var(--dur-fast) var(--ease-out);
+    }
+
+    .skip-link:focus {
+      transform: translateY(0);
+    }
+
+    .container {
+      max-width: var(--container-max);
+      margin-inline: auto;
+      padding-inline: var(--section-pad-x);
+    }
+
+    .container--narrow {
+      max-width: var(--container-narrow);
+      margin-inline: auto;
+      padding-inline: var(--section-pad-x);
+    }
+
+    .section {
+      position: relative;
+      padding-block: var(--section-pad-y);
+    }
+
+    .section--blue,
+    .section--cream {
+      background: var(--surface);
+      color: var(--ink);
+    }
+
+    .section--grey {
+      background: var(--ink-black);
+      color: var(--surface);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    section[id] {
+      scroll-margin-top: 96px;
+    }
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--s-3);
+      color: var(--ink);
+      text-decoration: none;
+    }
+    .logo__words {
+      display: flex;
+      flex-direction: row;
+      align-items: baseline;
+      overflow: hidden;
+      font-size: var(--fs-h3);
+    }
+    .logo__line1 {
+      font-family: var(--font-heading);
+      font-size: 0.95em;
+      font-weight: var(--fw-medium);
+      letter-spacing: var(--ls-heading);
+      color: var(--accent-strong);
+    }
+    .logo__line2 {
+      font-family: var(--font-heading);
+      font-size: var(--fs-h3);
+      font-weight: var(--fw-heading);
+      letter-spacing: var(--ls-display);
+      color: var(--ink);
+    }
+    .header {
+      position: fixed;
+      inset-block-start: 0;
+      inset-inline: 0;
+      z-index: var(--z-header);
+    }
+    .header__shell {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--s-5);
+      min-height: 72px;
+      max-width: var(--container-max);
+      margin-inline: auto;
+      padding-block: var(--s-3);
+      padding-inline: var(--section-pad-x);
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+      contain: layout paint;
+    }
+    [data-header-state="pinned"] .header__shell,
+    html[data-header-boot="pinned"] .header__shell {
+      max-width: min(var(--header-pill-max), calc(100% - var(--s-4) * 2));
+      margin-block-start: var(--s-2);
+      padding-block: var(--s-3);
+      border-radius: var(--radius-pill);
+      background: var(--header-pill-bg);
+      border: 1px solid var(--ink-12);
+      backdrop-filter: blur(16px);
+      box-shadow: var(--shadow-pill);
+    }
+    [data-header-state="pinned"] .logo__line1,
+    html[data-header-boot="pinned"] .logo__line1 {
+      opacity: 0;
+      max-inline-size: 0;
+      overflow: hidden;
+    }
+    [data-header-state="pinned"] .logo__line2,
+    html[data-header-boot="pinned"] .logo__line2 {
+      font-size: var(--fs-h4);
+    }
+    .header__nav {
+      display: none;
+    }
+    .header__list {
+      display: flex;
+      align-items: center;
+      gap: var(--s-6);
+    }
+    .header__list a {
+      display: inline-block;
+      padding-block: var(--s-2);
+      font-size: var(--fs-small);
+      color: var(--ink);
+      text-decoration: none;
+    }
+    .header__list a:hover {
+      color: var(--accent-strong);
+    }
+    .header__list a[aria-current="page"] {
+      font-weight: var(--fw-medium);
+      color: var(--accent-strong);
+    }
+    [data-theme="hero-dark"] [data-header-state="top"] .logo__line1 {
+      color: var(--accent);
+    }
+    [data-theme="hero-dark"] [data-header-state="top"] .logo__line2,
+    [data-theme="hero-dark"] [data-header-state="top"] .header__list a {
+      color: var(--surface);
+    }
+    [data-theme="hero-dark"] [data-header-state="top"] .header__burger-bar {
+      background: var(--surface);
+    }
+    [data-theme="hero-dark"] [data-header-state="top"] .header__list a:hover,
+    [data-theme="hero-dark"] [data-header-state="top"] .header__list a[aria-current="page"] {
+      color: var(--accent);
+    }
+    .header__shell .header__cta {
+      display: none;
+    }
+    .header__burger {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--s-1);
+      width: 40px;
+      height: 40px;
+      background: none;
+      border: 0;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+    }
+    .header__burger-bar {
+      width: 20px;
+      height: 2px;
+      background: var(--ink);
+      border-radius: var(--radius-pill);
+      transition: transform var(--dur-fast) var(--ease-out),
+        opacity var(--dur-fast) var(--ease-out);
+    }
+    .header__burger[aria-expanded="true"] .header__burger-bar:nth-child(1) {
+      transform: translateY(6px) rotate(45deg);
+    }
+    .header__burger[aria-expanded="true"] .header__burger-bar:nth-child(2) {
+      opacity: 0;
+    }
+    .header__burger[aria-expanded="true"] .header__burger-bar:nth-child(3) {
+      transform: translateY(-6px) rotate(-45deg);
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--s-2);
+      padding: var(--s-3) var(--s-6);
+      border-radius: var(--radius-pill);
+      font-family: var(--font-heading);
+      font-size: var(--fs-small);
+      font-weight: var(--fw-medium);
+      text-decoration: none;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: background-color var(--dur-fast) var(--ease-out),
+        color var(--dur-fast) var(--ease-out),
+        border-color var(--dur-fast) var(--ease-out),
+        box-shadow var(--dur-fast) var(--ease-out),
+        transform var(--dur-fast) var(--ease-out);
+    }
+    .btn--primary {
+      background: var(--ink);
+      color: var(--surface);
+    }
+    .btn--primary:hover,
+    .btn--primary:focus-visible {
+      background: var(--accent-strong);
+      color: var(--surface);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+    .btn--primary:active {
+      transform: translateY(0);
+      box-shadow: var(--shadow-sm);
+    }
+    .btn--ghost {
+      background: transparent;
+      color: var(--ink);
+      border-color: var(--line);
+    }
+    .btn--ghost:hover,
+    .btn--ghost:focus-visible {
+      background: var(--ink);
+      color: var(--surface);
+      border-color: var(--ink);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+    .btn--ghost:active {
+      transform: translateY(0);
+      box-shadow: none;
+    }
+    .btn--pill.header__cta {
+      padding: var(--s-2) var(--s-5);
+      background: var(--ink);
+      color: var(--surface);
+      box-shadow: var(--shadow-sm);
+    }
+    .btn--pill.header__cta:hover,
+    .btn--pill.header__cta:focus-visible {
+      background: var(--accent-strong);
+      color: var(--surface);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+    .btn--pill.header__cta:active {
+      transform: translateY(0);
+      box-shadow: var(--shadow-sm);
+    }
+    .label-mono,
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: var(--fs-micro);
+      font-weight: 400;
+      letter-spacing: var(--ls-caps);
+      text-transform: uppercase;
+      color: var(--ink-soft);
+    }
+    .eyebrow {
+      display: inline-block;
+      padding: var(--s-1) var(--s-4);
+      border-radius: var(--radius-pill);
+      background: var(--ink-05);
+    }
+    .section--center > .eyebrow {
+      display: block;
+      width: fit-content;
+      margin-inline: auto;
+      text-align: center;
+    }
+    .section--center > [data-mask-heading],
+    .section--center > .page__title {
+      text-align: center;
+    }
+    .section--center > .section__lead,
+    .section--center > .cta__lead,
+    .section--center > .page__lead {
+      max-width: var(--container-text);
+      margin-inline: auto;
+      text-align: center;
+    }
+    [data-mask-heading]::before {
+      content: "";
+      display: block;
+      width: var(--s-6);
+      margin-block-end: var(--s-3);
+      border-block-start: 1px dotted var(--line);
+    }
+    .section--center > [data-mask-heading]::before {
+      margin-inline: auto;
+    }
+    .page__title {
+      margin-block-start: var(--s-4);
+      font-size: var(--fs-h1);
+      font-weight: var(--fw-medium);
+      line-height: var(--lh-heading);
+      letter-spacing: var(--ls-heading);
+      color: var(--ink-black);
+    }
+    .page__lead {
+      margin-block-start: var(--s-5);
+      font-size: var(--fs-lead);
+      color: var(--ink-soft);
+      max-width: var(--container-text);
+    }
+    @media (min-width: 768px) {
+      .header__nav {
+        display: flex;
+      }
+      .header__shell .header__cta {
+        display: inline-flex;
+      }
+      .header__burger {
+        display: none;
+      }
+    }
+
+    .hero {
+      position: relative;
+      z-index: var(--z-raised);
+      height: 100svh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding-inline: var(--section-pad-x);
+      padding-block: 0;
+      background: var(--ink-black);
+      border-radius: 0;
+      margin-block-start: 0;
+    }
+    .hero__grid {
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      color: var(--surface);
+      opacity: 0.08;
+    }
+    .hero__grid-lines {
+      display: block;
+      width: 100%;
+      height: 100%;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1;
+    }
+    .hero__grid-cross {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1;
+    }
+    .hero__counterweight {
+      position: absolute;
+      inset-block-end: -8%;
+      inset-inline-end: -6%;
+      z-index: -1;
+      width: min(46vw, 620px);
+      aspect-ratio: 1;
+      color: var(--surface);
+      opacity: 0.18;
+    }
+    .hero__counterweight svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1;
+    }
+    .hero__title {
+      margin: 0;
+      font-size: var(--fs-display-sub);
+      font-weight: var(--fw-medium);
+      line-height: var(--lh-display);
+      letter-spacing: var(--ls-display);
+      color: var(--surface);
+      white-space: nowrap;
+    }
+    .hero__title .word,
+    [data-mask-heading] .word {
+      padding-bottom: 0.2em;
+      margin-bottom: -0.2em;
+    }
+    .hero__pillar {
+      position: relative;
+      margin-inline: calc(-1 * var(--section-pad-x));
+      padding-inline: var(--section-pad-x);
+      padding-block-end: var(--s-6);
+      border-block-end: 1px solid var(--surface-20);
+    }
+    .hero__pillar-window {
+      position: relative;
+    }
+    .hero__pillar-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .hero__pillar-name {
+      margin: 0;
+      padding-bottom: 0.18em;
+      font-size: var(--fs-display);
+      font-weight: var(--fw-medium);
+      line-height: var(--lh-display);
+      letter-spacing: var(--ls-display);
+      color: var(--surface);
+      white-space: nowrap;
+    }
+    .hero__pillar-index {
+      display: inline-block;
+      margin-block-start: var(--s-3);
+    }
+    .hero .label-mono {
+      color: var(--surface-60);
+    }
+    .hero__scroll-cue {
+      position: absolute;
+      inset-block-start: var(--s-6);
+      inset-inline-end: var(--s-6);
+      z-index: var(--z-raised);
+      padding: var(--s-2) var(--s-2) var(--s-2) var(--s-3);
+      border-inline-start: 1px dotted var(--surface-20);
+    }
+    .hero__scroll-cue-label {
+      font-family: var(--font-mono);
+      font-size: var(--fs-micro);
+      letter-spacing: var(--ls-caps);
+      text-transform: uppercase;
+      color: var(--surface-60);
+      writing-mode: vertical-rl;
+    }
+    .hero__telemetry {
+      position: absolute;
+      inset-inline: 0;
+      inset-block-end: 0;
+      z-index: var(--z-raised);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--s-5) var(--section-pad-x);
+      border-block-start: 1px dotted var(--surface-20);
+    }
+  </style>
+
+  <link rel="preload" href="/assets/css/tokens.css" as="style">
+  <link rel="preload" href="/assets/css/base.css" as="style">
+  <link rel="preload" href="/assets/css/components.css" as="style">
+
+  <script src="/assets/js/critical-css.js" data-css="/assets/css/tokens.css,/assets/css/base.css,/assets/css/components.css"></script>
+
+  <noscript>
+    <link rel="stylesheet" href="/assets/css/tokens.css">
+    <link rel="stylesheet" href="/assets/css/base.css">
+    <link rel="stylesheet" href="/assets/css/components.css">
+  </noscript>
 
   <script type="application/ld+json">
   {
@@ -174,7 +880,7 @@
       <ol class="services-pin__list" data-services-pin-list>
         <li class="services-pin__item" data-services-pin-item="0">
           <div class="services-pin__panel" data-services-pin-panel="0">
-            <img class="services-pin__poster" data-services-pin-poster src="/assets/video/panel-web-poster.webp" alt="" aria-hidden="true" width="1280" height="720">
+            <img class="services-pin__poster" data-services-pin-poster src="/assets/video/panel-web-poster.webp" alt="" aria-hidden="true" width="744" height="418">
             <video class="services-pin__video" data-services-pin-video muted playsinline preload="none" aria-hidden="true" data-video-src="/assets/video/panel-web.mp4"></video>
           </div>
           <h3 class="services-pin__title">Web Design</h3>
@@ -183,7 +889,7 @@
         </li>
         <li class="services-pin__item" data-services-pin-item="1">
           <div class="services-pin__panel" data-services-pin-panel="1">
-            <img class="services-pin__poster" data-services-pin-poster src="/assets/video/panel-seo-poster.webp" alt="" aria-hidden="true" width="1280" height="720">
+            <img class="services-pin__poster" data-services-pin-poster src="/assets/video/panel-seo-poster.webp" alt="" aria-hidden="true" width="744" height="418">
             <video class="services-pin__video" data-services-pin-video muted playsinline preload="none" aria-hidden="true" data-video-src="/assets/video/panel-seo.mp4"></video>
           </div>
           <h3 class="services-pin__title">SEO</h3>
@@ -192,7 +898,7 @@
         </li>
         <li class="services-pin__item" data-services-pin-item="2">
           <div class="services-pin__panel" data-services-pin-panel="2">
-            <img class="services-pin__poster" data-services-pin-poster src="/assets/video/panel-paid-poster.webp" alt="" aria-hidden="true" width="1280" height="720">
+            <img class="services-pin__poster" data-services-pin-poster src="/assets/video/panel-paid-poster.webp" alt="" aria-hidden="true" width="744" height="418">
             <video class="services-pin__video" data-services-pin-video muted playsinline preload="none" aria-hidden="true" data-video-src="/assets/video/panel-paid.mp4"></video>
           </div>
           <h3 class="services-pin__title">Paid Advertising</h3>
@@ -201,7 +907,7 @@
         </li>
         <li class="services-pin__item" data-services-pin-item="3">
           <div class="services-pin__panel" data-services-pin-panel="3">
-            <img class="services-pin__poster" data-services-pin-poster src="/assets/video/panel-ai-poster.webp" alt="" aria-hidden="true" width="1280" height="720">
+            <img class="services-pin__poster" data-services-pin-poster src="/assets/video/panel-ai-poster.webp" alt="" aria-hidden="true" width="744" height="418">
             <video class="services-pin__video" data-services-pin-video muted playsinline preload="none" aria-hidden="true" data-video-src="/assets/video/panel-ai.mp4"></video>
           </div>
           <h3 class="services-pin__title">AI Services</h3>

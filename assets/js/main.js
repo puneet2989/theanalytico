@@ -115,22 +115,42 @@ safeInit('contact-form', () =>
   initContactForm({ gsap, ScrollTrigger, lenis, reduced, isMobile })
 );
 
-// 4. Every other module, in no particular order relative to each other,
-// EXCEPT that hero-headline and services-pin must be first, in that
-// order: both pin (services-pin.js added 15 Sep 2026, on desktop/motion-
-// allowed only), reserving page height via a ScrollTrigger pin-spacer, and
-// every ScrollTrigger created before a given spacer exists in the DOM
-// measures a page shorter than its real, final layout. GSAP does not
-// appear to correct this on a later refresh() for triggers already
-// created against the shorter layout — confirmed by hand for this exact
-// class of bug — so the fix is ordering, not a refresh() call: nothing
-// that creates a ScrollTrigger of its own may run before both pins do.
-// services-pin.js sits below the hero in the page, so it must still come
-// after hero-headline even though the reasoning for each is the same.
-const remainingModules = [
-  ['hero-headline', initHeroHeadline],
+// 4. Hero modules run immediately too, same as 1-3 above: both are above
+// the fold on every page that has a hero (hero-tilt's own hook,
+// [data-hero-tilt], does not currently exist in any page's markup, so it
+// no-ops immediately regardless — kept here anyway because it is a hero
+// module, not a below-the-fold one, and costs nothing to call). Scheduling
+// change, 14 Sep 2026 (Lighthouse TBT fix): everything below the fold used
+// to run synchronously in this same block. See the deferred list below for
+// what moved and why the pin-spacer ordering rule still holds across the
+// split.
+safeInit('hero-headline', () =>
+  initHeroHeadline({ gsap, ScrollTrigger, lenis, reduced, isMobile })
+);
+safeInit('hero-tilt', () => initHeroTilt({ gsap, ScrollTrigger, lenis, reduced, isMobile }));
+
+// 5. Everything else initialises only once the user actually scrolls, or
+// once the main thread goes idle — whichever happens first — rather than
+// synchronously on load. Most of these modules drive content below the
+// fold (cards, KPI counters, the testimonial carousel, later services-pin
+// panels); running all of it up front was the largest single contributor
+// to Total Blocking Time, since GSAP/ScrollTrigger setup for a dozen+
+// modules the user has not scrolled near yet was still competing with the
+// hero's own paint for main-thread time.
+//
+// Ordering constraint carried over unchanged from the pre-split code: both
+// hero-headline (immediate, above) and services-pin pin their section,
+// reserving page height via a ScrollTrigger pin-spacer, and every
+// ScrollTrigger created before a given spacer exists in the DOM measures a
+// page shorter than its real, final layout — confirmed by hand, and a
+// later refresh() does not correct triggers already created against the
+// shorter layout. services-pin therefore still has to run before every
+// module in this list, exactly as it did in the old single synchronous
+// block; splitting the module list in two does not relax that rule, it
+// just moves the entire ordered remainder from "on load" to "on first
+// scroll or idle".
+const deferredModules = [
   ['services-pin', initServicesPin],
-  ['hero-tilt', initHeroTilt],
   ['heading-mask', initHeadingMask],
   ['section-curtain', initSectionCurtain],
   ['flowmap-trail', initFlowmapTrail],
@@ -146,30 +166,60 @@ const remainingModules = [
   ['reveal-stagger', initRevealStagger],
 ];
 
-for (const [name, initFn] of remainingModules) {
-  safeInit(name, () => initFn({ gsap, ScrollTrigger, lenis, reduced, isMobile }));
+let deferredModulesRan = false;
+
+function runDeferredModules() {
+  if (deferredModulesRan) return;
+  deferredModulesRan = true;
+  window.removeEventListener('scroll', onFirstScroll);
+
+  for (const [name, initFn] of deferredModules) {
+    safeInit(name, () => initFn({ gsap, ScrollTrigger, lenis, reduced, isMobile }));
+  }
+
+  // testimonial-marquee.js and testimonial-dissolve.js still run last of
+  // all, after everything above, for the same pin-spacer reason: both
+  // create their own ScrollTrigger (the marquee's pause-on-scroll-out
+  // state, the dissolve crossfade per figure), so both used to measure the
+  // testimonials section's scroll position too early and freeze the
+  // marquee mid-drift — cut off mid-word at both edges — the entire time
+  // the section was actually on screen. Their own relative order is also
+  // unchanged: the marquee clones slide DOM to make the loop seamless, and
+  // cloneNode does not copy a canvas bitmap, so the marquee must still run
+  // before the dissolve module builds a real canvas for every figure,
+  // originals and clones alike.
+  safeInit('testimonial-marquee', () =>
+    initTestimonialMarquee({ gsap, ScrollTrigger, lenis, reduced, isMobile })
+  );
+  safeInit('testimonial-dissolve', () =>
+    initTestimonialDissolve({ gsap, ScrollTrigger, lenis, reduced, isMobile })
+  );
+
+  // The page just gained every deferred module's own pin-spacers and
+  // triggers, changing total page height — refresh once more so the
+  // immediate group's own triggers (created against the shorter, pre-defer
+  // layout) pick up the final measurements too.
+  ScrollTrigger.refresh();
 }
 
-// 5. testimonial-marquee.js and testimonial-dissolve.js run last, after
-// hero-headline above, for the pin-spacer reason in the comment on 4: both
-// create their own ScrollTrigger (the marquee's pause-on-scroll-out state,
-// the dissolve crossfade per figure), so both used to measure the
-// testimonials section's scroll position too early and freeze the marquee
-// mid-drift — cut off mid-word at both edges — the entire time the
-// section was actually on screen. Their own relative
-// order is unchanged: the marquee clones slide DOM to make the loop
-// seamless, and cloneNode does not copy a canvas bitmap, so the marquee
-// must still run before the dissolve module builds a real canvas for
-// every figure, originals and clones alike.
-safeInit('testimonial-marquee', () =>
-  initTestimonialMarquee({ gsap, ScrollTrigger, lenis, reduced, isMobile })
-);
-safeInit('testimonial-dissolve', () =>
-  initTestimonialDissolve({ gsap, ScrollTrigger, lenis, reduced, isMobile })
-);
+function onFirstScroll() {
+  runDeferredModules();
+}
+
+window.addEventListener('scroll', onFirstScroll, { passive: true, once: true });
+
+if ('requestIdleCallback' in window) {
+  requestIdleCallback(runDeferredModules, { timeout: 2000 });
+} else {
+  // Safari has no requestIdleCallback. A short timeout is the fallback,
+  // not a second RAF loop — this fires once, same as the branch above.
+  setTimeout(runDeferredModules, 200);
+}
 
 // Refresh ScrollTrigger once fonts settle, so trigger positions account
-// for the final layout metrics.
+// for the final layout metrics. Independent of the deferred-module
+// refresh above — this one covers the immediate group whenever fonts
+// finish after it, the deferred group whenever fonts finish before it.
 document.fonts.ready.then(() => {
   ScrollTrigger.refresh();
 });
